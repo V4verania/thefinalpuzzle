@@ -7,14 +7,16 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <!-- 🔐 Code Gate -->
   <div id="veil">
     <h1>The Final Puzzle</h1>
     <p class="intro">Enter your invitation code to begin the ritual.</p>
     <input type="text" id="codeInput" placeholder="Enter your code..." />
-    <button onclick="validateCode()">Submit</button>
-    <p id="gateMessage"></p>
+    <button id="submitCode">Submit</button>
+    <p id="gateMessage" class="fade"></p>
   </div>
 
+  <!-- 🧩 Riddle Maze -->
   <div id="maze" class="hidden">
     <div id="riddleContainer">
       <p id="riddleText" class="fade"></p>
@@ -23,10 +25,16 @@
     </div>
   </div>
 
+  <!-- 🕯️ Final Reveal -->
   <div id="reveal" class="hidden">
-    <!-- Final reveal content will be injected here -->
+    <!-- Content injected by script.js -->
   </div>
 
   <script src="script.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("submitCode").onclick = validateCode;
+    });
+  </script>
 </body>
 </html>
