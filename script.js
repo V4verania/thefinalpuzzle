@@ -92,26 +92,25 @@ What did they whisper to end the play?”`,
 ];
 
 let currentStep = 0;
+let guestCode = "";
 
 async function validateCode() {
-  const code = document.getElementById("codeInput").value;
+  guestCode = document.getElementById("codeInput").value;
   const gateMessage = document.getElementById("gateMessage");
 
   try {
     const res = await fetch("https://thefinalpuzzle-worker.thefinalpuzzle.workers.dev", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code })
+      body: JSON.stringify({ code: guestCode })
     });
 
     const data = await res.json();
 
-    if (data.valid && data.revealed) {
+    if (data.valid) {
       document.getElementById("veil").classList.add("hidden");
       document.getElementById("maze").classList.remove("hidden");
       showRiddle();
-    } else if (data.valid && !data.revealed) {
-      gateMessage.textContent = "The veil stirs, but the time is not yet right.";
     } else {
       gateMessage.textContent = "The veil does not recognize you.";
     }
@@ -138,8 +137,7 @@ function showRiddle() {
         if (currentStep < riddles.length) {
           setTimeout(showRiddle, 2000);
         } else {
-          document.getElementById("maze").classList.add("hidden");
-          document.getElementById("reveal").classList.remove("hidden");
+          showFinalReveal();
         }
       } else {
         feedback.textContent = "The veil shudders. That is not the path.";
@@ -147,4 +145,28 @@ function showRiddle() {
     };
     choicesDiv.appendChild(btn);
   });
+}
+
+function showFinalReveal() {
+  document.getElementById("maze").classList.add("hidden");
+  document.getElementById("reveal").classList.remove("hidden");
+
+  const now = new Date();
+  const revealDate = new Date("2026-02-01T00:00:00");
+
+  if (now < revealDate) {
+    const daysLeft = Math.ceil((revealDate - now) / (1000 * 60 * 60 * 24));
+    document.getElementById("reveal").innerHTML = `
+      <h2>You have reached the inner sanctum.</h2>
+      <p class="fade">The dossiers remain sealed.</p>
+      <p class="fade">The flame will reveal them in <strong>${daysLeft} days</strong>...</p>
+    `;
+  } else {
+    document.getElementById("reveal").innerHTML = `
+      <h2>Your character dossier is ready.</h2>
+      <p class="fade">The veil parts. Your role awaits...</p>
+      <p class="fade">Code: <strong>${guestCode}</strong></p>
+      <!-- TODO: Load dossier based on code -->
+    `;
+  }
 }
