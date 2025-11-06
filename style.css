@@ -1,0 +1,30 @@
+body {
+  background: #0b0b0b;
+  color: #f0e6d2;
+  font-family: 'Georgia', serif;
+  text-align: center;
+  padding: 2em;
+}
+
+input, button {
+  padding: 0.5em;
+  font-size: 1em;
+  margin-top: 1em;
+}
+
+button {
+  background: #3c2a4d;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+.hidden {
+  display: none;
+}
+
+#choices button {
+  display: block;
+  margin: 0.5em auto;
+  width: 60%;
+}
