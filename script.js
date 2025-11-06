@@ -187,3 +187,8 @@ function showFinalReveal() {
 
     revealDiv.innerHTML = `
       <h2 class="fade">You have reached the inner sanctum.</h2
+
+      document.addEventListener("DOMContentLoaded", () => {
+  const button = document.getElementById("submitCode");
+  if (button) button.addEventListener("click", validateCode);
+});
