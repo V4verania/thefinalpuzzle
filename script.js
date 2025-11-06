@@ -96,12 +96,14 @@ function validateCode() {
   guestCode = document.getElementById("codeInput").value.trim();
   const gateMessage = document.getElementById("gateMessage");
 
-  if (guestCode === "RESETALL") {
-    localStorage.setItem("lockouts", JSON.stringify({}));
-    gateMessage.textContent = "✅ All lockouts have been cleared.";
-    gateMessage.classList.add("fade");
-    return;
-  }
+if (guestCode === "RESETALL") {
+  localStorage.setItem("lockouts", JSON.stringify({}));
+  lockouts = {}; // ✅ Clear in-memory copy too
+  gateMessage.textContent = "✅ All lockouts have been cleared.";
+  gateMessage.classList.add("fade");
+  return;
+}
+
 
   const lockoutUntil = lockouts[guestCode];
   if (lockoutUntil) {
