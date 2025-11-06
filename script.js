@@ -202,4 +202,28 @@ function showFinalReveal() {
       </div>
     `;
   } else {
-    revealDiv
+    revealDiv.innerHTML = `
+      <h2 class="fade">Your character dossier is ready.</h2>
+      <p class="fade">The veil parts. Your role awaits...</p>
+      <p class="fade">Code: <strong>${guestCode}</strong></p>
+      <!-- TODO: Load dossier based on code -->
+    `;
+  }
+}
+
+// ✅ DOM Ready: Attach listeners
+document.addEventListener("DOMContentLoaded", () => {
+  const button = document.getElementById("submitCode");
+  if (button) button.addEventListener("click", validateCode);
+
+  const muteToggle = document.getElementById("muteToggle");
+  const ambientAudio = document.getElementById("ambientAudio");
+
+  if (muteToggle && ambientAudio) {
+    muteToggle.addEventListener("click", () => {
+      ambientAudio.muted = !ambientAudio.muted;
+      muteToggle.textContent = ambientAudio.muted ? "🔇" : "🔊";
+    });
+  }
+});
+
