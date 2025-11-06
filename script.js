@@ -186,9 +186,5 @@ function showFinalReveal() {
     const percent = Math.min(100, Math.floor((1 - (revealDate - now) / (revealDate - new Date("2025-11-01T00:00:00"))) * 100));
 
     revealDiv.innerHTML = `
-      <h2 class="fade">You have reached the inner sanctum.</h2
-
-      document.addEventListener("DOMContentLoaded", () => {
-  const button = document.getElementById("submitCode");
-  if (button) button.addEventListener("click", validateCode);
-});
+      <h2 class="fade">You have reached the inner sanctum.</h2>
+      <p
