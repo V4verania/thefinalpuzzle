@@ -95,18 +95,7 @@ let currentStep = 0;
 let guestCode = "";
 let lockouts = JSON.parse(localStorage.getItem("lockouts") || "{}");
 
-function fadeOut(el) {
-  el.classList.add("fade-out");
-  setTimeout(() => el.classList.add("hidden"), 1000);
-}
-
-function fadeIn(el) {
-  el.classList.remove("hidden");
-  el.classList.remove("fade-out");
-  el.classList.add("fade");
-}
-
-async function validateCode() {
+function validateCode() {
   guestCode = document.getElementById("codeInput").value.trim();
   const gateMessage = document.getElementById("gateMessage");
 
@@ -124,27 +113,26 @@ async function validateCode() {
     }
   }
 
-  try {
-    const res = await fetch("https://thefinalpuzzle-worker.thefinalpuzzle.workers.dev", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code: guestCode })
-    });
-
-    const data = await res.json();
-
-    if (data.valid) {
-      fadeOut(document.getElementById("veil"));
-      setTimeout(() => fadeIn(document.getElementById("maze")), 1000);
-      showRiddle();
-    } else {
-      gateMessage.textContent = "❌ The veil does not recognize you.";
+  fetch("https://thefinalpuzzle-worker.thefinalpuzzle.workers.dev", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ code: guestCode })
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.valid) {
+        document.getElementById("veil").classList.add("hidden");
+        document.getElementById("maze").classList.remove("hidden");
+        showRiddle();
+      } else {
+        gateMessage.textContent = "❌ The veil does not recognize you.";
+        gateMessage.classList.add("fade");
+      }
+    })
+    .catch(() => {
+      gateMessage.textContent = "⚠️ The ritual failed. Try again.";
       gateMessage.classList.add("fade");
-    }
-  } catch (err) {
-    gateMessage.textContent = "⚠️ The ritual failed. Try again.";
-    gateMessage.classList.add("fade");
-  }
+    });
 }
 
 function showRiddle() {
@@ -156,7 +144,6 @@ function showRiddle() {
   riddleText.textContent = riddle.text;
   feedback.textContent = "";
   choicesDiv.innerHTML = "";
-  choicesDiv.classList.remove("hidden");
 
   riddle.options.forEach(option => {
     const btn = document.createElement("button");
@@ -187,14 +174,16 @@ function showRiddle() {
 }
 
 function showFinalReveal() {
-  fadeOut(document.getElementById("maze"));
-  setTimeout(() => {
-    const revealDiv = document.getElementById("reveal");
-    fadeIn(revealDiv);
+  document.getElementById("maze").classList.add("hidden");
+  const revealDiv = document.getElementById("reveal");
+  revealDiv.classList.remove("hidden");
 
-    const now = new Date();
-    const revealDate = new Date("2026-02-01T00:00:00");
+  const now = new Date();
+  const revealDate = new Date("2026-02-01T00:00:00");
 
-    if (now < revealDate) {
-      const daysLeft = Math.ceil((revealDate - now) / (1000 * 60 * 60 * 24));
-      const percent = Math.min(100, Math.floor((1 - (revealDate - now) / (revealDate - new Date("2025-11-01T00
+  if (now < revealDate) {
+    const daysLeft = Math.ceil((revealDate - now) / (1000 * 60 * 60 * 24));
+    const percent = Math.min(100, Math.floor((1 - (revealDate - now) / (revealDate - new Date("2025-11-01T00:00:00"))) * 100));
+
+    revealDiv.innerHTML = `
+      <h2 class="fade">You have reached the inner sanctum.</h2
