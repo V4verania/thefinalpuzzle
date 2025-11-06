@@ -7,8 +7,9 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div id="gate">
-    <h1>Enter the Code</h1>
+  <div id="veil">
+    <h1>The Final Puzzle</h1>
+    <p class="intro">Enter your invitation code to begin the ritual.</p>
     <input type="text" id="codeInput" placeholder="Enter your code..." />
     <button onclick="validateCode()">Submit</button>
     <p id="gateMessage"></p>
@@ -16,10 +17,16 @@
 
   <div id="maze" class="hidden">
     <div id="riddleContainer">
-      <p id="riddleText"></p>
-      <div id="choices"></div>
-      <p id="feedback"></p>
+      <p id="riddleText" class="fade"></p>
+      <div id="choices" class="fade"></div>
+      <p id="feedback" class="fade"></p>
     </div>
+  </div>
+
+  <div id="reveal" class="hidden">
+    <h2>You have reached the inner sanctum.</h2>
+    <p class="fade">The final puzzle awaits. Your dossier will be revealed soon...</p>
+    <!-- Optional: Add character reveal or next stage here -->
   </div>
 
   <script src="script.js"></script>
