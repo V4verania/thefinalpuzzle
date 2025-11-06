@@ -33,17 +33,5 @@
 
   <!-- ✅ Load script after DOM is ready -->
   <script src="script.js"></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const button = document.getElementById("submitCode");
-      if (button) button.addEventListener("click", () => {
-        if (typeof validateCode === "function") {
-          validateCode();
-        } else {
-          console.error("validateCode is not defined yet.");
-        }
-      });
-    });
-  </script>
 </body>
 </html>
