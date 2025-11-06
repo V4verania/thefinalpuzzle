@@ -30,10 +30,18 @@
     <!-- Content injected by script.js -->
   </div>
 
+  <!-- ✅ Load script after DOM is ready -->
   <script src="script.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      document.getElementById("submitCode").onclick = validateCode;
+      const button = document.getElementById("submitCode");
+      if (button) button.onclick = () => {
+        if (typeof validateCode === "function") {
+          validateCode();
+        } else {
+          console.error("validateCode is not defined yet.");
+        }
+      };
     });
   </script>
 </body>
