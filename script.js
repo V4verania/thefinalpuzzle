@@ -93,6 +93,7 @@ let guestCode = "";
 let lockouts = JSON.parse(localStorage.getItem("lockouts") || "{}");
 
 function validateCode() {
+  document.getElementById("ambientAudio").play();
   guestCode = document.getElementById("codeInput").value.trim();
   const gateMessage = document.getElementById("gateMessage");
 
