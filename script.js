@@ -93,9 +93,15 @@ let guestCode = "";
 let lockouts = JSON.parse(localStorage.getItem("lockouts") || "{}");
 
 function validateCode() {
-  document.getElementById("ambientAudio").play();
   guestCode = document.getElementById("codeInput").value.trim();
   const gateMessage = document.getElementById("gateMessage");
+
+  if (guestCode === "RESETALL") {
+    localStorage.setItem("lockouts", JSON.stringify({}));
+    gateMessage.textContent = "✅ All lockouts have been cleared.";
+    gateMessage.classList.add("fade");
+    return;
+  }
 
   const lockoutUntil = lockouts[guestCode];
   if (lockoutUntil) {
@@ -121,6 +127,7 @@ function validateCode() {
       if (data.valid) {
         document.getElementById("veil").classList.add("hidden");
         document.getElementById("maze").classList.remove("hidden");
+        document.getElementById("ambientAudio").play().catch(() => {});
         showRiddle();
       } else {
         gateMessage.textContent = "❌ The veil does not recognize you.";
@@ -170,6 +177,7 @@ function showRiddle() {
     choicesDiv.appendChild(btn);
   });
 }
+
 function showFinalReveal() {
   document.getElementById("maze").classList.add("hidden");
   const revealDiv = document.getElementById("reveal");
@@ -194,32 +202,4 @@ function showFinalReveal() {
       </div>
     `;
   } else {
-    revealDiv.innerHTML = `
-      <h2 class="fade">Your character dossier is ready.</h2>
-      <p class="fade">The veil parts. Your role awaits...</p>
-      <p class="fade">Code: <strong>${guestCode}</strong></p>
-      <!-- TODO: Load dossier based on code -->
-    `;
-  }
-}
-
-// ✅ Attach validateCode safely after DOM is ready
-document.addEventListener("DOMContentLoaded", () => {
-  const button = document.getElementById("submitCode");
-  if (button) button.addEventListener("click", validateCode);
-
-  const muteToggle = document.getElementById("muteToggle");
-  const ambientAudio = document.getElementById("ambientAudio");
-
-document.addEventListener("DOMContentLoaded", () => {
-  const button = document.getElementById("submitCode");
-  if (button) button.addEventListener("click", validateCode);
-
-  const muteToggle = document.getElementById("muteToggle");
-  const ambientAudio = document.getElementById("ambientAudio");
-
-  muteToggle.addEventListener("click", () => {
-    ambientAudio.muted = !ambientAudio.muted;
-    muteToggle.textContent = ambientAudio.muted ? "🔇" : "🔊";
-  });
-});
+    revealDiv
