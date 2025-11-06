@@ -1,96 +1,27 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>The Final Puzzle</title>
-  <style>
-    body {
-      background-color: #0e0e0e;
-      color: #e0e0e0;
-      font-family: 'Georgia', serif;
-      text-align: center;
-      padding: 50px;
-    }
-    input, button {
-      padding: 10px;
-      margin: 10px;
-      font-size: 1em;
-    }
-    .hidden {
-      display: none;
-    }
-    .sigil {
-      font-size: 3em;
-      margin: 20px 0;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>The Final Puzzle</h1>
-  <p>You have been summoned. The manor awaits.</p>
-
-  <!-- Step 1: Code Gate -->
-  <div id="codeGate">
-    <p>Enter your box code to begin:</p>
-    <input type="text" id="boxCode" placeholder="Enter code">
+  <div id="gate">
+    <h1>Enter the Code</h1>
+    <input type="text" id="codeInput" placeholder="Enter your code..." />
     <button onclick="validateCode()">Submit</button>
-    <p id="codeError" style="color:red;"></p>
+    <p id="gateMessage"></p>
   </div>
 
-  <!-- Step 2: Ritual Welcome -->
-  <div id="ritualWelcome" class="hidden">
-    <div class="sigil">✶</div>
-    <h2>The gate opens...</h2>
-    <p>The Archivist is watching. Your role will be revealed in time.</p>
-    <p>Return when the veil thins.</p>
-    <button onclick="checkReveal()">Check for Character Reveal</button>
-    <p id="revealMessage" style="color:gold;"></p>
+  <div id="maze" class="hidden">
+    <div id="riddleContainer">
+      <p id="riddleText"></p>
+      <div id="choices"></div>
+      <p id="feedback"></p>
+    </div>
   </div>
 
-  <!-- Step 3: Character Dossier -->
-  <div id="dossierReveal" class="hidden">
-    <h2>Your Role in the Mystery</h2>
-    <p><strong>Character Name:</strong> Lady Crimson Nocturne</p>
-    <p><strong>Backstory:</strong> Once the manor’s voice, now its echo. She returns with secrets stitched into silk.</p>
-    <p><strong>Suggested Attire:</strong> Velvet, crimson, antique jewelry. A whisper of mourning.</p>
-    <p><strong>Secret Motivation:</strong> You seek the truth behind Elowen’s final supper. But you carry a deeper wound.</p>
-  </div>
-
-  <script>
-    const workerURL = "https://thefinalpuzzle-worker.thefinalpuzzle.workers.dev"; 
-    let codeAccepted = false;
-    let revealReady = false;
-
-    async function validateCode() {
-      const code = document.getElementById("boxCode").value.trim();
-
-      const response = await fetch(workerURL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code })
-      });
-
-      const result = await response.json();
-
-      if (result.valid) {
-        codeAccepted = true;
-        revealReady = result.revealed;
-        document.getElementById("codeGate").classList.add("hidden");
-        document.getElementById("ritualWelcome").classList.remove("hidden");
-        document.getElementById("codeError").textContent = "";
-      } else {
-        document.getElementById("codeError").textContent = "The gate remains closed. Try again.";
-      }
-    }
-
-    function checkReveal() {
-      if (codeAccepted && revealReady) {
-        document.getElementById("ritualWelcome").classList.add("hidden");
-        document.getElementById("dossierReveal").classList.remove("hidden");
-      } else {
-        document.getElementById("revealMessage").textContent =
-          "The Archivist is not ready to speak. Return when the veil thins.";
-      }
-    }
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
