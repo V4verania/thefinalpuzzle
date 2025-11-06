@@ -172,7 +172,6 @@ function showRiddle() {
     choicesDiv.appendChild(btn);
   });
 }
-
 function showFinalReveal() {
   document.getElementById("maze").classList.add("hidden");
   const revealDiv = document.getElementById("reveal");
@@ -187,4 +186,27 @@ function showFinalReveal() {
 
     revealDiv.innerHTML = `
       <h2 class="fade">You have reached the inner sanctum.</h2>
-      <p
+      <p class="fade">The dossiers remain sealed.</p>
+      <p class="fade">The flame will reveal them in <strong>${daysLeft} days</strong>...</p>
+      <div id="candleContainer" class="fade">
+        <div id="candleFlame"></div>
+        <div id="candleMeter">
+          <div id="candleFill" style="width:${percent}%"></div>
+        </div>
+      </div>
+    `;
+  } else {
+    revealDiv.innerHTML = `
+      <h2 class="fade">Your character dossier is ready.</h2>
+      <p class="fade">The veil parts. Your role awaits...</p>
+      <p class="fade">Code: <strong>${guestCode}</strong></p>
+      <!-- TODO: Load dossier based on code -->
+    `;
+  }
+}
+
+// ✅ Attach validateCode safely after DOM is ready
+document.addEventListener("DOMContentLoaded", () => {
+  const button = document.getElementById("submitCode");
+  if (button) button.addEventListener("click", validateCode);
+});
