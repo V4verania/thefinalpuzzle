@@ -1,93 +1,90 @@
 const riddles = [
   {
-    text: `“The table is set but no one eats.  
-A name is spoken, then silence repeats.  
-One guest arrives with nothing to say —  
-What did they bring that let them stay?”`,
-    options: ["A mask", "A candle", "A secret", "A key"],
+    text: `“I am taken before you speak,  
+Yet never held or seen.  
+I vanish when revealed —  
+What am I?”`,
+    options: ["A mask", "A secret", "A whisper", "A thought"],
     answer: "A secret",
-    feedback: "The candle flickers once. The door opens without sound. You step inside."
+    feedback: "Correct. A secret disappears the moment it’s shared."
   },
   {
-    text: `“Five glasses shimmer, one is dry.  
-The host is missing, yet none ask why.  
-The toast is made by one unseen —  
-Who drinks first in this silent scene?”`,
-    options: ["The one with the empty plate", "The one who did not speak", "The one seated last", "The one who poured the wine"],
-    answer: "The one who did not speak",
-    feedback: "A chair creaks. You are offered a glass, but it is already empty. You move on."
+    text: `“Five glasses stand in a row.  
+Four are wet, one is dry.  
+One guest stayed silent —  
+Which glass is theirs?”`,
+    options: ["The first", "The last", "The dry one", "The tallest"],
+    answer: "The dry one",
+    feedback: "Correct. The silent guest didn’t toast — their glass remains untouched."
   },
   {
-    text: `“Three books lie on velvet cloth:  
-One is bound in silence, one in flame, one in frost.  
-The Archivist sleeps with eyes wide shut —  
-Which book reveals what others cut?”`,
-    options: ["The book with no title", "The book that smells of citrus", "The book with a broken spine", "The book bound in velvet"],
-    answer: "The book that smells of citrus",
-    feedback: "The ink glows faintly. A passage appears. You follow it into the dark."
+    text: `“Three books lie untouched:  
+One burned, one frozen, one blank.  
+Only one hides a message.  
+Which do you read?”`,
+    options: ["The burned book", "The frozen book", "The blank book", "The torn book"],
+    answer: "The blank book",
+    feedback: "Correct. A blank page invites discovery — the message is hidden in absence."
   },
   {
-    text: `“The record spins but plays no tune.  
-The needle rests beneath the moon.  
-One guest hums what none recall —  
-Which sound breaks silence in the hall?”`,
-    options: ["A bell", "A heartbeat", "A lullaby", "A knock"],
+    text: `“A record spins, no sound plays.  
+A guest hums a tune you’ve never heard,  
+Yet it feels familiar.  
+What kind of song is it?”`,
+    options: ["A lullaby", "A chant", "A hymn", "A memory"],
     answer: "A lullaby",
-    feedback: "The air softens. A door creaks open to a corridor of velvet hush."
+    feedback: "Correct. A lullaby is remembered without being heard — soft, haunting, familiar."
   },
   {
-    text: `“Petals bloom in candlelight,  
-One wilts before the stroke of night.  
-The flower that forgets its name —  
-Which holds the key to end the game?”`,
+    text: `“Four flowers bloom:  
+One fades quickly, one lasts long, one has no name, one is remembered.  
+Which one symbolizes memory?”`,
     options: ["Rose", "Lily", "Forget-me-not", "Orchid"],
     answer: "Forget-me-not",
-    feedback: "A breeze stirs the leaves. A hidden path reveals itself beneath the ivy."
+    feedback: "Correct. Its name is the clue — it resists forgetting."
   },
   {
-    text: `“Ashes fall where secrets burn.  
-A match is struck, the pipes return.  
-One guest exhales a ghostly thread —  
-What lingers long after words are said?”`,
-    options: ["Smoke", "Regret", "Truth", "Silence"],
+    text: `“A fire burns.  
+Ashes fall.  
+Something rises, thin and grey.  
+What remains?”`,
+    options: ["Smoke", "Regret", "Heat", "Dust"],
     answer: "Smoke",
-    feedback: "The smoke curls into a symbol. You follow it through the panelled wall."
+    feedback: "Correct. Smoke is the lingering trace of flame — visible, ephemeral, real."
   },
   {
-    text: `“Bottles line the wall in rows,  
-Some are sealed, some no one knows.  
-One is marked with wax and thread —  
-Which vintage wakes the sleeping dead?”`,
-    options: ["1888", "The unlabeled one", "The broken cork", "The one with dust"],
-    answer: "The unlabeled one",
-    feedback: "The bottle tips. A stairwell descends into shadow."
+    text: `“Four bottles sit on a shelf:  
+One labeled, one dusty, one cracked, one blank.  
+Which one holds the unknown?”`,
+    options: ["The labeled one", "The dusty one", "The cracked one", "The blank one"],
+    answer: "The blank one",
+    feedback: "Correct. Without a label, its contents are a mystery — the unknown lies within."
   },
   {
-    text: `“Footsteps echo, none reply.  
-A bell is rung, but no one’s nigh.  
-The tray is set, the tea gone cold —  
-Who answers when the bell is tolled?”`,
-    options: ["The butler", "The unseen", "The host", "The guest who left"],
+    text: `“A bell rings.  
+No one is seen.  
+Yet something moves.  
+Who responded?”`,
+    options: ["The wind", "The unseen", "The host", "The echo"],
     answer: "The unseen",
-    feedback: "A whisper brushes your ear. The corridor bends left, then vanishes."
+    feedback: "Correct. If no one is visible, the answer must be the unseen."
   },
   {
-    text: `“Reflections lie, but only once.  
-One mirror shows what came undone.  
-Another shows what might have been —  
-Which mirror hides the truth within?”`,
-    options: ["The cracked one", "The fogged one", "The gilded one", "The one that shows nothing"],
-    answer: "The one that shows nothing",
-    feedback: "Your reflection fades. You step through the glass."
+    text: `“Three mirrors reflect:  
+One shows your past, one shows disguise, one shows nothing.  
+Which one tells the truth?”`,
+    options: ["The past mirror", "The disguised mirror", "The empty mirror", "The broken mirror"],
+    answer: "The empty mirror",
+    feedback: "Correct. No reflection means no distortion — truth lies in absence."
   },
   {
-    text: `“Ten steps taken, one remains.  
-The key is not in locks or chains.  
-The guest who never asked to stay —  
-What did they whisper to end the play?”`,
-    options: ["I remember.", "Forgive me.", "It was me.", "Thank you."],
+    text: `“Ten doors, one locked.  
+No key, no code.  
+Only a whisper opens it.  
+What do you say?”`,
+    options: ["I remember.", "Forgive me.", "It was me.", "Let me in."],
     answer: "It was me.",
-    feedback: "The door opens. The veil lifts. The final puzzle awaits."
+    feedback: "Correct. A confession is the key — ownership ends the puzzle."
   }
 ];
 
