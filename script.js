@@ -211,13 +211,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const muteToggle = document.getElementById("muteToggle");
   const ambientAudio = document.getElementById("ambientAudio");
 
+document.addEventListener("DOMContentLoaded", () => {
+  const button = document.getElementById("submitCode");
+  if (button) button.addEventListener("click", validateCode);
+
+  const muteToggle = document.getElementById("muteToggle");
+  const ambientAudio = document.getElementById("ambientAudio");
+
   muteToggle.addEventListener("click", () => {
-    if (ambientAudio.muted) {
-      ambientAudio.muted = false;
-      muteToggle.textContent = "🔊 Sound On";
-    } else {
-      ambientAudio.muted = true;
-      muteToggle.textContent = "🔇 Sound Off";
-    }
+    ambientAudio.muted = !ambientAudio.muted;
+    muteToggle.textContent = ambientAudio.muted ? "🔇" : "🔊";
   });
 });
