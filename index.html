@@ -2,50 +2,51 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>The Final Puzzle</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="icon" href="/favicon.ico" type="image/x-icon" />
 </head>
 <body>
   <!-- 🔐 Code Gate -->
-  <div id="veil">
+  <section id="veil">
     <h1>The Final Puzzle</h1>
     <p class="intro">Enter your invitation code to begin the ritual.</p>
-    <input type="text" id="codeInput" placeholder="Enter your code..." />
+    <input type="text" id="codeInput" placeholder="Enter your code..." aria-label="Invitation code" />
     <button id="submitCode">Submit</button>
-    <p id="gateMessage" class="fade"></p>
-  </div>
+    <p id="gateMessage" class="fade" aria-live="polite"></p>
+  </section>
 
   <!-- 🧩 Riddle Maze -->
-  <div id="maze" class="hidden">
+  <section id="maze" class="hidden">
     <div id="riddleContainer">
       <p id="riddleText" class="fade"></p>
       <div id="choices" class="fade"></div>
-      <p id="feedback" class="fade"></p>
+      <p id="feedback" class="fade" aria-live="polite"></p>
     </div>
 
-    <!-- 🔥 Ritual Animation anchored to bottom -->
+    <!-- 🔥 Ritual Animation -->
     <div id="ritualAnimation" class="ritual-bottom hidden" aria-hidden="true">
       <div class="flame"></div>
       <div class="sigil">✶</div>
       <div class="veilRipple"></div>
     </div>
-  </div>
+  </section>
 
   <!-- 🕯️ Final Reveal -->
-  <div id="reveal" class="hidden"></div>
+  <section id="reveal" class="hidden"></section>
 
   <!-- 🎵 Audio -->
   <audio id="ambientAudio" src="ambient.mp3" loop autoplay></audio>
   <audio id="whisperAudio" src="whisper.mp3" preload="auto"></audio>
+  <audio id="wrongAnswerAudio" src="wrong.mp3" preload="auto"></audio>
   <button id="muteToggle" class="fade" aria-label="Toggle sound">🔊</button>
-<audio id="wrongAnswerAudio" src="wrong.mp3" preload="auto"></audio>
-  
-    <div id="dimOverlay" class="hidden"></div>
-    <div id="rippleEffect" class="hidden"></div>
+
+  <!-- 🌘 Visual Effects -->
+  <div id="dimOverlay" class="hidden"></div>
+  <div id="rippleEffect" class="hidden"></div>
+
   <!-- ✅ Script -->
   <script src="script.js"></script>
-
 </body>
 </html>
