@@ -180,10 +180,12 @@ function showRiddle() {
     <button id="submitRiddle">Submit</button>
   `;
 
-  document.getElementById("submitRiddle").onclick = () => {
-const rawInput = document.getElementById("riddleInput").value.trim().toLowerCase();
-const normalizedInput = rawInput.replace(/[^a-z0-9 ]+/g, " "); // removes punctuation/symbols
-const matched = riddle.keywords.some(keyword => normalizedInput.includes(keyword.toLowerCase()));
+document.getElementById("submitRiddle").onclick = () => {
+  const rawInput = document.getElementById("riddleInput").value.trim().toLowerCase();
+  const normalizedInput = rawInput.replace(/[^a-z0-9 ]+/g, " "); // removes punctuation/symbols
+  const matched = riddle.keywords.some(keyword =>
+    normalizedInput.includes(keyword.toLowerCase())
+  );
 
     if (matched) {
       feedback.textContent = riddle.feedback;
