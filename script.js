@@ -252,7 +252,19 @@ function showFinalReveal() {
 
     revealDiv.innerHTML = `
       <h2 class="fade">You have reached the inner sanctum.</h2>
-      <p class="fade">The dossiers remain sealed.</p>
+      <p class="fade">You have solved the maze.
+You have mastered the riddles.
+You have earned your place.
+Now, the door opens.
+You are invited to an evening of secrets, symbols, and shadows at:
+</p>
+<p class="fade"> The Dene of Whispers
+</p>
+<p class="fade"> RSVP Required
+Confirm your presence to receive your token and instructions.
+Elena awaits.
+The Whispering Archivist will speak.
+</p>
       <p class="fade">The flame will reveal them in <strong>${daysLeft} days</strong>...</p>
       <div id="candleContainer" class="fade">
         <div id="candleFlame"></div>
