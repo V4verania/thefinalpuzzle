@@ -224,7 +224,7 @@ function showRiddle() {
       }, 1200);
 
       const lockoutDate = new Date();
-      lockoutDate.setHours(lockoutDate.getHours() + 24);
+      lockoutDate.setHours(lockoutDate.getHours() + 5);
       await saveLockout(guestCode, lockoutDate.toISOString());
 
       feedback.textContent = `🕯️ The veil shudders. That is not the path. Return in 24 hours.`;
