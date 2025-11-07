@@ -6,13 +6,15 @@ The Butler says he was organizing the wine cellar.
 The Cook says she was preparing breakfast.
 The Gardener says he was watering the ferns.
 The Maid says she was collecting the morning mail.
-The police immediately arrest the murderer. Who did it and how did they know?
+The police immediately arrest the murderer. Who did it and how did they know?',
     keywords: ["maid", "the maid"],
     feedback: "Correct. There’s no mail on Sundays — the maid’s alibi gave her away."
   },
   {
     text: `🧊 The Poisoned Drinks  
-Two rivals sit down for a drink. They both order iced tea from the same pitcher. One man drinks his glass very quickly and immediately orders another. The other woman sips her one glass slowly. The woman dies, but the man survives. It is determined that all the drinks were poisoned. How did the man survive?
+Two rivals sit down for a drink. They both order iced tea from the same pitcher. One man drinks his glass very quickly and 
+  immediately orders another. The other woman sips her one glass slowly. The woman dies, but the man survives. It is determined that all the drinks were poisoned. 
+    How did the man survive?',
     keywords: ["ice", "ice cubes"],
     feedback: "Correct. The poison was in the ice — it melted into her drink, not his."
   },
