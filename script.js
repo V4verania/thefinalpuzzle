@@ -96,27 +96,39 @@ function validateCode() {
   guestCode = document.getElementById("codeInput").value.trim();
   const gateMessage = document.getElementById("gateMessage");
 
-if (guestCode === "RESETALL") {
-  localStorage.setItem("lockouts", JSON.stringify({}));
-  lockouts = {}; // ✅ Clear in-memory copy too
-  gateMessage.textContent = "✅ All lockouts have been cleared.";
-  gateMessage.classList.add("fade");
-  return;
-}
-
+  if (guestCode === "RESETALL") {
+    localStorage.setItem("lockouts", JSON.stringify({}));
+    lockouts = {};
+    gateMessage.textContent = "✅ All lockouts have been cleared.";
+    gateMessage.classList.add("fade");
+    return;
+  }
 
   const lockoutUntil = lockouts[guestCode];
   if (lockoutUntil) {
-    const now = new Date();
     const unlockDate = new Date(lockoutUntil);
-    if (now < unlockDate) {
+    const countdown = () => {
+      const now = new Date();
       const timeLeftMs = unlockDate - now;
-      const daysLeft = Math.floor(timeLeftMs / (1000 * 60 * 60 * 24));
-      const hoursLeft = Math.floor((timeLeftMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      gateMessage.textContent = `⛔ The veil is sealed for you. Return in ${daysLeft} day${daysLeft !== 1 ? "s" : ""} and ${hoursLeft} hour${hoursLeft !== 1 ? "s" : ""}.`;
+
+      if (timeLeftMs <= 0) {
+        gateMessage.textContent = "✅ The veil is open. You may now enter.";
+        gateMessage.classList.add("fade");
+        clearInterval(timer);
+        return;
+      }
+
+      const hours = Math.floor((timeLeftMs / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((timeLeftMs / (1000 * 60)) % 60);
+      const seconds = Math.floor((timeLeftMs / 1000) % 60);
+
+      gateMessage.textContent = `⛔ The veil is sealed. Countdown: ${hours}h ${minutes}m ${seconds}s`;
       gateMessage.classList.add("fade");
-      return;
-    }
+    };
+
+    countdown();
+    const timer = setInterval(countdown, 1000);
+    return;
   }
 
   fetch("https://thefinalpuzzle-worker.thefinalpuzzle.workers.dev", {
@@ -168,10 +180,10 @@ function showRiddle() {
         }
       } else {
         const lockoutDate = new Date();
-        lockoutDate.setDate(lockoutDate.getDate() + 2);
+        lockoutDate.setHours(lockoutDate.getHours() + 24);
         lockouts[guestCode] = lockoutDate.toISOString();
         localStorage.setItem("lockouts", JSON.stringify(lockouts));
-        feedback.textContent = `🕯️ The veil shudders. That is not the path. Return in 2 days.`;
+        feedback.textContent = `🕯️ The veil shudders. That is not the path. Return in 24 hours.`;
         feedback.classList.add("fade");
         choicesDiv.innerHTML = "";
       }
@@ -213,7 +225,6 @@ function showFinalReveal() {
   }
 }
 
-// ✅ DOM Ready: Attach listeners
 document.addEventListener("DOMContentLoaded", () => {
   const button = document.getElementById("submitCode");
   if (button) button.addEventListener("click", validateCode);
@@ -228,5 +239,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
 
 
