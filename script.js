@@ -1,4 +1,3 @@
-let passedGuests = JSON.parse(localStorage.getItem("passedGuests") || "{}");
 const riddles = [
   {
     text: `“I am taken before you speak,  
