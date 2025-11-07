@@ -206,12 +206,14 @@ function showRiddle() {
     };
     choicesDiv.appendChild(btn);
   });
-  if (currentStep < riddles.length) {
+if (currentStep < riddles.length) {
   setTimeout(showRiddle, 2000);
 } else {
   passedGuests[guestCode] = true;
   localStorage.setItem("passedGuests", JSON.stringify(passedGuests));
-  setTimeout(showFinalReveal, 2000);
+  document.getElementById("maze").classList.add("hidden");
+  document.getElementById("reveal").classList.remove("hidden");
+  showFinalReveal();
 }
 }
 
