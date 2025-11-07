@@ -225,3 +225,8 @@ function showRiddle() {
         passedGuests[guestCode] = true;
         localStorage.setItem("passedGuests", JSON.stringify(passedGuests));
         document
+        showFinalReveal();
+      }
+    }
+  };
+}
