@@ -92,34 +92,42 @@ What do you say?”`,
 let currentStep = 0;
 let guestCode = "";
 let lockouts = JSON.parse(localStorage.getItem("lockouts") || "{}");
+let passedGuests = JSON.parse(localStorage.getItem("passedGuests") || "{}");
 
 function validateCode() {
   guestCode = document.getElementById("codeInput").value.trim();
   const gateMessage = document.getElementById("gateMessage");
 
-  if (passedGuests[guestCode]) {
-  document.getElementById("veil").classList.add("hidden");
-  document.getElementById("maze").classList.add("hidden");
-  document.getElementById("reveal").classList.remove("hidden");
-  showFinalReveal();
-  return;
-}
-
+  // ✅ Admin override: clear passed flags
   if (guestCode === "RESETPASSED") {
-  localStorage.setItem("passedGuests", JSON.stringify({}));
-  passedGuests = {};
-  gateMessage.textContent = "✅ All passed flags have been cleared.";
-  gateMessage.classList.add("fade");
-  return;
-}
+    localStorage.setItem("passedGuests", JSON.stringify({}));
+    passedGuests = {};
+    gateMessage.textContent = "✅ All passed flags have been cleared.";
+    gateMessage.classList.add("fade");
+    document.getElementById("codeInput").value = "";
+    return;
+  }
+
+  // ✅ Admin override: clear lockouts
   if (guestCode === "RESETALL") {
     localStorage.setItem("lockouts", JSON.stringify({}));
     lockouts = {};
     gateMessage.textContent = "✅ All lockouts have been cleared.";
     gateMessage.classList.add("fade");
+    document.getElementById("codeInput").value = "";
     return;
   }
 
+  // ✅ Bypass maze if guest already passed
+  if (passedGuests[guestCode]) {
+    document.getElementById("veil").classList.add("hidden");
+    document.getElementById("maze").classList.add("hidden");
+    document.getElementById("reveal").classList.remove("hidden");
+    showFinalReveal();
+    return;
+  }
+
+  // ✅ Lockout check
   const lockoutUntil = lockouts[guestCode];
   if (lockoutUntil) {
     const unlockDate = new Date(lockoutUntil);
@@ -147,6 +155,7 @@ function validateCode() {
     return;
   }
 
+  // ✅ Validate code via fetch
   fetch("https://thefinalpuzzle-worker.thefinalpuzzle.workers.dev", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -189,10 +198,15 @@ function showRiddle() {
         feedback.textContent = riddle.feedback;
         feedback.classList.add("fade");
         currentStep++;
+
         if (currentStep < riddles.length) {
           setTimeout(showRiddle, 2000);
         } else {
-          setTimeout(showFinalReveal, 2000);
+          passedGuests[guestCode] = true;
+          localStorage.setItem("passedGuests", JSON.stringify(passedGuests));
+          document.getElementById("maze").classList.add("hidden");
+          document.getElementById("reveal").classList.remove("hidden");
+          showFinalReveal();
         }
       } else {
         const lockoutDate = new Date();
@@ -206,19 +220,9 @@ function showRiddle() {
     };
     choicesDiv.appendChild(btn);
   });
-if (currentStep < riddles.length) {
-  setTimeout(showRiddle, 2000);
-} else {
-  passedGuests[guestCode] = true;
-  localStorage.setItem("passedGuests", JSON.stringify(passedGuests));
-  document.getElementById("maze").classList.add("hidden");
-  document.getElementById("reveal").classList.remove("hidden");
-  showFinalReveal();
-}
 }
 
 function showFinalReveal() {
-  document.getElementById("maze").classList.add("hidden");
   const revealDiv = document.getElementById("reveal");
   revealDiv.classList.remove("hidden");
 
@@ -264,6 +268,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
 
 
 
