@@ -146,10 +146,12 @@ async function validateCode() {
 }
 function showRiddle() {
   if (currentStep >= riddles.length) {
+    document.getElementById("maze").classList.add("hidden");
+    document.getElementById("reveal").classList.remove("hidden");
     showFinalReveal();
     return;
   }
-
+  
   const riddle = riddles[currentStep];
   const riddleText = document.getElementById("riddleText");
   const choicesDiv = document.getElementById("choices");
