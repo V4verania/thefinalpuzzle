@@ -218,6 +218,11 @@ else {
       lockoutDate.setHours(lockoutDate.getHours() + 24);
       lockouts[guestCode] = lockoutDate.toISOString();
       localStorage.setItem("lockouts", JSON.stringify(lockouts));
+      const wrongAudio = document.getElementById("wrongAnswerAudio");
+if (wrongAudio) {
+  wrongAudio.currentTime = 0;
+  wrongAudio.play().catch(() => {});
+}
       feedback.textContent = `🕯️ The veil shudders. That is not the path. Return in 24 hours.`;
       feedback.classList.add("fade");
       choicesDiv.innerHTML = "";
