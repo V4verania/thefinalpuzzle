@@ -1,3 +1,6 @@
+const WORKER_URL = "https://thefinalpuzzle-worker.thefinalpuzzle.workers.dev";
+let guestCode = "";
+let currentStep = 0;
 const riddles = [
   {
     text: `The Sunday Alibi  
@@ -73,90 +76,72 @@ What is it?`,
   }
 ];
 
-let currentStep = 0;
-let guestCode = "";
-let lockouts = JSON.parse(localStorage.getItem("lockouts") || "{}");
-let passedGuests = JSON.parse(localStorage.getItem("passedGuests") || "{}");
+async function getLockout(code) {
+  const res = await fetch(`${WORKER_URL}?code=${code}&type=lockout`);
+  return await res.json();
+}
 
-function validateCode() {
+async function getProgress(code) {
+  const res = await fetch(`${WORKER_URL}?code=${code}&type=progress`);
+  return await res.json();
+}
+
+async function saveLockout(code, until) {
+  await fetch(`${WORKER_URL}?type=lockout`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ code, until })
+  });
+}
+
+async function saveProgress(code, step) {
+  await fetch(`${WORKER_URL}?type=progress`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ code, step })
+  });
+}
+
+async function validateCode() {
   guestCode = document.getElementById("codeInput").value.trim();
   document.getElementById("codeInput").value = "";
   const gateMessage = document.getElementById("gateMessage");
-  
-  if (guestCode === "RESETPASSED") {
-    localStorage.setItem("passedGuests", JSON.stringify({}));
-    passedGuests = {};
-    gateMessage.textContent = "✅ All passed flags have been cleared.";
+
+  if (guestCode === "RESETPASSED" || guestCode === "RESETALL") {
+    gateMessage.textContent = "⚠️ Reset commands are now handled server-side.";
     gateMessage.classList.add("fade");
     return;
   }
 
-  if (guestCode === "RESETALL") {
-    localStorage.setItem("lockouts", JSON.stringify({}));
-    lockouts = {};
-    gateMessage.textContent = "✅ All lockouts have been cleared.";
+  const lockoutData = await getLockout(guestCode);
+  if (lockoutData.until && new Date(lockoutData.until) > new Date()) {
+    gateMessage.textContent = `⛔ The veil is sealed. Return after ${new Date(lockoutData.until).toLocaleString()}`;
     gateMessage.classList.add("fade");
     return;
   }
 
-  if (passedGuests[guestCode]) {
-    document.getElementById("veil").classList.add("hidden");
-    document.getElementById("maze").classList.add("hidden");
-    document.getElementById("reveal").classList.remove("hidden");
-    showFinalReveal();
-    return;
-  }
-
-  const lockoutUntil = lockouts[guestCode];
-  if (lockoutUntil) {
-    const unlockDate = new Date(lockoutUntil);
-    const countdown = () => {
-      const now = new Date();
-      const timeLeftMs = unlockDate - now;
-
-      if (timeLeftMs <= 0) {
-        gateMessage.textContent = "✅ The veil is open. You may now enter.";
-        gateMessage.classList.add("fade");
-        clearInterval(timer);
-        return;
-      }
-
-      const hours = Math.floor((timeLeftMs / (1000 * 60 * 60)) % 24);
-      const minutes = Math.floor((timeLeftMs / (1000 * 60)) % 60);
-      const seconds = Math.floor((timeLeftMs / 1000) % 60);
-
-      gateMessage.textContent = `⛔ The veil is sealed. Countdown: ${hours}h ${minutes}m ${seconds}s`;
-      gateMessage.classList.add("fade");
-    };
-
-    countdown();
-    const timer = setInterval(countdown, 1000);
-    return;
-  }
-
-  console.log("Sending to server:", JSON.stringify({ code: guestCode }));
-
-  fetch("https://thefinalpuzzle-worker.thefinalpuzzle.workers.dev", {
+  const statusRes = await fetch(`${WORKER_URL}?type=progress`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ code: guestCode })
-  })
-    .then(res => res.json())
-    .then(data => {
-      console.log("Server response:", data);
-      if (data.valid) {
-        document.getElementById("veil").classList.add("hidden");
-        document.getElementById("maze").classList.remove("hidden");
-        document.getElementById("ambientAudio").play().catch(() => {});
-        showRiddle();
-      } else {
-        gateMessage.textContent = "❌ The veil does not recognize you.";
-      }
-    })
-    .catch(err => {
-      console.error("Fetch error:", err);
-      gateMessage.textContent = "⚠️ The ritual failed. Try again.";
-    });
+    body: JSON.stringify({ code: guestCode, step: 0 })
+  });
+  const status = await statusRes.json();
+
+  if (!status.valid) {
+    gateMessage.textContent = "❌ The veil does not recognize you.";
+    return;
+  }
+
+  if (status.revealed) {
+    showFinalReveal();
+  } else {
+    const progressData = await getProgress(guestCode);
+    currentStep = progressData.step || 0;
+    document.getElementById("veil").classList.add("hidden");
+    document.getElementById("maze").classList.remove("hidden");
+    document.getElementById("ambientAudio").play().catch(() => {});
+    showRiddle();
+  }
 }
 
 function showRiddle() {
@@ -172,12 +157,12 @@ function showRiddle() {
     <button id="submitRiddle">Submit</button>
   `;
 
-document.getElementById("submitRiddle").onclick = () => {
-  const rawInput = document.getElementById("riddleInput").value.trim().toLowerCase();
-  const normalizedInput = rawInput.replace(/[^a-z0-9 ]+/g, " "); // removes punctuation/symbols
-  const matched = riddle.keywords.some(keyword =>
-    normalizedInput.includes(keyword.toLowerCase())
-  );
+  document.getElementById("submitRiddle").onclick = async () => {
+    const rawInput = document.getElementById("riddleInput").value.trim().toLowerCase();
+    const normalizedInput = rawInput.replace(/[^a-z0-9 ]+/g, " ");
+    const matched = riddle.keywords.some(keyword =>
+      normalizedInput.includes(keyword.toLowerCase())
+    );
 
     if (matched) {
       feedback.textContent = riddle.feedback;
@@ -203,55 +188,49 @@ document.getElementById("submitRiddle").onclick = () => {
       }, 1800);
 
       currentStep++;
-if (currentStep < riddles.length) {
-  setTimeout(showRiddle, 4500); // or 5000 for a full 5 seconds
-}
-else {
-        passedGuests[guestCode] = true;
-        localStorage.setItem("passedGuests", JSON.stringify(passedGuests));
+      await saveProgress(guestCode, currentStep);
+
+      if (currentStep < riddles.length) {
+        setTimeout(showRiddle, 4500);
+      } else {
+        await saveProgress(guestCode, riddles.length);
         document.getElementById("maze").classList.add("hidden");
         document.getElementById("reveal").classList.remove("hidden");
         showFinalReveal();
       }
- } else {
-  // 🔊 Play wrong answer sound
-  const wrongAudio = document.getElementById("wrongAnswerAudio");
-  if (wrongAudio) {
-    wrongAudio.currentTime = 0;
-    wrongAudio.play().catch(() => {});
-  }
+    } else {
+      const wrongAudio = document.getElementById("wrongAnswerAudio");
+      if (wrongAudio) {
+        wrongAudio.currentTime = 0;
+        wrongAudio.play().catch(() => {});
+      }
 
-  // 🌘 Dim the screen briefly
-  const dimOverlay = document.getElementById("dimOverlay");
-  dimOverlay.classList.remove("hidden");
-  dimOverlay.classList.add("active");
+      const dimOverlay = document.getElementById("dimOverlay");
+      dimOverlay.classList.remove("hidden");
+      dimOverlay.classList.add("active");
 
-const ripple = document.getElementById("rippleEffect");
-ripple.classList.remove("hidden");
-ripple.classList.add("active");
+      const ripple = document.getElementById("rippleEffect");
+      ripple.classList.remove("hidden");
+      ripple.classList.add("active");
 
-setTimeout(() => {
-  ripple.classList.remove("active");
-  ripple.classList.add("hidden");
-}, 1000);
-      
-  setTimeout(() => {
-    dimOverlay.classList.remove("active");
-    dimOverlay.classList.add("hidden");
-  }, 1200);
+      setTimeout(() => {
+        ripple.classList.remove("active");
+        ripple.classList.add("hidden");
+      }, 1000);
 
-  // 🔒 Lock out the guest
-  const lockoutDate = new Date();
-  lockoutDate.setHours(lockoutDate.getHours() + 24);
-  lockouts[guestCode] = lockoutDate.toISOString();
-  localStorage.setItem("lockouts", JSON.stringify(lockouts));
+      setTimeout(() => {
+        dimOverlay.classList.remove("active");
+        dimOverlay.classList.add("hidden");
+      }, 1200);
 
-  // 🕯️ Feedback
-  feedback.textContent = `🕯️ The veil shudders. That is not the path. Return in 24 hours.`;
-  feedback.classList.add("fade");
-  choicesDiv.innerHTML = "";
-}
+      const lockoutDate = new Date();
+      lockoutDate.setHours(lockoutDate.getHours() + 24);
+      await saveLockout(guestCode, lockoutDate.toISOString());
 
+      feedback.textContent = `🕯️ The veil shudders. That is not the path. Return in 24 hours.`;
+      feedback.classList.add("fade");
+      choicesDiv.innerHTML = "";
+    }
   };
 }
 
