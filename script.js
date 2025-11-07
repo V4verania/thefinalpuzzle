@@ -94,6 +94,7 @@ let lockouts = JSON.parse(localStorage.getItem("lockouts") || "{}");
 let passedGuests = JSON.parse(localStorage.getItem("passedGuests") || "{}");
 
 function validateCode() {
+  document.getElementById("codeInput").value = "";
   guestCode = document.getElementById("codeInput").value.trim();
   const gateMessage = document.getElementById("gateMessage");
 
@@ -113,7 +114,6 @@ function validateCode() {
     lockouts = {};
     gateMessage.textContent = "✅ All lockouts have been cleared.";
     gateMessage.classList.add("fade");
-    document.getElementById("codeInput").value = "";
     return;
   }
 
