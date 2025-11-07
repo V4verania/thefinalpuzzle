@@ -87,7 +87,7 @@ function validateCode() {
   guestCode = document.getElementById("codeInput").value.trim();
   document.getElementById("codeInput").value = "";
   const gateMessage = document.getElementById("gateMessage");
-
+  
   if (guestCode === "RESETPASSED") {
     localStorage.setItem("passedGuests", JSON.stringify({}));
     passedGuests = {};
