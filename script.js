@@ -141,28 +141,31 @@ function validateCode() {
     return;
   }
 
-  fetch("https://thefinalpuzzle-worker.thefinalpuzzle.workers.dev", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ invitationCode: guestCode })
+fetch("https://thefinalpuzzle-worker.thefinalpuzzle.workers.dev", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    invitationCode: guestCode
   })
-    .then(res => res.json())
-    .then(data => {
-      if (data.valid) {
-        document.getElementById("veil").classList.add("hidden");
-        document.getElementById("maze").classList.remove("hidden");
-        document.getElementById("ambientAudio").play().catch(() => {});
-        showRiddle();
-      } else {
-        gateMessage.textContent = "❌ The veil does not recognize you.";
-        gateMessage.classList.add("fade");
-      }
-    })
-    .catch(() => {
-      gateMessage.textContent = "⚠️ The ritual failed. Try again.";
-      gateMessage.classList.add("fade");
-    });
-}
+})
+  .then(res => res.json())
+  .then(data => {
+    console.log("Server response:", data);
+    if (data.valid) {
+      document.getElementById("veil").classList.add("hidden");
+      document.getElementById("maze").classList.remove("hidden");
+      document.getElementById("ambientAudio").play().catch(() => {});
+      showRiddle();
+    } else {
+      document.getElementById("gateMessage").textContent = "❌ The veil does not recognize you.";
+    }
+  })
+  .catch(err => {
+    console.error("Fetch error:", err);
+    document.getElementById("gateMessage").textContent = "⚠️ The ritual failed. Try again.";
+  });
 
 function showRiddle() {
   const riddle = riddles[currentStep];
