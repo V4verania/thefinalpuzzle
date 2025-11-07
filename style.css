@@ -96,3 +96,50 @@ button:hover {
   cursor: pointer;
   color: #fff;
 }
+#ritualAnimation {
+  position: relative;
+  width: 100%;
+  height: 120px;
+  margin-top: 20px;
+  text-align: center;
+}
+
+.flame {
+  width: 20px;
+  height: 40px;
+  margin: 0 auto;
+  background: radial-gradient(ellipse at center, #ffcc00 0%, #ff6600 80%);
+  border-radius: 50% 50% 40% 40%;
+  animation: flicker 1.2s ease-in-out infinite;
+  opacity: 0;
+}
+
+.sigil {
+  font-size: 32px;
+  color: #ffd700;
+  opacity: 0;
+  animation: glow 1.5s ease-in-out forwards;
+}
+
+.veilRipple {
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(to right, transparent, #999, transparent);
+  opacity: 0;
+  animation: ripple 1.5s ease-in-out forwards;
+}
+
+@keyframes flicker {
+  0%, 100% { transform: scaleY(1); opacity: 0.8; }
+  50% { transform: scaleY(1.2); opacity: 1; }
+}
+
+@keyframes glow {
+  0% { opacity: 0; transform: scale(0.8); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes ripple {
+  0% { opacity: 0; transform: scaleX(0); }
+  100% { opacity: 1; transform: scaleX(1); }
+}
