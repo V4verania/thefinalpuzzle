@@ -226,6 +226,15 @@ else {
   dimOverlay.classList.remove("hidden");
   dimOverlay.classList.add("active");
 
+const ripple = document.getElementById("rippleEffect");
+ripple.classList.remove("hidden");
+ripple.classList.add("active");
+
+setTimeout(() => {
+  ripple.classList.remove("active");
+  ripple.classList.add("hidden");
+}, 1000);
+      
   setTimeout(() => {
     dimOverlay.classList.remove("active");
     dimOverlay.classList.add("hidden");
