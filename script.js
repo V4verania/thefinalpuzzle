@@ -8,7 +8,7 @@ The Gardener says he was watering the ferns.
 The Maid says she was collecting the morning mail.
 The police immediately arrest the murderer. Who did it`,
     keywords: ["maid", "the maid"],
-    feedback: "Correct. There’s no mail on Sundays — the maid’s alibi gave her away."
+    feedback: "Correct. There’s no mail on Sundays"
   },
   {
     text: `The Poisoned Drinks  
