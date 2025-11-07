@@ -29,8 +29,7 @@ What am I?`,
     feedback: "Correct. A map shows features without containing them."
   },
   {
-    text: `The Object  
-The person who makes it has no need of it.  
+    text: `The person who makes it has no need of it.  
 The person who buys it has no use for it.  
 The person who uses it can neither see nor feel it.  
 What is it?`,
@@ -38,44 +37,37 @@ What is it?`,
     feedback: "Correct. A coffin is made for the dead — unseen, unfelt by its user."
   },
   {
-    text: `Belonging  
-What belongs to you, but everyone else uses more than you do?`,
+    text: `What belongs to you, but everyone else uses more than you do?`,
     keywords: ["name", "my name"],
     feedback: "Correct. Others speak your name far more than you do."
   },
   {
-    text: `The Silent Runner  
-What can run but never walks, has a mouth but never talks, has a head but never weeps, has a bed but never sleeps?`,
+    text: `What can run but never walks, has a mouth but never talks, has a head but never weeps, has a bed but never sleeps?`,
     keywords: ["river"],
     feedback: "Correct. A river fits all four clues perfectly."
   },
   {
-    text: `The Invisible Guest  
-What can fill a room but takes up no space?`,
+    text: `What can fill a room but takes up no space?`,
     keywords: ["light"],
     feedback: "Correct. Light fills space without occupying it."
   },
   {
-    text: `The Dangerous Companion  
-Always in you, sometimes on you; if I surround you, I can kill you. What am I?`,
+    text: `Always in you, sometimes on you; if I surround you, I can kill you. What am I?`,
     keywords: ["water"],
     feedback: "Correct. Water is essential — but overwhelming, it becomes deadly."
   },
   {
-    text: `The Hungry Touch  
-I’m always hungry, I must always be fed. The finger I touch will soon turn red. What am I?`,
+    text: `I’m always hungry, I must always be fed. The finger I touch will soon turn red. What am I?`,
     keywords: ["fire"],
     feedback: "Correct. Fire consumes and burns — always hungry, always dangerous."
   },
   {
-    text: `The Traveler  
-What can travel around the world while staying in the same spot?`,
+    text: `What can travel around the world while staying in the same spot?`,
     keywords: ["stamp", "postage"],
     feedback: "Correct. A stamp travels far while remaining fixed to the envelope."
   },
   {
-    text: `The Wingless Flyer  
-I fly without wings, I cry without eyes. Wherever I go, darkness follows me. What am I?`,
+    text: `I fly without wings, I cry without eyes. Wherever I go, darkness follows me. What am I?`,
     keywords: ["cloud", "A cloud"],
     feedback: "Correct. A cloud drifts, weeps, and casts shadow — poetic and true."
   }
