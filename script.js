@@ -1,19 +1,19 @@
 const riddles = [
   {
     text: `🕵️‍♀️ The Sunday Alibi  
-A man is found murdered on a Sunday morning.  
-The Maid says she was collecting the morning mail.  
-Who did it, and how did they know?`,
-    keywords: ["mail", "post", "postal"],
+A man is found murdered on a Sunday morning. His wife immediately calls the police, who question the household staff.
+The Butler says he was organizing the wine cellar.
+The Cook says she was preparing breakfast.
+The Gardener says he was watering the ferns.
+The Maid says she was collecting the morning mail.
+The police immediately arrest the murderer. Who did it and how did they know?
+    keywords: ["maid", "the maid"],
     feedback: "Correct. There’s no mail on Sundays — the maid’s alibi gave her away."
   },
   {
     text: `🧊 The Poisoned Drinks  
-Two rivals drink iced tea.  
-The man gulps his quickly and survives.  
-The woman sips hers slowly and dies.  
-How did the man survive?`,
-    keywords: ["ice", "ice cubes", "frozen"],
+Two rivals sit down for a drink. They both order iced tea from the same pitcher. One man drinks his glass very quickly and immediately orders another. The other woman sips her one glass slowly. The woman dies, but the man survives. It is determined that all the drinks were poisoned. How did the man survive?
+    keywords: ["ice", "ice cubes"],
     feedback: "Correct. The poison was in the ice — it melted into her drink, not his."
   },
   {
@@ -37,7 +37,7 @@ What is it?`,
   {
     text: `🗣️ Belonging  
 What belongs to you, but everyone else uses more than you do?`,
-    keywords: ["name"],
+    keywords: ["name", "my name"],
     feedback: "Correct. Others speak your name far more than you do."
   },
   {
@@ -73,7 +73,7 @@ What can travel around the world while staying in the same spot?`,
   {
     text: `☁️ The Wingless Flyer  
 I fly without wings, I cry without eyes. Wherever I go, darkness follows me. What am I?`,
-    keywords: ["cloud"],
+    keywords: ["cloud", "A cloud"],
     feedback: "Correct. A cloud drifts, weeps, and casts shadow — poetic and true."
   }
 ];
