@@ -25,6 +25,14 @@ button:hover {
   background: #5a3a6d;
 }
 
+input[type="text"] {
+  width: 60%;
+  max-width: 400px;
+  background: #1e142a;
+  border: 1px solid #5a3a6d;
+  color: #fff;
+}
+
 .hidden {
   display: none;
 }
@@ -50,6 +58,7 @@ button:hover {
   margin-bottom: 1em;
 }
 
+/* 🕯️ Candle Reveal */
 #candleContainer {
   margin: 2em auto;
   width: 100px;
@@ -86,6 +95,7 @@ button:hover {
   transition: width 1s ease-in-out;
 }
 
+/* 🔊 Mute Toggle */
 #muteToggle {
   position: fixed;
   bottom: 20px;
@@ -96,6 +106,8 @@ button:hover {
   cursor: pointer;
   color: #fff;
 }
+
+/* 🔥 Ritual Animation */
 #ritualAnimation {
   position: relative;
   width: 100%;
@@ -127,11 +139,6 @@ button:hover {
   background: linear-gradient(to right, transparent, #999, transparent);
   opacity: 0;
   animation: ripple 1.5s ease-in-out forwards;
-}
-
-@keyframes flicker {
-  0%, 100% { transform: scaleY(1); opacity: 0.8; }
-  50% { transform: scaleY(1.2); opacity: 1; }
 }
 
 @keyframes glow {
