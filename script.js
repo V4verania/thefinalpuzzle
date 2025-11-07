@@ -142,7 +142,7 @@ function validateCode() {
   fetch("https://thefinalpuzzle-worker.thefinalpuzzle.workers.dev", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ code: guestCode })
+    body: JSON.stringify({ invitationCode: guestCode })
   })
     .then(res => res.json())
     .then(data => {
