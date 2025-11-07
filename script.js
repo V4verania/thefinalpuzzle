@@ -224,10 +224,10 @@ function showRiddle() {
       }, 1200);
 
       const lockoutDate = new Date();
-      lockoutDate.setHours(lockoutDate.getHours() + 5);
+      lockoutDate.setHours(lockoutDate.getHours() + 2);
       await saveLockout(guestCode, lockoutDate.toISOString());
 
-      feedback.textContent = `🕯️ The veil shudders. That is not the path. Return in 24 hours.`;
+      feedback.textContent = `🕯️ The veil shudders. That is not the path. Return in 2 hours.`;
       feedback.classList.add("fade");
       choicesDiv.innerHTML = "";
     }
