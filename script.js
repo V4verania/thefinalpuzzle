@@ -1,5 +1,3 @@
-console.log("Sending to server:", JSON.stringify({ code: guestCode }));
-
 const riddles = [
   {
     text: `🕵️‍♀️ The Sunday Alibi  
@@ -141,17 +139,12 @@ function validateCode() {
     return;
   }
 
-  // ✅ This fetch block must be inside validateCode()
-  console.log("Sending to server:", JSON.stringify({ code: guestCode }));
+  console.log("Sending to server:", JSON.stringify({ invitationCode: guestCode }));
 
   fetch("https://thefinalpuzzle-worker.thefinalpuzzle.workers.dev", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      invitationCode: guestCode
-    })
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ invitationCode: guestCode })
   })
     .then(res => res.json())
     .then(data => {
@@ -169,5 +162,121 @@ function validateCode() {
       console.error("Fetch error:", err);
       gateMessage.textContent = "⚠️ The ritual failed. Try again.";
     });
-} 
+}
+
+function showRiddle() {
+  const riddle = riddles[currentStep];
+  const riddleText = document.getElementById("riddleText");
+  const choicesDiv = document.getElementById("choices");
+  const feedback = document.getElementById("feedback");
+
+  riddleText.textContent = riddle.text;
+  feedback.textContent = "";
+  choicesDiv.innerHTML = `
+    <input type="text" id="riddleInput" placeholder="Type your answer..." />
+    <button id="submitRiddle">Submit</button>
+  `;
+
+  document.getElementById("submitRiddle").onclick = () => {
+    const userInput = document.getElementById("riddleInput").value.trim().toLowerCase();
+    const matched = riddle.keywords.some(keyword => userInput.includes(keyword));
+
+    if (matched) {
+      feedback.textContent = riddle.feedback;
+      feedback.classList.add("fade");
+
+      const ritual = document.getElementById("ritualAnimation");
+      ritual.classList.remove("hidden");
+      ritual.querySelector(".flame").style.opacity = "1";
+      ritual.querySelector(".sigil").style.opacity = "1";
+      ritual.querySelector(".veilRipple").style.opacity = "1";
+
+      const whisper = document.getElementById("whisperAudio");
+      if (whisper) {
+        whisper.currentTime = 0;
+        whisper.play().catch(() => {});
+      }
+
+      setTimeout(() => {
+        ritual.classList.add("hidden");
+        ritual.querySelector(".flame").style.opacity = "0";
+        ritual.querySelector(".sigil").style.opacity = "0";
+        ritual.querySelector(".veilRipple").style.opacity = "0";
+      }, 1800);
+
+      currentStep++;
+      if (currentStep < riddles.length) {
+        setTimeout(showRiddle, 2000);
+      } else {
+        passedGuests[guestCode] = true;
+        localStorage.setItem("passedGuests", JSON.stringify(passedGuests));
+        document.getElementById("maze").classList.add("hidden");
+        document.getElementById("reveal").classList.remove("hidden");
+        showFinalReveal();
+      }
+    } else {
+      const lockoutDate = new Date();
+      lockoutDate.setHours(lockoutDate.getHours() + 24);
+      lockouts[guestCode] = lockoutDate.toISOString();
+      localStorage.setItem("lockouts", JSON.stringify(lockouts));
+      feedback.textContent = `🕯️ The veil shudders. That is not the path. Return in 24 hours.`;
+      feedback.classList.add("fade");
+      choicesDiv.innerHTML = "";
+    }
+  };
+}
+
+function showFinalReveal() {
+  const revealDiv = document.getElementById("reveal");
+  revealDiv.classList.remove("hidden");
+
+  const now = new Date();
+  const revealDate = new Date("2026-02-01T00:00:00");
+
+  if (now < revealDate) {
+    const daysLeft = Math.ceil((revealDate - now) / (1000 * 60 * 60 * 24));
+    const percent = Math.min(
+      100,
+      Math.floor(
+        (1 - (revealDate - now) / (revealDate - new Date("2025-11-01T00:00:00"))) * 100
+      )
+    );
+
+    revealDiv.innerHTML = `
+      <h2 class="fade">You have reached the inner sanctum.</h2>
+      <p class="fade">The dossiers remain sealed.</p>
+      <p class="fade">The flame will reveal them in <strong>${daysLeft} days</strong>...</p>
+      <div id="candleContainer" class="fade">
+        <div id="candleFlame"></div>
+        <div id="candleMeter">
+          <div id="candleFill" style="width:${percent}%"></div>
+        </div>
+      </div>
+    `;
+  } else {
+    revealDiv.innerHTML = `
+      <h2 class="fade">Your character dossier is ready.</h2>
+      <p class="fade">The veil parts. Your role awaits...</p>
+      <p class="fade">Code: <strong>${guestCode}</strong></p>
+      <!-- TODO: Load dossier based on code -->
+    `;
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const button = document.getElementById("submitCode");
+  if (button) {
+    button.addEventListener("click", validateCode);
+  }
+
+  const muteToggle = document.getElementById("muteToggle");
+  const ambientAudio = document.getElementById("ambientAudio");
+
+  if (muteToggle && ambientAudio) {
+    muteToggle.addEventListener("click", () => {
+      ambientAudio.muted = !ambientAudio.muted;
+      muteToggle.textContent = ambientAudio.muted ? "🔇" : "🔊";
+    });
+  }
+});
 
