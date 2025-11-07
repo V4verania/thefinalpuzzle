@@ -1,3 +1,4 @@
+let passedGuests = JSON.parse(localStorage.getItem("passedGuests") || "{}");
 const riddles = [
   {
     text: `“I am taken before you speak,  
@@ -96,6 +97,21 @@ function validateCode() {
   guestCode = document.getElementById("codeInput").value.trim();
   const gateMessage = document.getElementById("gateMessage");
 
+  if (passedGuests[guestCode]) {
+  document.getElementById("veil").classList.add("hidden");
+  document.getElementById("maze").classList.add("hidden");
+  document.getElementById("reveal").classList.remove("hidden");
+  showFinalReveal();
+  return;
+}
+
+  if (guestCode === "RESETPASSED") {
+  localStorage.setItem("passedGuests", JSON.stringify({}));
+  passedGuests = {};
+  gateMessage.textContent = "✅ All passed flags have been cleared.";
+  gateMessage.classList.add("fade");
+  return;
+}
   if (guestCode === "RESETALL") {
     localStorage.setItem("lockouts", JSON.stringify({}));
     lockouts = {};
@@ -190,6 +206,13 @@ function showRiddle() {
     };
     choicesDiv.appendChild(btn);
   });
+  if (currentStep < riddles.length) {
+  setTimeout(showRiddle, 2000);
+} else {
+  passedGuests[guestCode] = true;
+  localStorage.setItem("passedGuests", JSON.stringify(passedGuests));
+  setTimeout(showFinalReveal, 2000);
+}
 }
 
 function showFinalReveal() {
