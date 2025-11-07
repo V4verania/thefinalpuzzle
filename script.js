@@ -94,8 +94,8 @@ let lockouts = JSON.parse(localStorage.getItem("lockouts") || "{}");
 let passedGuests = JSON.parse(localStorage.getItem("passedGuests") || "{}");
 
 function validateCode() {
-  document.getElementById("codeInput").value = "";
   guestCode = document.getElementById("codeInput").value.trim();
+  document.getElementById("codeInput").value = "";
   const gateMessage = document.getElementById("gateMessage");
 
   // ✅ Admin override: clear passed flags
