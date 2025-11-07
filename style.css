@@ -162,3 +162,19 @@ input[type="text"] {
   z-index: 10;
   pointer-events: none;
 }
+#dimOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5); /* semi-transparent black */
+  z-index: 999;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+#dimOverlay.active {
+  opacity: 1;
+}
