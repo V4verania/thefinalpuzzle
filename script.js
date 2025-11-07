@@ -209,9 +209,10 @@ const matched = riddle.keywords.some(keyword => normalizedInput.includes(keyword
       }, 1800);
 
       currentStep++;
-      if (currentStep < riddles.length) {
-        setTimeout(showRiddle, 2000);
-      } else {
+if (currentStep < riddles.length) {
+  setTimeout(showRiddle, 4500); // or 5000 for a full 5 seconds
+}
+else {
         passedGuests[guestCode] = true;
         localStorage.setItem("passedGuests", JSON.stringify(passedGuests));
         document.getElementById("maze").classList.add("hidden");
