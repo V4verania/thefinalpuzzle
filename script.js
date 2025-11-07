@@ -107,24 +107,27 @@ async function validateCode() {
   document.getElementById("codeInput").value = "";
   const gateMessage = document.getElementById("gateMessage");
 
-  if (guestCode === "RESETPASSED" || guestCode === "RESETALL") {
-    gateMessage.textContent = "⚠️ Reset commands are now handled server-side.";
-    gateMessage.classList.add("fade");
+  if (!guestCode) {
+    gateMessage.textContent = "❌ Please enter a code.";
     return;
   }
 
-  const lockoutData = await getLockout(guestCode);
+  // Check lockout
+  const lockoutRes = await fetch(`${WORKER_URL}?code=${guestCode}&type=lockout`);
+  const lockoutData = await lockoutRes.json();
   if (lockoutData.until && new Date(lockoutData.until) > new Date()) {
     gateMessage.textContent = `⛔ The veil is sealed. Return after ${new Date(lockoutData.until).toLocaleString()}`;
     gateMessage.classList.add("fade");
     return;
   }
 
-  const statusRes = await fetch(`${WORKER_URL}?type=progress`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ code: guestCode, step: 0 })
-  });
+  // Retrieve progress
+  const progressRes = await fetch(`${WORKER_URL}?code=${guestCode}&type=progress`);
+  const progressData = await progressRes.json();
+  currentStep = progressData.step || 0;
+
+  // Validate code and check reveal
+  const statusRes = await fetch(`${WORKER_URL}/validate?code=${guestCode}`);
   const status = await statusRes.json();
 
   if (!status.valid) {
@@ -135,15 +138,12 @@ async function validateCode() {
   if (status.revealed) {
     showFinalReveal();
   } else {
-    const progressData = await getProgress(guestCode);
-    currentStep = progressData.step || 0;
     document.getElementById("veil").classList.add("hidden");
     document.getElementById("maze").classList.remove("hidden");
     document.getElementById("ambientAudio").play().catch(() => {});
     showRiddle();
   }
 }
-
 function showRiddle() {
   const riddle = riddles[currentStep];
   const riddleText = document.getElementById("riddleText");
