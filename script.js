@@ -1,90 +1,94 @@
 const riddles = [
   {
-    text: `“I am taken before you speak,  
-Yet never held or seen.  
-I vanish when revealed —  
-What am I?”`,
-    options: ["A mask", "A secret", "A whisper", "A thought"],
-    answer: "A secret",
-    feedback: "Correct. A secret disappears the moment it’s shared."
+    text: `🕵️‍♀️ The Sunday Alibi  
+A man is found murdered on a Sunday morning.  
+The Butler was organizing the wine cellar.  
+The Cook was preparing breakfast.  
+The Gardener was watering the ferns.  
+The Maid was collecting the morning mail.  
+The police arrest the killer immediately.  
+Who did it, and how did they know?`,
+    keywords: ["mail", "post", "postal"],
+    feedback: "Correct. There’s no mail on Sundays — the maid’s alibi gave her away."
   },
   {
-    text: `“Five glasses stand in a row.  
-Four are wet, one is dry.  
-One guest stayed silent —  
-Which glass is theirs?”`,
-    options: ["The first", "The last", "The dry one", "The tallest"],
-    answer: "The dry one",
-    feedback: "Correct. The silent guest didn’t toast — their glass remains untouched."
+    text: `🧊 The Poisoned Drinks  
+Two rivals drink iced tea from the same pitcher.  
+The man gulps his quickly and survives.  
+The woman sips hers slowly and dies.  
+All the drinks were poisoned.  
+How did the man survive?`,
+    keywords: ["ice", "ice cubes", "frozen"],
+    feedback: "Correct. The poison was in the ice — it melted into her drink, not his."
   },
   {
-    text: `“Three books lie untouched:  
-One burned, one frozen, one blank.  
-Only one hides a message.  
-Which do you read?”`,
-    options: ["The burned book", "The frozen book", "The blank book", "The torn book"],
-    answer: "The blank book",
-    feedback: "Correct. A blank page invites discovery — the message is hidden in absence."
+    text: `🗺️ What Am I?  
+I have cities, but no houses.  
+I have mountains, but no trees.  
+I have water, but no fish.  
+What am I?`,
+    keywords: ["map"],
+    feedback: "Correct. A map shows features without containing them."
   },
   {
-    text: `“A record spins, no sound plays.  
-A guest hums a tune you’ve never heard,  
-Yet it feels familiar.  
-What kind of song is it?”`,
-    options: ["A lullaby", "A chant", "A hymn", "A memory"],
-    answer: "A lullaby",
-    feedback: "Correct. A lullaby is remembered without being heard — soft, haunting, familiar."
+    text: `⚰️ The Object  
+The person who makes it has no need of it.  
+The person who buys it has no use for it.  
+The person who uses it can neither see nor feel it.  
+What is it?`,
+    keywords: ["coffin", "casket"],
+    feedback: "Correct. A coffin is made for the dead — unseen, unfelt by its user."
   },
   {
-    text: `“Four flowers bloom:  
-One fades quickly, one lasts long, one has no name, one is remembered.  
-Which one symbolizes memory?”`,
-    options: ["Rose", "Lily", "Forget-me-not", "Orchid"],
-    answer: "Forget-me-not",
-    feedback: "Correct. Its name is the clue — it resists forgetting."
+    text: `🗣️ Belonging  
+What belongs to you, but everyone else uses more than you do?`,
+    keywords: ["name"],
+    feedback: "Correct. Others speak your name far more than you do."
   },
   {
-    text: `“A fire burns.  
-Ashes fall.  
-Something rises, thin and grey.  
-What remains?”`,
-    options: ["Smoke", "Regret", "Heat", "Dust"],
-    answer: "Smoke",
-    feedback: "Correct. Smoke is the lingering trace of flame — visible, ephemeral, real."
+    text: `🌊 The Silent Runner  
+What can run but never walks,  
+has a mouth but never talks,  
+has a head but never weeps,  
+has a bed but never sleeps?`,
+    keywords: ["river"],
+    feedback: "Correct. A river fits all four clues perfectly."
   },
   {
-    text: `“Four bottles sit on a shelf:  
-One labeled, one dusty, one cracked, one blank.  
-Which one holds the unknown?”`,
-    options: ["The labeled one", "The dusty one", "The cracked one", "The blank one"],
-    answer: "The blank one",
-    feedback: "Correct. Without a label, its contents are a mystery — the unknown lies within."
+    text: `💡 The Invisible Guest  
+What can fill a room but takes up no space?`,
+    keywords: ["light"],
+    feedback: "Correct. Light fills space without occupying it."
   },
   {
-    text: `“A bell rings.  
-No one is seen.  
-Yet something moves.  
-Who responded?”`,
-    options: ["The wind", "The unseen", "The host", "The echo"],
-    answer: "The unseen",
-    feedback: "Correct. If no one is visible, the answer must be the unseen."
+    text: `💧 The Dangerous Companion  
+Always in you, sometimes on you;  
+if I surround you, I can kill you.  
+What am I?`,
+    keywords: ["water"],
+    feedback: "Correct. Water is essential — but overwhelming, it becomes deadly."
   },
   {
-    text: `“Three mirrors reflect:  
-One shows your past, one shows disguise, one shows nothing.  
-Which one tells the truth?”`,
-    options: ["The past mirror", "The disguised mirror", "The empty mirror", "The broken mirror"],
-    answer: "The empty mirror",
-    feedback: "Correct. No reflection means no distortion — truth lies in absence."
+    text: `🔥 The Hungry Touch  
+I’m always hungry, I must always be fed.  
+The finger I touch will soon turn red.  
+What am I?`,
+    keywords: ["fire"],
+    feedback: "Correct. Fire consumes and burns — always hungry, always dangerous."
   },
   {
-    text: `“Ten doors, one locked.  
-No key, no code.  
-Only a whisper opens it.  
-What do you say?”`,
-    options: ["I remember.", "Forgive me.", "It was me.", "Let me in."],
-    answer: "It was me.",
-    feedback: "Correct. A confession is the key — ownership ends the puzzle."
+    text: `✉️ The Traveler  
+What can travel around the world while staying in the same spot?`,
+    keywords: ["stamp", "postage"],
+    feedback: "Correct. A stamp travels far while remaining fixed to the envelope."
+  },
+  {
+    text: `☁️ The Wingless Flyer  
+I fly without wings, I cry without eyes.  
+Wherever I go, darkness follows me.  
+What am I?`,
+    keywords: ["cloud"],
+    feedback: "Correct. A cloud drifts, weeps, and casts shadow — poetic and true."
   }
 ];
 
@@ -98,17 +102,14 @@ function validateCode() {
   document.getElementById("codeInput").value = "";
   const gateMessage = document.getElementById("gateMessage");
 
-  // ✅ Admin override: clear passed flags
   if (guestCode === "RESETPASSED") {
     localStorage.setItem("passedGuests", JSON.stringify({}));
     passedGuests = {};
     gateMessage.textContent = "✅ All passed flags have been cleared.";
     gateMessage.classList.add("fade");
-    document.getElementById("codeInput").value = "";
     return;
   }
 
-  // ✅ Admin override: clear lockouts
   if (guestCode === "RESETALL") {
     localStorage.setItem("lockouts", JSON.stringify({}));
     lockouts = {};
@@ -117,7 +118,6 @@ function validateCode() {
     return;
   }
 
-  // ✅ Bypass maze if guest already passed
   if (passedGuests[guestCode]) {
     document.getElementById("veil").classList.add("hidden");
     document.getElementById("maze").classList.add("hidden");
@@ -126,7 +126,6 @@ function validateCode() {
     return;
   }
 
-  // ✅ Lockout check
   const lockoutUntil = lockouts[guestCode];
   if (lockoutUntil) {
     const unlockDate = new Date(lockoutUntil);
@@ -154,7 +153,6 @@ function validateCode() {
     return;
   }
 
-  // ✅ Validate code via fetch
   fetch("https://thefinalpuzzle-worker.thefinalpuzzle.workers.dev", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -186,88 +184,44 @@ function showRiddle() {
 
   riddleText.textContent = riddle.text;
   feedback.textContent = "";
-  choicesDiv.innerHTML = "";
+  choicesDiv.innerHTML = `
+    <input type="text" id="riddleInput" placeholder="Type your answer..." />
+    <button id="submitRiddle">Submit</button>
+  `;
 
-  riddle.options.forEach(option => {
-    const btn = document.createElement("button");
-    btn.textContent = option;
-    btn.classList.add("fade");
-    btn.onclick = () => {
-      if (option === riddle.answer) {
-        feedback.textContent = riddle.feedback;
-        feedback.classList.add("fade");
-        currentStep++;
+  document.getElementById("submitRiddle").onclick = () => {
+    const userInput = document.getElementById("riddleInput").value.trim().toLowerCase();
+    const matched = riddle.keywords.some(keyword => userInput.includes(keyword));
 
-        if (currentStep < riddles.length) {
-          setTimeout(showRiddle, 2000);
-        } else {
-          passedGuests[guestCode] = true;
-          localStorage.setItem("passedGuests", JSON.stringify(passedGuests));
-          document.getElementById("maze").classList.add("hidden");
-          document.getElementById("reveal").classList.remove("hidden");
-          showFinalReveal();
-        }
-      } else {
-        const lockoutDate = new Date();
-        lockoutDate.setHours(lockoutDate.getHours() + 24);
-        lockouts[guestCode] = lockoutDate.toISOString();
-        localStorage.setItem("lockouts", JSON.stringify(lockouts));
-        feedback.textContent = `🕯️ The veil shudders. That is not the path. Return in 24 hours.`;
-        feedback.classList.add("fade");
-        choicesDiv.innerHTML = "";
+    if (matched) {
+      feedback.textContent = riddle.feedback;
+      feedback.classList.add("fade");
+
+      // 🔥 Ritual animation
+      const ritual = document.getElementById("ritualAnimation");
+      ritual.classList.remove("hidden");
+      ritual.querySelector(".flame").style.opacity = "1";
+      ritual.querySelector(".sigil").style.opacity = "1";
+      ritual.querySelector(".veilRipple").style.opacity = "1";
+
+      // 🔊 Whisper sound
+      const whisper = document.getElementById("whisperAudio");
+      if (whisper) {
+        whisper.currentTime = 0;
+        whisper.play().catch(() => {});
       }
-    };
-    choicesDiv.appendChild(btn);
-  });
-}
 
-function showFinalReveal() {
-  const revealDiv = document.getElementById("reveal");
-  revealDiv.classList.remove("hidden");
+      setTimeout(() => {
+        ritual.classList.add("hidden");
+        ritual.querySelector(".flame").style.opacity = "0";
+        ritual.querySelector(".sigil").style.opacity = "0";
+        ritual.querySelector(".veilRipple").style.opacity = "0";
+      }, 1800);
 
-  const now = new Date();
-  const revealDate = new Date("2026-02-01T00:00:00");
-
-  if (now < revealDate) {
-    const daysLeft = Math.ceil((revealDate - now) / (1000 * 60 * 60 * 24));
-    const percent = Math.min(100, Math.floor((1 - (revealDate - now) / (revealDate - new Date("2025-11-01T00:00:00"))) * 100));
-
-    revealDiv.innerHTML = `
-      <h2 class="fade">You have reached the inner sanctum.</h2>
-      <p class="fade">The dossiers remain sealed.</p>
-      <p class="fade">The flame will reveal them in <strong>${daysLeft} days</strong>...</p>
-      <div id="candleContainer" class="fade">
-        <div id="candleFlame"></div>
-        <div id="candleMeter">
-          <div id="candleFill" style="width:${percent}%"></div>
-        </div>
-      </div>
-    `;
-  } else {
-    revealDiv.innerHTML = `
-      <h2 class="fade">Your character dossier is ready.</h2>
-      <p class="fade">The veil parts. Your role awaits...</p>
-      <p class="fade">Code: <strong>${guestCode}</strong></p>
-      <!-- TODO: Load dossier based on code -->
-    `;
-  }
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  const button = document.getElementById("submitCode");
-  if (button) button.addEventListener("click", validateCode);
-
-  const muteToggle = document.getElementById("muteToggle");
-  const ambientAudio = document.getElementById("ambientAudio");
-
-  if (muteToggle && ambientAudio) {
-    muteToggle.addEventListener("click", () => {
-      ambientAudio.muted = !ambientAudio.muted;
-      muteToggle.textContent = ambientAudio.muted ? "🔇" : "🔊";
-    });
-  }
-});
-
-
-
-
+      currentStep++;
+      if (currentStep < riddles.length) {
+        setTimeout(showRiddle, 2000);
+      } else {
+        passedGuests[guestCode] = true;
+        localStorage.setItem("passedGuests", JSON.stringify(passedGuests));
+        document
