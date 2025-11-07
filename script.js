@@ -145,6 +145,11 @@ async function validateCode() {
   }
 }
 function showRiddle() {
+  if (currentStep >= riddles.length) {
+    showFinalReveal();
+    return;
+  }
+
   const riddle = riddles[currentStep];
   const riddleText = document.getElementById("riddleText");
   const choicesDiv = document.getElementById("choices");
