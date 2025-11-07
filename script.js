@@ -1,3 +1,5 @@
+console.log("Sending to server:", JSON.stringify({ code: guestCode }));
+
 const riddles = [
   {
     text: `🕵️‍♀️ The Sunday Alibi  
