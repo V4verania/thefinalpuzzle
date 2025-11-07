@@ -16,12 +16,14 @@
     <button id="submitCode">Submit</button>
     <p id="gateMessage" class="fade"></p>
   </div>
-  
-<div id="ritualAnimation" class="hidden">
-  <div class="flame"></div>
-  <div class="sigil">✶</div>
-  <div class="veilRipple"></div>
-</div>
+
+  <!-- 🔥 Ritual Animation -->
+  <div id="ritualAnimation" class="hidden">
+    <div class="flame"></div>
+    <div class="sigil">✶</div>
+    <div class="veilRipple"></div>
+  </div>
+
   <!-- 🧩 Riddle Maze -->
   <div id="maze" class="hidden">
     <div id="riddleContainer">
@@ -32,13 +34,14 @@
   </div>
 
   <!-- 🕯️ Final Reveal -->
-  <div id="reveal" class="hidden">
-    <!-- Content injected by script.js -->
-  </div>
+  <div id="reveal" class="hidden"></div>
 
-  <!-- ✅ Load script after DOM is ready -->
+  <!-- 🎵 Audio -->
+  <audio id="ambientAudio" src="ambient.mp3" loop autoplay></audio>
+  <audio id="whisperAudio" src="whisper.mp3" preload="auto"></audio>
+  <button id="muteToggle" class="fade" aria-label="Toggle sound">🔊</button>
+
+  <!-- ✅ Script -->
   <script src="script.js"></script>
-<audio id="ambientAudio" src="ambient.mp3" loop autoplay></audio>
-<button id="muteToggle" class="fade" aria-label="Toggle sound">🔊</button>
 </body>
 </html>
