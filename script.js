@@ -1,6 +1,6 @@
 const riddles = [
   {
-    text: `🕵️‍♀️ The Sunday Alibi  
+    text: `The Sunday Alibi  
 A man is found murdered on a Sunday morning. His wife immediately calls the police, who question the household staff.
 The Butler says he was organizing the wine cellar.
 The Cook says she was preparing breakfast.
@@ -11,7 +11,7 @@ The police immediately arrest the murderer. Who did it`,
     feedback: "Correct. There’s no mail on Sundays — the maid’s alibi gave her away."
   },
   {
-    text: `🧊 The Poisoned Drinks  
+    text: `The Poisoned Drinks  
 Two rivals sit down for a drink. They both order iced tea from the same pitcher. One man drinks his glass very quickly and 
   immediately orders another. The other woman sips her one glass slowly. The woman dies, but the man survives. It is determined that all the drinks were poisoned. 
     How did the man survive?`,
@@ -20,7 +20,7 @@ Two rivals sit down for a drink. They both order iced tea from the same pitcher.
     feedback: "Correct. The poison was in the ice — it melted into her drink, not his."
   },
   {
-    text: `🗺️ What Am I?  
+    text: `What Am I?  
 I have cities, but no houses.  
 I have mountains, but no trees.  
 I have water, but no fish.  
@@ -29,7 +29,7 @@ What am I?`,
     feedback: "Correct. A map shows features without containing them."
   },
   {
-    text: `⚰️ The Object  
+    text: `The Object  
 The person who makes it has no need of it.  
 The person who buys it has no use for it.  
 The person who uses it can neither see nor feel it.  
@@ -38,43 +38,43 @@ What is it?`,
     feedback: "Correct. A coffin is made for the dead — unseen, unfelt by its user."
   },
   {
-    text: `🗣️ Belonging  
+    text: `Belonging  
 What belongs to you, but everyone else uses more than you do?`,
     keywords: ["name", "my name"],
     feedback: "Correct. Others speak your name far more than you do."
   },
   {
-    text: `🌊 The Silent Runner  
+    text: `The Silent Runner  
 What can run but never walks, has a mouth but never talks, has a head but never weeps, has a bed but never sleeps?`,
     keywords: ["river"],
     feedback: "Correct. A river fits all four clues perfectly."
   },
   {
-    text: `💡 The Invisible Guest  
+    text: `The Invisible Guest  
 What can fill a room but takes up no space?`,
     keywords: ["light"],
     feedback: "Correct. Light fills space without occupying it."
   },
   {
-    text: `💧 The Dangerous Companion  
+    text: `The Dangerous Companion  
 Always in you, sometimes on you; if I surround you, I can kill you. What am I?`,
     keywords: ["water"],
     feedback: "Correct. Water is essential — but overwhelming, it becomes deadly."
   },
   {
-    text: `🔥 The Hungry Touch  
+    text: `The Hungry Touch  
 I’m always hungry, I must always be fed. The finger I touch will soon turn red. What am I?`,
     keywords: ["fire"],
     feedback: "Correct. Fire consumes and burns — always hungry, always dangerous."
   },
   {
-    text: `✉️ The Traveler  
+    text: `The Traveler  
 What can travel around the world while staying in the same spot?`,
     keywords: ["stamp", "postage"],
     feedback: "Correct. A stamp travels far while remaining fixed to the envelope."
   },
   {
-    text: `☁️ The Wingless Flyer  
+    text: `The Wingless Flyer  
 I fly without wings, I cry without eyes. Wherever I go, darkness follows me. What am I?`,
     keywords: ["cloud", "A cloud"],
     feedback: "Correct. A cloud drifts, weeps, and casts shadow — poetic and true."
