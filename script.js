@@ -213,20 +213,36 @@ else {
         document.getElementById("reveal").classList.remove("hidden");
         showFinalReveal();
       }
-    } else {
-      const lockoutDate = new Date();
-      lockoutDate.setHours(lockoutDate.getHours() + 24);
-      lockouts[guestCode] = lockoutDate.toISOString();
-      localStorage.setItem("lockouts", JSON.stringify(lockouts));
-      const wrongAudio = document.getElementById("wrongAnswerAudio");
-if (wrongAudio) {
-  wrongAudio.currentTime = 0;
-  wrongAudio.play().catch(() => {});
+ } else {
+  // 🔊 Play wrong answer sound
+  const wrongAudio = document.getElementById("wrongAnswerAudio");
+  if (wrongAudio) {
+    wrongAudio.currentTime = 0;
+    wrongAudio.play().catch(() => {});
+  }
+
+  // 🌘 Dim the screen briefly
+  const dimOverlay = document.getElementById("dimOverlay");
+  dimOverlay.classList.remove("hidden");
+  dimOverlay.classList.add("active");
+
+  setTimeout(() => {
+    dimOverlay.classList.remove("active");
+    dimOverlay.classList.add("hidden");
+  }, 1200);
+
+  // 🔒 Lock out the guest
+  const lockoutDate = new Date();
+  lockoutDate.setHours(lockoutDate.getHours() + 24);
+  lockouts[guestCode] = lockoutDate.toISOString();
+  localStorage.setItem("lockouts", JSON.stringify(lockouts));
+
+  // 🕯️ Feedback
+  feedback.textContent = `🕯️ The veil shudders. That is not the path. Return in 24 hours.`;
+  feedback.classList.add("fade");
+  choicesDiv.innerHTML = "";
 }
-      feedback.textContent = `🕯️ The veil shudders. That is not the path. Return in 24 hours.`;
-      feedback.classList.add("fade");
-      choicesDiv.innerHTML = "";
-    }
+
   };
 }
 
