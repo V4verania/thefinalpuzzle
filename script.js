@@ -256,7 +256,7 @@ const alreadyRSVPd = rsvpData.confirmed === true;
 
 if (alreadyRSVPd) {
   html += `
-    <p class="fade">✅ You have already whispered. Elena awaits.</p>
+    <p class="fade">✅ Thank you. You have already RSVP'd.</p>
   `;
 } else {
   html += `
@@ -271,7 +271,7 @@ if (alreadyRSVPd) {
 
 html += `
   <div class="fade" style="margin-top: 2em;">
-    <p>Join the whispers:</p>
+    <p>Join the circle:</p>
     <img src="innercircle.png" alt="Join WhatsApp group QR code" style="margin-top: 0.5em; width: 150px; height: 150px;" />
   </div>
 `;
@@ -293,9 +293,9 @@ html += `
       <p class="fade">You are invited to an evening of secrets, symbols, and shadows at:</p>
       <p class="fade"><strong>The Dene of Whispers</strong></p>
       <p class="fade">Number 40, you know the place</p>
-      <p class="fade">RSVP Required, follow the QR code.</p>
-      <p class="fade"> Elena awaits. The Whispering Archivist will speak. </p>
-      <p class="fade"> The flame will reveal more instructions in <strong>${daysLeft} days</strong>...</p>
+      <p class="fade">RSVP and follow the QR code.</p>
+      <p class="fade"> Your host Elena awaits. The Whispering Archivist will speak. </p>
+      <p class="fade"> The flame will reveal more instructions in <strong>${daysLeft} days, return then</strong>...</p>
       <div id="candleContainer" class="fade">
         <div id="candleFlame"></div>
         <div id="candleMeter">
@@ -331,7 +331,7 @@ revealDiv.innerHTML = html;
         const result = await res.json();
         const message = document.getElementById("rsvpMessage");
         message.textContent = result.success
-          ? "✅ RSVP confirmed. Elena has received your whisper. You will be summoned."
+          ? "✅ RSVP confirmed. Elena has received your instructions. You will be summoned."
           : "⚠️ RSVP failed. The veil resisted. Try again or speak with the Archivist.";
 
         if (result.success) {
