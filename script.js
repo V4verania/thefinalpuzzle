@@ -247,7 +247,7 @@ async function showFinalReveal() {
   revealDiv.classList.remove("hidden");
 
   const now = new Date();
-  const revealDate = new Date("2026-02-01T00:00:00");
+  const revealDate = new Date("2025-10-01T00:00:00");
 
   let html = ""; // ✅ This line is essential
 const rsvpRes = await fetch(`${WORKER_URL}?code=${guestCode}&type=rsvp`);
@@ -294,7 +294,7 @@ if (rsvpData.dossier && rsvpData.description && now >= revealDate) {
       <p class="fade"><strong>The Dene of Whispers</strong></p>
       <p class="fade">Number 40, you know the place</p>
       <p class="fade">RSVP and follow the QR code.</p>
-      <p class="fade"> Your host Elena awaits. The Whispering Archivist will speak. </p>
+      <p class="fade"> Your host Elena awaits your company. The Whispering Archivist will speak. </p>
       <p class="fade"> The flame will reveal more instructions in <strong>${daysLeft} days, return then</strong>...</p>
       <div id="candleContainer" class="fade">
         <div id="candleFlame"></div>
