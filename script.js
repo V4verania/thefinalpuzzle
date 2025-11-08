@@ -280,14 +280,28 @@ The Whispering Archivist will speak.
         </div>
       </div>
     `;
-  } else {
-    revealDiv.innerHTML = `
-      <h2 class="fade">Your character dossier is ready.</h2>
-      <p class="fade">The veil parts. Your role awaits...</p>
-      <p class="fade">Code: <strong>${guestCode}</strong></p>
-      <!-- TODO: Load dossier based on code -->
-    `;
-  }
+ } else {
+  revealDiv.innerHTML = `
+    <h2 class="fade">Your character dossier is ready.</h2>
+    <p class="fade">The veil parts. Your role awaits...</p>
+    <p class="fade">Code: <strong>${guestCode}</strong></p>
+    <button id="rsvpButton" class="fade">Confirm RSVP</button>
+    <p id="rsvpMessage" class="fade"></p>
+  `;
+
+  document.getElementById("rsvpButton").onclick = async () => {
+    const res = await fetch(`${WORKER_URL}?type=rsvp`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: guestCode, confirmed: true })
+    });
+
+    const result = await res.json();
+    const message = document.getElementById("rsvpMessage");
+    message.textContent = result.success
+      ? "✅ RSVP confirmed. Elena has received your whisper."
+      : "⚠️ RSVP failed. Try again or speak with the Archivist.";
+  };
 }
 
 document.addEventListener("DOMContentLoaded", () => {
