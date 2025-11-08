@@ -250,17 +250,25 @@ function showFinalReveal() {
   const revealDate = new Date("2026-02-01T00:00:00");
 
   let html = ""; // ✅ This line is essential
+const rsvpRes = await fetch(`${WORKER_URL}?code=${guestCode}&type=rsvp`);
+const rsvpData = await rsvpRes.json();
+const alreadyRSVPd = rsvpData.confirmed === true;
 
-html += `
-  <form id="rsvpForm" class="fade">
-    <label for="dietInput">Any dietary requirements?</label>
-    <input id="dietInput" type="text" placeholder="e.g. vegetarian, gluten-free" />
-    <button id="rsvpButton">Confirm RSVP</button>
-    <p id="rsvpMessage" aria-live="polite"></p>
-  </form>
-`;
-
+if (alreadyRSVPd) {
   html += `
+    <p class="fade">✅ You have already whispered. Elena awaits.</p>
+  `;
+} else {
+  html += `
+    <form id="rsvpForm" class="fade">
+      <label for="dietInput">Any dietary requirements?</label>
+      <input id="dietInput" type="text" placeholder="e.g. vegetarian, gluten-free" />
+      <button id="rsvpButton">Confirm RSVP</button>
+      <p id="rsvpMessage" aria-live="polite"></p>
+    </form>
+  `;
+  html += `
+}
   <div class="fade" style="margin-top: 2em;">
     <p>Join the whispers:</p>
     <img src="innercircle.png" alt="Join WhatsApp group QR code" style="margin-top: 0.5em; width: 150px; height: 150px;" />
