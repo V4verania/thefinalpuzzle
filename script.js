@@ -275,8 +275,10 @@ html += `
       <p class="fade">You have solved the maze. You have mastered the riddles. You have earned your place. Now, the door opens.</p>
       <p class="fade">You are invited to an evening of secrets, symbols, and shadows at:</p>
       <p class="fade"><strong>The Dene of Whispers</strong></p>
-      <p class="fade">RSVP Required. Confirm your presence to receive your token and instructions. Elena awaits. The Whispering Archivist will speak.</p>
-      <p class="fade">The flame will reveal them in <strong>${daysLeft} days</strong>...</p>
+      <p class="fade">Number 40, you know the place</p>
+      <p class="fade">RSVP Required, follow the QR code.</p>
+      <p class="fade"> Elena awaits. The Whispering Archivist will speak. </p>
+      <p class="fade"> The flame will reveal more instructions in <strong>${daysLeft} days</strong>...</p>
       <div id="candleContainer" class="fade">
         <div id="candleFlame"></div>
         <div id="candleMeter">
