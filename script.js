@@ -308,7 +308,14 @@ async function showFinalReveal() {
     </div>
   `;
 
-if (rsvpData.dossier && rsvpData.description && now >= revealDate) {
+if (
+  rsvpData.dossier &&
+  rsvpData.description &&
+  rsvpData.name &&
+  rsvpData.realName &&
+  rsvpData.costume &&
+  now >= revealDate
+) {
   html += `
     <div class="fade dossier">
       <h3>Your Role: <strong>${rsvpData.dossier}</strong></h3>
@@ -318,8 +325,6 @@ if (rsvpData.dossier && rsvpData.description && now >= revealDate) {
     </div>
   `;
 }
-
-
   revealDiv.innerHTML = html;
 
   // RSVP logic
