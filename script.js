@@ -248,26 +248,10 @@ function showFinalReveal() {
   const now = new Date();
   const revealDate = new Date("2026-02-01T00:00:00");
 
-  // RSVP and dietary input always shown
-  let html = `
-    <h2 class="fade">Your character dossier is ready.</h2>
-    <p class="fade">The veil parts. Your role awaits...</p>
-    <p class="fade">Code: <strong>${guestCode}</strong></p>
+  let html = "";
 
-    <label for="dietInput" class="fade">Any dietary requirements?</label>
-    <input id="dietInput" type="text" placeholder="e.g. vegetarian, gluten-free" class="fade" />
-
-    <button id="rsvpButton" class="fade">Confirm RSVP</button>
-    <p id="rsvpMessage" class="fade"></p>
-
-    <div class="fade" style="margin-top: 2em;">
-      <p>Join the whispers:</p>
-      <img src="innercircle.png" alt="Join WhatsApp group QR code" style="margin-top: 0.5em; width: 150px; height: 150px;" />
-    </div>
-  `;
-
-  // Add countdown and candle if veil hasn't lifted
   if (now < revealDate) {
+    // Veil not lifted — show countdown and candle only
     const daysLeft = Math.ceil((revealDate - now) / (1000 * 60 * 60 * 24));
     const percent = Math.min(
       100,
@@ -290,36 +274,56 @@ function showFinalReveal() {
         </div>
       </div>
     `;
+  } else {
+    // Veil lifted — show dossier and RSVP
+    html += `
+      <h2 class="fade">Your character dossier is ready.</h2>
+      <p class="fade">The veil parts. Your role awaits...</p>
+      <p class="fade">Code: <strong>${guestCode}</strong></p>
+
+      <label for="dietInput" class="fade">Any dietary requirements?</label>
+      <input id="dietInput" type="text" placeholder="e.g. vegetarian, gluten-free" class="fade" />
+
+      <button id="rsvpButton" class="fade">Confirm RSVP</button>
+      <p id="rsvpMessage" class="fade"></p>
+
+      <div class="fade" style="margin-top: 2em;">
+        <p>Join the whispers:</p>
+        <img src="innercircle.png" alt="Join WhatsApp group QR code" style="margin-top: 0.5em; width: 150px; height: 150px;" />
+      </div>
+    `;
   }
 
   revealDiv.innerHTML = html;
 
-  // Attach RSVP logic
-  setTimeout(() => {
-    const rsvpBtn = document.getElementById("rsvpButton");
-    const ripple = document.getElementById("rippleEffect");
+  // Attach RSVP logic only if veil has lifted
+  if (now >= revealDate) {
+    setTimeout(() => {
+      const rsvpBtn = document.getElementById("rsvpButton");
+      const ripple = document.getElementById("rippleEffect");
 
-    if (rsvpBtn) {
-      rsvpBtn.onclick = async () => {
-        ripple.classList.add("active");
-        setTimeout(() => ripple.classList.remove("active"), 1000);
+      if (rsvpBtn) {
+        rsvpBtn.onclick = async () => {
+          ripple.classList.add("active");
+          setTimeout(() => ripple.classList.remove("active"), 1000);
 
-        const dietary = document.getElementById("dietInput").value.trim();
+          const dietary = document.getElementById("dietInput").value.trim();
 
-        const res = await fetch(`${WORKER_URL}?type=rsvp`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ code: guestCode, confirmed: true, dietary })
-        });
+          const res = await fetch(`${WORKER_URL}?type=rsvp`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ code: guestCode, confirmed: true, dietary })
+          });
 
-        const result = await res.json();
-        const message = document.getElementById("rsvpMessage");
-        message.textContent = result.success
-          ? "✅ RSVP confirmed. Elena has received your whisper."
-          : "⚠️ RSVP failed. Try again or speak with the Archivist.";
-      };
-    }
-  }, 0);
+          const result = await res.json();
+          const message = document.getElementById("rsvpMessage");
+          message.textContent = result.success
+            ? "✅ RSVP confirmed. Elena has received your whisper."
+            : "⚠️ RSVP failed. Try again or speak with the Archivist.";
+        };
+      }
+    }, 0);
+  }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
