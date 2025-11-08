@@ -256,7 +256,7 @@ const alreadyRSVPd = rsvpData.confirmed === true;
 
 if (alreadyRSVPd) {
   html += `
-    <p class="fade">✅ Thank you. You have already RSVP'd.</p>
+    <p class="fade">✅ Thank you. You have already submitted your RSVP.</p>
   `;
 } else {
   html += `
