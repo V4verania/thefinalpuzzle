@@ -302,7 +302,7 @@ The Whispering Archivist will speak.
       ? "✅ RSVP confirmed. Elena has received your whisper."
       : "⚠️ RSVP failed. Try again or speak with the Archivist.";
   };
-}
+}}
 
 document.addEventListener("DOMContentLoaded", () => {
   const button = document.getElementById("submitCode");
