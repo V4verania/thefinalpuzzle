@@ -289,6 +289,8 @@ async function showFinalReveal() {
     <p class="fade">You are invited to an evening of secrets, symbols, and shadows at:</p>
     <p class="fade"><strong>The Dene of Whispers</strong></p>
     <p class="fade">Number 40, you know the place</p>
+    <p class="fade">Saturday the 16th of May 2026</p>
+    <p class="fade"><strong>7.30PM</strong></p>
     <p class="fade">RSVP and follow the QR code.</p>
     <p class="fade">Your host Elena awaits your company. The Whispering Archivist will speak.</p>
   `;
