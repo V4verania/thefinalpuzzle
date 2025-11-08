@@ -308,14 +308,17 @@ async function showFinalReveal() {
     </div>
   `;
 
-  if (rsvpData.dossier && rsvpData.description && now >= revealDate) {
-    html += `
-      <div class="fade dossier">
-        <h3>Your Role: <strong>${rsvpData.dossier}</strong></h3>
-        <p>${rsvpData.description}</p>
-      </div>
-    `;
-  }
+if (rsvpData.dossier && rsvpData.description && now >= revealDate) {
+  html += `
+    <div class="fade dossier">
+      <h3>Your Role: <strong>${rsvpData.dossier}</strong></h3>
+      <p><em>${rsvpData.name} <span style="opacity: 0.6;">(played by ${rsvpData.realName})</span></em></p>
+      <p>${rsvpData.description}</p>
+      <p><strong>Suggested Costume:</strong> ${rsvpData.costume}</p>
+    </div>
+  `;
+}
+
 
   revealDiv.innerHTML = html;
 
