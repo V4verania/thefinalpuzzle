@@ -232,3 +232,18 @@ button:hover {
   font-style: italic;
   color: #ffcc66;
 }
+
+.hidden {
+  display: none;
+}
+
+.fade {
+  opacity: 0;
+  animation: fadeIn 1s forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
