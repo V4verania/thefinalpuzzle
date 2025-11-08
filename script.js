@@ -267,13 +267,15 @@ if (alreadyRSVPd) {
       <p id="rsvpMessage" aria-live="polite"></p>
     </form>
   `;
-  html += `
 }
+
+html += `
   <div class="fade" style="margin-top: 2em;">
     <p>Join the whispers:</p>
     <img src="innercircle.png" alt="Join WhatsApp group QR code" style="margin-top: 0.5em; width: 150px; height: 150px;" />
   </div>
 `;
+
 
 
   if (now < revealDate) {
