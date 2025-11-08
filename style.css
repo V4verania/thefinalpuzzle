@@ -1,3 +1,4 @@
+/* 🌑 Base Styling */
 body {
   background: #0b0b0b;
   color: #f0e6d2;
@@ -11,18 +12,19 @@ h1, h2 {
   margin-bottom: 0.5em;
 }
 
-input, button {
+.intro {
+  font-style: italic;
+  margin-bottom: 1em;
+}
+
+/* 🔐 Inputs and Buttons */
+input[type="text"], button {
   padding: 0.5em;
   font-size: 1em;
   margin-top: 1em;
-  background: #3c2a4d;
-  color: #fff;
   border: none;
   cursor: pointer;
-}
-
-button:hover {
-  background: #5a3a6d;
+  transition: background 0.3s ease;
 }
 
 input[type="text"] {
@@ -33,29 +35,21 @@ input[type="text"] {
   color: #fff;
 }
 
-.hidden {
-  display: none;
+button {
+  background: #3c2a4d;
+  color: #fff;
 }
 
-.fade {
-  animation: fadeIn 1.5s ease-in-out;
+button:hover {
+  background: #5a3a6d;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
+/* 🧩 Maze Choices */
 #choices button {
   display: block;
   margin: 0.5em auto;
   width: 60%;
   background: #2e1f3b;
-}
-
-.intro {
-  font-style: italic;
-  margin-bottom: 1em;
 }
 
 /* 🕯️ Candle Reveal */
@@ -150,25 +144,15 @@ input[type="text"] {
   0% { opacity: 0; transform: scaleX(0); }
   100% { opacity: 1; transform: scaleX(1); }
 }
-#maze {
-  position: relative;
-}
 
-.ritual-bottom {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
-  pointer-events: none;
-}
+/* 🌘 Dim Overlay */
 #dimOverlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.5); /* semi-transparent black */
+  background: rgba(0, 0, 0, 0.5);
   z-index: 999;
   pointer-events: none;
   opacity: 0;
@@ -179,6 +163,7 @@ input[type="text"] {
   opacity: 1;
 }
 
+/* 💫 Ripple Effect */
 #rippleEffect {
   position: fixed;
   top: 50%;
@@ -209,4 +194,18 @@ input[type="text"] {
     transform: translate(-50%, -50%) scale(20);
     opacity: 0;
   }
+}
+
+/* 🎭 Visibility and Animation */
+.hidden {
+  display: none;
+}
+
+.fade {
+  animation: fadeIn 1.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
