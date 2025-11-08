@@ -249,58 +249,70 @@ async function showFinalReveal() {
   const now = new Date();
   const revealDate = new Date("2025-10-01T00:00:00");
 
-  let html = ""; // ✅ This line is essential
-const rsvpRes = await fetch(`${WORKER_URL}?code=${guestCode}&type=rsvp`);
-const rsvpData = await rsvpRes.json();
-const alreadyRSVPd = rsvpData.confirmed === true;
+  const daysLeft = Math.max(0, Math.ceil((revealDate - now) / (1000 * 60 * 60 * 24)));
+  const percent = Math.min(
+    100,
+    Math.floor(
+      (1 - (revealDate - now) / (revealDate - new Date("2025-11-01T00:00:00"))) * 100
+    )
+  );
 
-if (alreadyRSVPd) {
+  let html = "";
+
+  const rsvpRes = await fetch(`${WORKER_URL}?code=${guestCode}&type=rsvp`);
+  const rsvpData = await rsvpRes.json();
+  const alreadyRSVPd = rsvpData.confirmed === true;
+
+  if (alreadyRSVPd) {
+    html += `<p class="fade">✅ Thank you. You have already submitted your RSVP.</p>`;
+  } else {
+    html += `
+      <form id="rsvpForm" class="fade">
+        <label for="dietInput">Any dietary requirements?</label>
+        <input id="dietInput" type="text" placeholder="e.g. vegetarian, gluten-free" />
+        <button id="rsvpButton">Confirm RSVP</button>
+        <p id="rsvpMessage" aria-live="polite"></p>
+      </form>
+    `;
+  }
+
   html += `
-    <p class="fade">✅ Thank you. You have already submitted your RSVP.</p>
-  `;
-} else {
-  html += `
-    <form id="rsvpForm" class="fade">
-      <label for="dietInput">Any dietary requirements?</label>
-      <input id="dietInput" type="text" placeholder="e.g. vegetarian, gluten-free" />
-      <button id="rsvpButton">Confirm RSVP</button>
-      <p id="rsvpMessage" aria-live="polite"></p>
-    </form>
-  `;
-}
-
-html += `
-  <div class="fade" style="margin-top: 2em;">
-    <p>Join the circle:</p>
-    <img src="innercircle.png" alt="Join WhatsApp group QR code" style="margin-top: 0.5em; width: 150px; height: 150px;" />
-  </div>
-`;
-
-
-
-if (rsvpData.dossier && rsvpData.description && now >= revealDate) {
-  html += `
-    <div class="fade dossier">
-      <h3>Your Role: <strong>${rsvpData.dossier}</strong></h3>
-      <p>${rsvpData.description}</p>
+    <div class="fade" style="margin-top: 2em;">
+      <p>Join the circle:</p>
+      <img src="innercircle.png" alt="Join WhatsApp group QR code" style="margin-top: 0.5em; width: 150px; height: 150px;" />
     </div>
   `;
-}
 
+  html += `
+    <h2 class="fade">You have reached the inner sanctum.</h2>
+    <p class="fade">You have solved the maze. You have mastered the riddles. You have earned your place. Now, the door opens.</p>
+    <p class="fade">You are invited to an evening of secrets, symbols, and shadows at:</p>
+    <p class="fade"><strong>The Dene of Whispers</strong></p>
+    <p class="fade">Number 40, you know the place</p>
+    <p class="fade">RSVP and follow the QR code.</p>
+    <p class="fade">Your host Elena awaits your company. The Whispering Archivist will speak.</p>
+  `;
+
+  if (now < revealDate) {
+    html += `<p class="fade">The flame will reveal more instructions in <strong>${daysLeft} days</strong>. Return then...</p>`;
+  } else {
+    html += `<p class="fade"><strong>🔥 The flame has spoken. Your role is now revealed.</strong></p>`;
+  }
+
+  html += `
+    <div id="candleContainer" class="fade">
+      <div id="candleFlame"></div>
+      <div id="candleMeter">
+        <div id="candleFill" style="width:${percent}%"></div>
+      </div>
+    </div>
+  `;
+
+  if (rsvpData.dossier && rsvpData.description && now >= revealDate) {
     html += `
-      <h2 class="fade">You have reached the inner sanctum.</h2>
-      <p class="fade">You have solved the maze. You have mastered the riddles. You have earned your place. Now, the door opens.</p>
-      <p class="fade">You are invited to an evening of secrets, symbols, and shadows at:</p>
-      <p class="fade"><strong>The Dene of Whispers</strong></p>
-      <p class="fade">Number 40, you know the place</p>
-      <p class="fade">RSVP and follow the QR code.</p>
-      <p class="fade"> Your host Elena awaits your company. The Whispering Archivist will speak. </p>
-      <p class="fade"> The flame will reveal more instructions in <strong>${daysLeft} days, return then</strong>...</p>
-      <div id="candleContainer" class="fade">
-        <div id="candleFlame"></div>
-        <div id="candleMeter">
-          <div id="candleFill" style="width:${percent}%"></div>
-        </div>
+      <div class="fade dossier">
+        <h3>Your Role: <strong>${rsvpData.dossier}</strong></h3>
+        <p>${rsvpData.description}</p>
       </div>
     `;
   }
@@ -340,7 +352,7 @@ if (rsvpData.dossier && rsvpData.description && now >= revealDate) {
       };
     }
   }, 0);
-} // ✅ This closes showFinalReveal()
+}
 
 document.addEventListener("DOMContentLoaded", () => {
   const button = document.getElementById("submitCode");
