@@ -292,34 +292,6 @@ function showFinalReveal() {
     `;
   }
 
-  // Attach RSVP logic after DOM updates
-  setTimeout(() => {
-    const rsvpBtn = document.getElementById("rsvpButton");
-    const ripple = document.getElementById("rippleEffect");
-
-    if (rsvpBtn) {
-      rsvpBtn.onclick = async () => {
-        ripple.classList.add("active");
-        setTimeout(() => ripple.classList.remove("active"), 1000);
-
-        const dietary = document.getElementById("dietInput").value.trim();
-
-        const res = await fetch(`${WORKER_URL}?type=rsvp`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ code: guestCode, confirmed: true, dietary })
-        });
-
-        const result = await res.json();
-        const message = document.getElementById("rsvpMessage");
-        message.textContent = result.success
-          ? "✅ RSVP confirmed. Elena has received your whisper."
-          : "⚠️ RSVP failed. Try again or speak with the Archivist.";
-      };
-    }
-  }, 0);
-}
-
 setTimeout(() => {
     const rsvpBtn = document.getElementById("rsvpButton");
     const ripple = document.getElementById("rippleEffect");
