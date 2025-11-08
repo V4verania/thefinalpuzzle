@@ -258,3 +258,37 @@ button:hover {
   border-radius: 8px;
   box-shadow: 0 0 12px #6a4f91;
 }
+
+#rsvpForm {
+  margin-top: 2em;
+  padding: 1em;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid #5a3a6d;
+  border-radius: 8px;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#rsvpForm label {
+  display: block;
+  font-size: 1rem;
+  margin-bottom: 0.5em;
+  color: #ffcc66;
+}
+
+#dietInput {
+  width: 100%;
+  padding: 0.6em;
+  border-radius: 6px;
+  border: 1px solid #444;
+  background-color: #111;
+  color: #eee;
+}
+
+#rsvpMessage {
+  margin-top: 1em;
+  font-style: italic;
+  color: #ffcc66;
+  transition: opacity 0.5s ease;
+}
