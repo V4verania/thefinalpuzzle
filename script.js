@@ -241,7 +241,7 @@ function showRiddle() {
   };
 }
 
-function showFinalReveal() {
+async function showFinalReveal() {
   const revealDiv = document.getElementById("revealContent");
   document.getElementById("reveal").classList.remove("hidden");
   revealDiv.classList.remove("hidden");
