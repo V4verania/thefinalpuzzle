@@ -262,7 +262,7 @@ function showFinalReveal() {
 
     <div class="fade" style="margin-top: 2em;">
       <p>Join the whispers:</p>
-      <img src="images/whatsapp-qr.png" alt="Join WhatsApp group QR code" style="margin-top: 0.5em; width: 150px; height: 150px;" />
+      <img src="images/innercircle.png" alt="Join WhatsApp group QR code" style="margin-top: 0.5em; width: 150px; height: 150px;" />
     </div>
   `;
 
