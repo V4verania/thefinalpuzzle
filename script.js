@@ -248,6 +248,16 @@ function showFinalReveal() {
   const now = new Date();
   const revealDate = new Date("2026-02-01T00:00:00");
 
+  // Always show RSVP button first
+  revealDiv.innerHTML = `
+    <h2 class="fade">Your character dossier is ready.</h2>
+    <p class="fade">The veil parts. Your role awaits...</p>
+    <p class="fade">Code: <strong>${guestCode}</strong></p>
+    <button id="rsvpButton" class="fade">Confirm RSVP</button>
+    <p id="rsvpMessage" class="fade"></p>
+  `;
+
+  // If reveal date hasn't arrived, add countdown and candle
   if (now < revealDate) {
     const daysLeft = Math.ceil((revealDate - now) / (1000 * 60 * 60 * 24));
     const percent = Math.min(
@@ -257,18 +267,12 @@ function showFinalReveal() {
       )
     );
 
-    revealDiv.innerHTML = `
-      <h2 class="fade">You have reached the inner sanctum.</h2>
-      <p class="fade">You have solved the maze.
-You have mastered the riddles.
-You have earned your place.
-Now, the door opens.
-You are invited to an evening of secrets, symbols, and shadows at:</p>
-      <p class="fade">The Dene of Whispers</p>
-      <p class="fade">RSVP Required.
-Confirm your presence to receive your token and instructions.
-Elena awaits.
-The Whispering Archivist will speak.</p>
+    revealDiv.innerHTML += `
+      <p class="fade">You have reached the inner sanctum.</p>
+      <p class="fade">You have solved the maze. You have mastered the riddles. You have earned your place. Now, the door opens.</p>
+      <p class="fade">You are invited to an evening of secrets, symbols, and shadows at:</p>
+      <p class="fade"><strong>The Dene of Whispers</strong></p>
+      <p class="fade">RSVP Required. Confirm your presence to receive your token and instructions. Elena awaits. The Whispering Archivist will speak.</p>
       <p class="fade">The flame will reveal them in <strong>${daysLeft} days</strong>...</p>
       <div id="candleContainer" class="fade">
         <div id="candleFlame"></div>
@@ -277,42 +281,32 @@ The Whispering Archivist will speak.</p>
         </div>
       </div>
     `;
-  } else {
-    revealDiv.innerHTML = `
-      <h2 class="fade">Your character dossier is ready.</h2>
-      <p class="fade">The veil parts. Your role awaits...</p>
-      <p class="fade">Code: <strong>${guestCode}</strong></p>
-      <button id="rsvpButton" class="fade">Confirm RSVP</button>
-      <p id="rsvpMessage" class="fade"></p>
-    `;
-
-    // Ensure DOM is updated before attaching event
-    setTimeout(() => {
-      const rsvpBtn = document.getElementById("rsvpButton");
-      const ripple = document.getElementById("rippleEffect");
-
-      if (rsvpBtn) {
-        rsvpBtn.onclick = async () => {
-          // Trigger ripple animation
-          ripple.classList.add("active");
-          setTimeout(() => ripple.classList.remove("active"), 1000);
-
-          // Send RSVP to Worker
-          const res = await fetch(`${WORKER_URL}?type=rsvp`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ code: guestCode, confirmed: true })
-          });
-
-          const result = await res.json();
-          const message = document.getElementById("rsvpMessage");
-          message.textContent = result.success
-            ? "✅ RSVP confirmed. Elena has received your whisper."
-            : "⚠️ RSVP failed. Try again or speak with the Archivist.";
-        };
-      }
-    }, 0);
   }
+
+  // Attach RSVP logic after DOM updates
+  setTimeout(() => {
+    const rsvpBtn = document.getElementById("rsvpButton");
+    const ripple = document.getElementById("rippleEffect");
+
+    if (rsvpBtn) {
+      rsvpBtn.onclick = async () => {
+        ripple.classList.add("active");
+        setTimeout(() => ripple.classList.remove("active"), 1000);
+
+        const res = await fetch(`${WORKER_URL}?type=rsvp`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code: guestCode, confirmed: true })
+        });
+
+        const result = await res.json();
+        const message = document.getElementById("rsvpMessage");
+        message.textContent = result.success
+          ? "✅ RSVP confirmed. Elena has received your whisper."
+          : "⚠️ RSVP failed. Try again or speak with the Archivist.";
+      };
+    }
+  }, 0);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
