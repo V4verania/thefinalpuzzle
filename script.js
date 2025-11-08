@@ -249,22 +249,15 @@ document.getElementById("reveal").classList.remove("hidden");
   const now = new Date();
   const revealDate = new Date("2026-02-01T00:00:00");
 
-  let html = `
-    <h2 class="fade">Your character dossier is ready.</h2>
-    <p class="fade">The veil parts. Your role awaits...</p>
-    <p class="fade">Code: <strong>${guestCode}</strong></p>
+html += `
+  <form id="rsvpForm" class="fade">
+    <label for="dietInput">Any dietary requirements?</label>
+    <input id="dietInput" type="text" placeholder="e.g. vegetarian, gluten-free" />
+    <button id="rsvpButton">Confirm RSVP</button>
+    <p id="rsvpMessage" aria-live="polite"></p>
+  </form>
+`;
 
-    <label for="dietInput" class="fade">Any dietary requirements?</label>
-    <input id="dietInput" type="text" placeholder="e.g. vegetarian, gluten-free" class="fade" />
-
-    <button id="rsvpButton" class="fade">Confirm RSVP</button>
-    <p id="rsvpMessage" class="fade"></p>
-
-    <div class="fade" style="margin-top: 2em;">
-      <p>Join the whispers:</p>
-      <img src="innercircle.png" alt="Join WhatsApp group QR code" style="margin-top: 0.5em; width: 150px; height: 150px;" />
-    </div>
-  `;
 
   if (now < revealDate) {
     const daysLeft = Math.ceil((revealDate - now) / (1000 * 60 * 60 * 24));
@@ -295,31 +288,36 @@ document.getElementById("reveal").classList.remove("hidden");
 
   // Attach RSVP logic
   setTimeout(() => {
-    const rsvpBtn = document.getElementById("rsvpButton");
-    const ripple = document.getElementById("rippleEffect");
+  const rsvpBtn = document.getElementById("rsvpButton");
+  const ripple = document.getElementById("rippleEffect");
 
-    if (rsvpBtn) {
-      rsvpBtn.onclick = async () => {
-        ripple.classList.add("active");
-        setTimeout(() => ripple.classList.remove("active"), 1000);
+  if (rsvpBtn) {
+    rsvpBtn.onclick = async (e) => {
+      e.preventDefault(); // prevent form submission
+      ripple.classList.add("active");
+      setTimeout(() => ripple.classList.remove("active"), 1000);
 
-        const dietary = document.getElementById("dietInput").value.trim();
+      const dietary = document.getElementById("dietInput").value.trim();
 
-        const res = await fetch(`${WORKER_URL}?type=rsvp`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ code: guestCode, confirmed: true, dietary })
-        });
+      const res = await fetch(`${WORKER_URL}?type=rsvp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: guestCode, confirmed: true, dietary })
+      });
 
-        const result = await res.json();
-        const message = document.getElementById("rsvpMessage");
-        message.textContent = result.success
-          ? "✅ RSVP confirmed. Elena has received your whisper."
-          : "⚠️ RSVP failed. Try again or speak with the Archivist.";
-      };
-    }
-  }, 0);
-}
+      const result = await res.json();
+      const message = document.getElementById("rsvpMessage");
+      message.textContent = result.success
+        ? "✅ RSVP confirmed. Elena has received your whisper. You will be summoned."
+        : "⚠️ RSVP failed. The veil resisted. Try again or speak with the Archivist.";
+
+      if (result.success) {
+        rsvpBtn.disabled = true;
+        rsvpBtn.textContent = "Whisper received";
+      }
+    };
+  }
+}, 0);
 
 document.addEventListener("DOMContentLoaded", () => {
   const button = document.getElementById("submitCode");
