@@ -242,7 +242,8 @@ function showRiddle() {
 }
 
 function showFinalReveal() {
-  const revealDiv = document.getElementById("reveal");
+const revealDiv = document.getElementById("revealContent");
+document.getElementById("reveal").classList.remove("hidden");
   revealDiv.classList.remove("hidden");
 
   const now = new Date();
