@@ -242,12 +242,14 @@ function showRiddle() {
 }
 
 function showFinalReveal() {
-const revealDiv = document.getElementById("revealContent");
-document.getElementById("reveal").classList.remove("hidden");
+  const revealDiv = document.getElementById("revealContent");
+  document.getElementById("reveal").classList.remove("hidden");
   revealDiv.classList.remove("hidden");
 
   const now = new Date();
   const revealDate = new Date("2026-02-01T00:00:00");
+
+  let html = ""; // ✅ This line is essential
 
 html += `
   <form id="rsvpForm" class="fade">
