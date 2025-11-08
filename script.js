@@ -351,8 +351,9 @@ async function showFinalReveal() {
         }
       };
     }
-  }, 0);
-}
+  }, 0); // closes setTimeout
+} // closes showFinalReveal
+
 
 document.addEventListener("DOMContentLoaded", () => {
   const button = document.getElementById("submitCode");
