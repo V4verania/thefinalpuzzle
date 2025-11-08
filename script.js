@@ -278,14 +278,14 @@ html += `
 
 
 
-  if (now < revealDate) {
-    const daysLeft = Math.ceil((revealDate - now) / (1000 * 60 * 60 * 24));
-    const percent = Math.min(
-      100,
-      Math.floor(
-        (1 - (revealDate - now) / (revealDate - new Date("2025-11-01T00:00:00"))) * 100
-      )
-    );
+if (rsvpData.dossier && rsvpData.description && now >= revealDate) {
+  html += `
+    <div class="fade dossier">
+      <h3>Your Role: <strong>${rsvpData.dossier}</strong></h3>
+      <p>${rsvpData.description}</p>
+    </div>
+  `;
+}
 
     html += `
       <h2 class="fade">You have reached the inner sanctum.</h2>
@@ -307,9 +307,7 @@ html += `
 
   revealDiv.innerHTML = html;
 
-revealDiv.innerHTML = html;
-
-  // Attach RSVP logic
+  // RSVP logic
   setTimeout(() => {
     const rsvpBtn = document.getElementById("rsvpButton");
     const ripple = document.getElementById("rippleEffect");
