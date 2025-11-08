@@ -320,7 +320,7 @@ html += `
     };
   }
 }, 0);
-
+}
 document.addEventListener("DOMContentLoaded", () => {
   const button = document.getElementById("submitCode");
   if (button) {
