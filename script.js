@@ -307,39 +307,43 @@ html += `
 
   revealDiv.innerHTML = html;
 
+revealDiv.innerHTML = html;
+
   // Attach RSVP logic
   setTimeout(() => {
-  const rsvpBtn = document.getElementById("rsvpButton");
-  const ripple = document.getElementById("rippleEffect");
+    const rsvpBtn = document.getElementById("rsvpButton");
+    const ripple = document.getElementById("rippleEffect");
 
-  if (rsvpBtn) {
-    rsvpBtn.onclick = async (e) => {
-      e.preventDefault(); // prevent form submission
-      ripple.classList.add("active");
-      setTimeout(() => ripple.classList.remove("active"), 1000);
+    if (rsvpBtn) {
+      rsvpBtn.onclick = async (e) => {
+        e.preventDefault();
+        ripple.classList.add("active");
+        setTimeout(() => ripple.classList.remove("active"), 1000);
 
-      const dietary = document.getElementById("dietInput").value.trim();
+        const dietary = document.getElementById("dietInput").value.trim();
 
-      const res = await fetch(`${WORKER_URL}?type=rsvp`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code: guestCode, confirmed: true, dietary })
-      });
+        const res = await fetch(`${WORKER_URL}?type=rsvp`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code: guestCode, confirmed: true, dietary })
+        });
 
-      const result = await res.json();
-      const message = document.getElementById("rsvpMessage");
-      message.textContent = result.success
-        ? "✅ RSVP confirmed. Elena has received your whisper. You will be summoned."
-        : "⚠️ RSVP failed. The veil resisted. Try again or speak with the Archivist.";
+        const result = await res.json();
+        const message = document.getElementById("rsvpMessage");
+        message.textContent = result.success
+          ? "✅ RSVP confirmed. Elena has received your whisper. You will be summoned."
+          : "⚠️ RSVP failed. The veil resisted. Try again or speak with the Archivist.";
 
-      if (result.success) {
-        rsvpBtn.disabled = true;
-        rsvpBtn.textContent = "Whisper received";
-      }
-    };
-  }
-}, 0);
-}  
+        if (result.success) {
+          rsvpBtn.disabled = true;
+          rsvpBtn.textContent = "Whisper received";
+          document.getElementById("rsvpForm").style.display = "none";
+        }
+      };
+    }
+  }, 0);
+} // ✅ This closes showFinalReveal()
+
 document.addEventListener("DOMContentLoaded", () => {
   const button = document.getElementById("submitCode");
   if (button) {
