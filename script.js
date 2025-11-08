@@ -263,15 +263,12 @@ function showFinalReveal() {
 You have mastered the riddles.
 You have earned your place.
 Now, the door opens.
-You are invited to an evening of secrets, symbols, and shadows at:
-</p>
-<p class="fade"> The Dene of Whispers
-</p>
-<p class="fade"> RSVP Required
+You are invited to an evening of secrets, symbols, and shadows at:</p>
+      <p class="fade">The Dene of Whispers</p>
+      <p class="fade">RSVP Required.
 Confirm your presence to receive your token and instructions.
 Elena awaits.
-The Whispering Archivist will speak.
-</p>
+The Whispering Archivist will speak.</p>
       <p class="fade">The flame will reveal them in <strong>${daysLeft} days</strong>...</p>
       <div id="candleContainer" class="fade">
         <div id="candleFlame"></div>
@@ -280,30 +277,43 @@ The Whispering Archivist will speak.
         </div>
       </div>
     `;
- } else {
-  revealDiv.innerHTML = `
-    <h2 class="fade">Your character dossier is ready.</h2>
-    <p class="fade">The veil parts. Your role awaits...</p>
-    <p class="fade">Code: <strong>${guestCode}</strong></p>
-    <button id="rsvpButton" class="fade">Confirm RSVP</button>
-    <p id="rsvpMessage" class="fade"></p>
-  `;
+  } else {
+    revealDiv.innerHTML = `
+      <h2 class="fade">Your character dossier is ready.</h2>
+      <p class="fade">The veil parts. Your role awaits...</p>
+      <p class="fade">Code: <strong>${guestCode}</strong></p>
+      <button id="rsvpButton" class="fade">Confirm RSVP</button>
+      <p id="rsvpMessage" class="fade"></p>
+    `;
 
-  document.getElementById("rsvpButton").onclick = async () => {
-    const res = await fetch(`${WORKER_URL}?type=rsvp`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code: guestCode, confirmed: true })
-    });
+    // Ensure DOM is updated before attaching event
+    setTimeout(() => {
+      const rsvpBtn = document.getElementById("rsvpButton");
+      const ripple = document.getElementById("rippleEffect");
 
-    const result = await res.json();
-    const message = document.getElementById("rsvpMessage");
-    message.textContent = result.success
-      ? "✅ RSVP confirmed. Elena has received your whisper."
-      : "⚠️ RSVP failed. Try again or speak with the Archivist.";
-  };
+      if (rsvpBtn) {
+        rsvpBtn.onclick = async () => {
+          // Trigger ripple animation
+          ripple.classList.add("active");
+          setTimeout(() => ripple.classList.remove("active"), 1000);
+
+          // Send RSVP to Worker
+          const res = await fetch(`${WORKER_URL}?type=rsvp`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ code: guestCode, confirmed: true })
+          });
+
+          const result = await res.json();
+          const message = document.getElementById("rsvpMessage");
+          message.textContent = result.success
+            ? "✅ RSVP confirmed. Elena has received your whisper."
+            : "⚠️ RSVP failed. Try again or speak with the Archivist.";
+        };
+      }
+    }, 0);
+  }
 }
-} 
 
 document.addEventListener("DOMContentLoaded", () => {
   const button = document.getElementById("submitCode");
