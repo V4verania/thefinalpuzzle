@@ -248,8 +248,8 @@ function showFinalReveal() {
   const now = new Date();
   const revealDate = new Date("2026-02-01T00:00:00");
 
-  // Always show RSVP and dietary input first
-  revealDiv.innerHTML = `
+  // RSVP and dietary input always shown
+  let html = `
     <h2 class="fade">Your character dossier is ready.</h2>
     <p class="fade">The veil parts. Your role awaits...</p>
     <p class="fade">Code: <strong>${guestCode}</strong></p>
@@ -266,7 +266,7 @@ function showFinalReveal() {
     </div>
   `;
 
-  // If veil hasn't lifted, add countdown and candle
+  // Add countdown and candle if veil hasn't lifted
   if (now < revealDate) {
     const daysLeft = Math.ceil((revealDate - now) / (1000 * 60 * 60 * 24));
     const percent = Math.min(
@@ -276,7 +276,7 @@ function showFinalReveal() {
       )
     );
 
-    revealDiv.innerHTML += `
+    html += `
       <h2 class="fade">You have reached the inner sanctum.</h2>
       <p class="fade">You have solved the maze. You have mastered the riddles. You have earned your place. Now, the door opens.</p>
       <p class="fade">You are invited to an evening of secrets, symbols, and shadows at:</p>
@@ -292,7 +292,10 @@ function showFinalReveal() {
     `;
   }
 
-setTimeout(() => {
+  revealDiv.innerHTML = html;
+
+  // Attach RSVP logic
+  setTimeout(() => {
     const rsvpBtn = document.getElementById("rsvpButton");
     const ripple = document.getElementById("rippleEffect");
 
