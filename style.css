@@ -292,3 +292,8 @@ button:hover {
   color: #ffcc66;
   transition: opacity 0.5s ease;
 }
+
+#riddleInput {
+  display: block;
+  margin-bottom: 1em;
+}
