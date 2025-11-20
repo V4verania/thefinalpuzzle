@@ -376,11 +376,19 @@ if (
 } // closes showFinalReveal
 
 
-document.addEventListener("DOMContentLoaded", () => {
+setTimeout(() => {
   const button = document.getElementById("submitCode");
-  if (button) {
-    button.addEventListener("click", validateCode);
+  const codeInput = document.getElementById("codeInput");
+
+  if (button && codeInput) {
+    codeInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        button.click();
+      }
+    });
   }
+}, 0);
   
 const codeInput = document.getElementById("codeInput");
 if (codeInput) {
