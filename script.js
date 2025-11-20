@@ -381,7 +381,15 @@ document.addEventListener("DOMContentLoaded", () => {
   if (button) {
     button.addEventListener("click", validateCode);
   }
-
+  
+const codeInput = document.getElementById("codeInput");
+if (codeInput) {
+  codeInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      button.click();
+    }
+  });
+}
   const muteToggle = document.getElementById("muteToggle");
   const ambientAudio = document.getElementById("ambientAudio");
 
