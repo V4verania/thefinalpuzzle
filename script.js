@@ -165,6 +165,15 @@ choicesDiv.innerHTML = `
   <button id="submitRiddle">Submit</button>
 `;
 
+const riddleInput = document.getElementById("riddleInput");
+const submitButton = document.getElementById("submitRiddle");
+
+riddleInput.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    submitButton.click();
+  }
+});
+
 
   document.getElementById("submitRiddle").onclick = async () => {
     const rawInput = document.getElementById("riddleInput").value.trim().toLowerCase();
