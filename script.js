@@ -25,18 +25,18 @@ Two rivals sit down for a drink. They both order iced tea from the same pitcher.
   },
   {
     text: `What Am I?  
-I have cities, but no houses.  \n
-I have mountains, but no trees.  \n
-I have water, but no fish.  \n
+I have cities, but no houses.  
+I have mountains, but no trees.  
+I have water, but no fish.  
 What am I?`,
     keywords: ["map"],
     feedback: "Correct. A map shows features without containing them."
   },
   {
-    text: `The person who makes it has no need of it.  \n
-The person who buys it has no use for it.  \n
-The person who uses it can neither see nor feel it.  \n
-<strong>What is it?</strong>`,
+    text: `The person who makes it has no need of it.  
+The person who buys it has no use for it.  
+The person who uses it can neither see nor feel it.  
+What is it?`,
     keywords: ["coffin", "casket"],
     feedback: "Correct. A coffin is made for the dead — unseen, unfelt by its user."
   },
@@ -71,7 +71,7 @@ The person who uses it can neither see nor feel it.  \n
     feedback: "Correct. A stamp travels far while remaining fixed to the envelope."
   },
   {
-    text: `I fly without wings, I cry without eyes. Wherever I go, darkness follows me. \n <strong>What am I?</strong>`,
+    text: `I fly without wings, I cry without eyes. Wherever I go, darkness follows me. What am I?`,
     keywords: ["cloud", "A cloud"],
     feedback: "Correct. A cloud drifts, weeps, and casts shadow — poetic and true."
   }
@@ -160,20 +160,10 @@ function showRiddle() {
 
   riddleText.innerHTML = riddle.text.replace(/\n/g, "<br>");
   feedback.textContent = "";
-choicesDiv.innerHTML = `
-  <input type="text" id="riddleInput" placeholder="Type your answer..." />
-  <button id="submitRiddle">Submit</button>
-`;
-
-const riddleInput = document.getElementById("riddleInput");
-const submitButton = document.getElementById("submitRiddle");
-
-riddleInput.addEventListener("keydown", (event) => {
-  if (event.key === "Enter") {
-    submitButton.click();
-  }
-});
-
+  choicesDiv.innerHTML = `
+    <input type="text" id="riddleInput" placeholder="Type your answer..." />
+    <button id="submitRiddle">Submit</button>
+  `;
 
   document.getElementById("submitRiddle").onclick = async () => {
     const rawInput = document.getElementById("riddleInput").value.trim().toLowerCase();
@@ -377,24 +367,10 @@ if (
 
 
 document.addEventListener("DOMContentLoaded", () => {
-  setTimeout(() => {
-    const button = document.getElementById("submitCode");
-    const codeInput = document.getElementById("codeInput");
-
-    if (button) {
-      button.addEventListener("click", validateCode);
-    }
-
-    if (codeInput && button) {
-      codeInput.addEventListener("keydown", (event) => {
-        if (event.key === "Enter") {
-          event.preventDefault();
-          button.click();
-        }
-      });
-    }
-  }, 0);
-});
+  const button = document.getElementById("submitCode");
+  if (button) {
+    button.addEventListener("click", validateCode);
+  }
 
   const muteToggle = document.getElementById("muteToggle");
   const ambientAudio = document.getElementById("ambientAudio");
@@ -406,4 +382,3 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
-
