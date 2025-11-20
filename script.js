@@ -3,20 +3,21 @@ let guestCode = "";
 let currentStep = 0;
 const riddles = [
   {
-    text: `The Sunday Alibi  
-A man is found murdered on a Sunday morning. His wife immediately calls the police, who question the household staff.
-The Butler says he was organizing the wine cellar.
-The Cook says she was preparing breakfast.
-The Gardener says he was watering the ferns.
-The Maid says she was collecting the morning mail.
-The police immediately arrest the murderer. Who did it`,
+    text: `<strong>The Sunday Alibi</strong> \n  
+A man is found murdered on a Sunday morning. His wife immediately calls the police, who question the household staff:\n
+- The Butler says he was organizing the wine cellar.\n
+- The Cook says she was preparing breakfast.\n
+- The Gardener says he was watering the ferns.\n
+- The Maid says she was collecting the morning mail.\n
+The police immediately arrest the murderer.\n
+<strong>Who did it</strong>`,
     keywords: ["maid", "the maid"],
     feedback: "Correct. There’s no mail on Sundays"
   },
   {
-    text: `The Poisoned Drinks  
+    text: `<strong>The Poisoned Drinks</strong> \n  
 Two rivals sit down for a drink. They both order iced tea from the same pitcher. One man drinks his glass very quickly and 
-  immediately orders another. The other woman sips her one glass slowly. The woman dies, but the man survives. It is determined that all the drinks were poisoned. 
+  immediately orders another. The other woman sips her one glass slowly. The woman dies, but the man survives. It is determined that all the drinks were poisoned. \n
     How did the man survive?`,
 
     keywords: ["ice", "ice cubes"],
@@ -157,7 +158,7 @@ function showRiddle() {
   const choicesDiv = document.getElementById("choices");
   const feedback = document.getElementById("feedback");
 
-  riddleText.textContent = riddle.text;
+  riddleText.innerHTML = riddle.text.replace(/\n/g, "<br>");
   feedback.textContent = "";
   choicesDiv.innerHTML = `
     <input type="text" id="riddleInput" placeholder="Type your answer..." />
