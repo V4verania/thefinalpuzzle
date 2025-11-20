@@ -297,3 +297,9 @@ button:hover {
   display: block;
   margin-bottom: 1em;
 }
+
+#riddleInput:focus {
+  outline: none;
+  box-shadow: 0 0 8px #6a4f91;
+  border-color: #8b6bbf;
+}
