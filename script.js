@@ -25,18 +25,18 @@ Two rivals sit down for a drink. They both order iced tea from the same pitcher.
   },
   {
     text: `What Am I?  
-I have cities, but no houses.  
-I have mountains, but no trees.  
-I have water, but no fish.  
+I have cities, but no houses.  \n
+I have mountains, but no trees.  \n
+I have water, but no fish.  \n
 What am I?`,
     keywords: ["map"],
     feedback: "Correct. A map shows features without containing them."
   },
   {
-    text: `The person who makes it has no need of it.  
-The person who buys it has no use for it.  
-The person who uses it can neither see nor feel it.  
-What is it?`,
+    text: `The person who makes it has no need of it.  \n
+The person who buys it has no use for it.  \n
+The person who uses it can neither see nor feel it.  \n
+<strong>What is it?`</strong>,
     keywords: ["coffin", "casket"],
     feedback: "Correct. A coffin is made for the dead — unseen, unfelt by its user."
   },
@@ -71,7 +71,7 @@ What is it?`,
     feedback: "Correct. A stamp travels far while remaining fixed to the envelope."
   },
   {
-    text: `I fly without wings, I cry without eyes. Wherever I go, darkness follows me. What am I?`,
+    text: `I fly without wings, I cry without eyes. Wherever I go, darkness follows me. \n <strong>What am I?</strong>`,
     keywords: ["cloud", "A cloud"],
     feedback: "Correct. A cloud drifts, weeps, and casts shadow — poetic and true."
   }
