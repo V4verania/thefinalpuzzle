@@ -160,10 +160,11 @@ function showRiddle() {
 
   riddleText.innerHTML = riddle.text.replace(/\n/g, "<br>");
   feedback.textContent = "";
-  choicesDiv.innerHTML = `
-    <input type="text" id="riddleInput" placeholder="Type your answer..." />
-    <button id="submitRiddle">Submit</button>
-  `;
+choicesDiv.innerHTML = `
+  <input type="text" id="riddleInput" placeholder="Type your answer..." />
+  <button id="submitRiddle">Submit</button>
+`;
+
 
   document.getElementById("submitRiddle").onclick = async () => {
     const rawInput = document.getElementById("riddleInput").value.trim().toLowerCase();
