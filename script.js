@@ -1,6 +1,7 @@
 const WORKER_URL = "https://thefinalpuzzle-worker.thefinalpuzzle.workers.dev";
 let guestCode = "";
 let currentStep = 0;
+
 const riddles = [
   {
     text: `<strong>The Sunday Alibi</strong> \n  

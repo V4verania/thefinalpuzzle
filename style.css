@@ -1,7 +1,8 @@
 /* 🌑 Base Styling */
+
 body {
-  background: #0b0b0b;
-  color: #f0e6d2;
+  background: url('/assets/puzzle-background.jpg') no-repeat center center fixed;
+  background-size: cover;
   font-family: 'Georgia', serif;
   text-align: center;
   padding: 2em;
@@ -28,6 +29,16 @@ strong {
 .intro {
   font-style: italic;
   margin-bottom: 1em;
+}
+
+.puzzleFrame {
+  background: url('/assets/puzzle-frame.png') no-repeat center center;
+  background-size: contain;
+  padding: 2em;
+  max-width: 600px;
+  margin: 2em auto;
+  position: relative;
+  z-index: 1;
 }
 
 /* 🔐 Inputs and Buttons */
