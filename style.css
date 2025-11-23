@@ -1,7 +1,7 @@
 /* 🌑 Base Styling */
 
 body {
-  background: url('/assets/puzzle-background.png') no-repeat center center fixed;
+  background: url('http://www.thefinalpuzzle.com/assets/puzzle-background.png') no-repeat center center fixed;
   background-size: cover;
   font-family: 'Georgia', serif;
   text-align: center;
@@ -32,7 +32,7 @@ strong {
 }
 
 .puzzleFrame {
-  background: url('/assets/puzzle-frame.png') no-repeat center center;
+  background: url('http://www.thefinalpuzzle.com/assets/puzzle-frame.png') no-repeat center center;
   background-size: contain;
   padding: 2em;
   max-width: 600px;
