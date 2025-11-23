@@ -295,7 +295,13 @@ button:hover {
 
 #riddleInput {
   display: block;
-  margin-bottom: 1em;
+  margin: 0.5em auto; /* ✅ centers horizontally */
+  width: 80%;
+  max-width: 400px;
+  background: #1e142a;
+  border: 1px solid #5a3a6d;
+  color: #fff;
+  border-radius: 6px;
 }
 
 #riddleInput:focus {
