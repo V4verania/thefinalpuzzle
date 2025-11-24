@@ -8,6 +8,12 @@
     --glow-red: 0 0 10px rgba(255, 51, 51, 0.7);
     --amber-warn: #ffae00;
     --glow-amber: 0 0 10px rgba(255, 174, 0, 0.7);
+    --border-color: rgba(0, 255, 0, 0.5);
+    --bg-overlay: rgba(0, 20, 0, 0.9);
+}
+
+* {
+    box-sizing: border-box;
 }
 
 body {
@@ -17,9 +23,210 @@ body {
     overflow: hidden;
     height: 100vh;
     margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
 }
 
-/* CRT Scanline Effect */
+/* --- UTILITY CLASSES --- */
+.hidden { display: none !important; }
+.text-center { text-align: center; }
+.uppercase { text-transform: uppercase; }
+.w-full { width: 100%; }
+.mt-2 { margin-top: 0.5rem; }
+.mt-4 { margin-top: 1rem; }
+.mb-2 { margin-bottom: 0.5rem; }
+.mb-4 { margin-bottom: 1rem; }
+.mb-8 { margin-bottom: 2rem; }
+
+/* Colors & Effects */
+.text-green-300 { color: #86efac; }
+.text-green-400 { color: #4ade80; }
+.text-green-600 { color: #16a34a; }
+.text-amber-500 { color: var(--amber-warn); }
+.text-red-500 { color: var(--error-red); }
+.text-gray-500 { color: #6b7280; }
+
+.glow-text { text-shadow: var(--glow); }
+.glow-text-red { text-shadow: var(--glow-red); color: var(--error-red); }
+
+/* Animations */
+.animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .5; }
+}
+
+/* --- COMPONENTS --- */
+
+/* Screens (Start & Login) */
+.screen-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background-color: black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    transition: opacity 0.5s ease;
+}
+
+/* Typography */
+.main-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    letter-spacing: 0.1em;
+    margin-bottom: 2rem;
+    text-shadow: var(--glow);
+    text-align: center;
+}
+
+@media (min-width: 768px) {
+    .main-title { font-size: 3.75rem; }
+}
+
+/* Boxes & Containers */
+.border-box-outer {
+    border: 1px solid var(--terminal-green);
+    padding: 4px;
+    margin-bottom: 2rem;
+}
+
+.border-box-inner {
+    border: 1px solid rgba(0, 255, 0, 0.5);
+    background-color: rgba(0, 50, 0, 0.1);
+    backdrop-filter: blur(4px);
+    padding: 1.5rem;
+}
+
+.login-container {
+    width: 100%;
+    max-width: 28rem; /* approx 450px */
+    border: 2px solid rgba(0, 255, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.9);
+    padding: 2rem;
+    box-shadow: 0 0 30px rgba(0, 255, 0, 0.2);
+}
+
+.terminal-container {
+    width: 100%;
+    max-width: 48rem; /* approx 768px */
+    height: 80vh;
+    border: 2px solid #064e3b; /* green-800 */
+    background-color: rgba(0, 0, 0, 0.9);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    box-shadow: 0 0 50px rgba(0, 255, 0, 0.1);
+    border-radius: 2px;
+    z-index: 30;
+    margin: 0 1rem;
+}
+
+@media (min-width: 768px) {
+    .terminal-container { padding: 2rem; }
+}
+
+/* Buttons */
+.btn-primary {
+    padding: 0.75rem 2rem;
+    background-color: rgba(0, 50, 0, 0.2);
+    border: 1px solid var(--terminal-green);
+    color: var(--terminal-green);
+    font-weight: bold;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%; /* Default to full width in some contexts */
+}
+
+.btn-primary:hover {
+    background-color: var(--terminal-green);
+    color: black;
+}
+
+/* Inputs */
+.login-input {
+    width: 100%;
+    background: transparent;
+    border: 1px solid var(--terminal-green);
+    color: var(--terminal-green);
+    font-family: 'Share Tech Mono', monospace;
+    text-align: center;
+    letter-spacing: 2px;
+    padding: 0.75rem;
+    font-size: 1.25rem;
+    outline: none;
+    text-transform: uppercase;
+}
+.login-input:focus { box-shadow: 0 0 15px var(--terminal-green); }
+
+.input-area {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: #4ade80;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1.125rem;
+    outline: none;
+}
+.input-area::placeholder { color: #064e3b; }
+
+/* Terminal Internal UI */
+.terminal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(0, 50, 0, 0.5);
+    padding-bottom: 0.5rem;
+    font-size: 0.75rem;
+    color: #16a34a;
+}
+
+@media (min-width: 768px) {
+    .terminal-header { font-size: 0.875rem; }
+}
+
+.terminal-log {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+    font-family: monospace;
+    font-size: 0.875rem;
+    padding-right: 0.5rem;
+}
+
+@media (min-width: 768px) {
+    .terminal-log { font-size: 1rem; }
+}
+
+.terminal-input-row {
+    position: relative;
+    border-top: 1px solid rgba(0, 50, 0, 0.5);
+    padding-top: 1rem;
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+}
+
+/* Dossier Card */
+.dossier-card {
+    border: 1px solid var(--terminal-green);
+    background: rgba(0, 20, 0, 0.8);
+    padding: 15px;
+    margin-top: 20px;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
+}
+
+/* CRT Scanline Effect (Unchanged) */
 .scanlines {
     position: fixed;
     top: 0;
@@ -54,54 +261,20 @@ body {
     animation: flicker 0.15s infinite;
 }
 
-/* Text Styles */
-.glow-text { text-shadow: var(--glow); }
-.glow-text-red { text-shadow: var(--glow-red); color: var(--error-red); }
-.glow-text-amber { text-shadow: var(--glow-amber); color: var(--amber-warn); }
-
-/* Typewriter Cursor */
-.cursor::after {
-    content: '█';
-    animation: blink 1s step-end infinite;
-}
-
-@keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
-}
-
-@keyframes scroll {
-    0% { background-position: 0 0; }
-    100% { background-position: 0 100%; }
-}
-
-@keyframes flicker {
-    0% { opacity: 0.02; }
-    50% { opacity: 0.05; }
-    100% { opacity: 0.02; }
-}
-
+/* Keyframes (Unchanged) */
+@keyframes scroll { 0% { background-position: 0 0; } 100% { background-position: 0 100%; } }
+@keyframes flicker { 0% { opacity: 0.02; } 50% { opacity: 0.05; } 100% { opacity: 0.02; } }
 @keyframes shake {
     0%, 100% { transform: translateX(0); }
     10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
     20%, 40%, 60%, 80% { transform: translateX(5px); }
 }
-
 .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
 
-.input-area:focus { outline: none; box-shadow: none; }
+/* Cursor & Loading Bar */
+.cursor::after { content: '█'; animation: blink 1s step-end infinite; }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
-.login-input {
-    background: transparent;
-    border: 1px solid var(--terminal-green);
-    color: var(--terminal-green);
-    font-family: 'Share Tech Mono', monospace;
-    text-align: center;
-    letter-spacing: 2px;
-}
-.login-input:focus { box-shadow: 0 0 15px var(--terminal-green); }
-
-/* Loading Bar */
 .loader-container {
     width: 100%;
     height: 4px;
@@ -122,12 +295,3 @@ body {
 ::-webkit-scrollbar-track { background: #001100; }
 ::-webkit-scrollbar-thumb { background: #004400; }
 ::-webkit-scrollbar-thumb:hover { background: #006600; }
-
-/* Dossier Card */
-.dossier-card {
-    border: 1px solid var(--terminal-green);
-    background: rgba(0, 20, 0, 0.8);
-    padding: 15px;
-    margin-top: 20px;
-    box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
-}
