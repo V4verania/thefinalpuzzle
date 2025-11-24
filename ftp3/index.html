@@ -406,12 +406,6 @@
         function handleScrollInteraction(delta) {
             if (systemActivated) return;
 
-            // Implicit audio consent
-            if(!state.audioEnabled) {
-                state.audioEnabled = true;
-                playSound('ambient');
-            }
-
             // Increase progress
             scrollProgress += delta * 0.001;
             scrollProgress = Math.max(0, Math.min(1, scrollProgress)); // Clamp 0-1
@@ -439,20 +433,24 @@
         async function activateSystem() {
             systemActivated = true;
             
-            // 1. Visual flash
+            // 1. Play Ambient Audio (Once on breach)
+            state.audioEnabled = true;
+            playSound('ambient');
+            
+            // 2. Visual flash
             document.body.style.backgroundColor = '#fff';
             setTimeout(() => document.body.style.backgroundColor = '#000', 50);
 
-            // 2. Hide Landing
+            // 3. Hide Landing
             document.getElementById('landing-overlay').style.display = 'none';
             document.getElementById('canvas-container').style.opacity = '0.2'; // Dim background
 
-            // 3. Show Boot Screen
+            // 4. Show Boot Screen
             const bootOverlay = document.getElementById('boot-overlay');
             const bootText = document.getElementById('boot-text');
             bootOverlay.style.display = 'flex';
 
-            // 4. Run Boot Script
+            // 5. Run Boot Script
             const lines = [
                 "BIOS DATE 01/01/2026 14:22:51 VER 1.02",
                 "CPU: QUANTUM CORE V4.2, SPEED: 400 THz",
@@ -490,7 +488,7 @@
             await new Promise(r => setTimeout(r, 800));
             bootOverlay.style.display = 'none';
             
-            // 5. Show Terminal
+            // 6. Show Terminal
             const terminal = document.getElementById('terminal-wrapper');
             terminal.style.display = 'flex';
             setTimeout(() => {
@@ -503,18 +501,64 @@
         // --- TERMINAL LOGIC (Existing) ---
         
         const WORKER_URL = "https://thefinalpuzzle-worker.thefinalpuzzle.workers.dev";
+        
+        // REVERTED RIDDLES TO ORIGINAL TEXT (Cleaned for Terminal)
         const riddles = [
-            { text: "ENCRYPTION LAYER 1: SUNDAY_ALIBI.LOG\n\nSUBJECT: Murder Investigation\nTIMESTAMP: Sunday Morning\n\nSTATEMENT LOGS:\n> BUTLER: Organizing wine cellar.\n> COOK: Preparing breakfast.\n> GARDENER: Watering ferns.\n> MAID: Collecting morning mail.\n\nANALYSIS REQUIRED: Identify the anomaly. Who is the perpetrator?", keywords: ["maid", "the maid"], feedback: "LOGIC VERIFIED. POSTAL SERVICES INACTIVE ON SUNDAYS." },
-            { text: "ENCRYPTION LAYER 2: TOXICOLOGY_REPORT.DAT\n\nSCENARIO: Two subjects consume iced tea from a shared source.\nSUBJECT A: Consumes 5 units rapidly. Survives.\nSUBJECT B: Consumes 1 unit slowly. Deceased.\nRESULT: Liquid verified poisonous.\n\nQUERY: Explain Subject A's survival vector.", keywords: ["ice", "ice cubes", "the ice"], feedback: "ANALYSIS CONFIRMED. TOXIN SUSPENDED IN SOLID STATE H2O." },
-            { text: "ENCRYPTION LAYER 3: GEOSPATIAL_ANOMALY.TXT\n\nObject possesses urban centers (population: 0), geological formations (vegetation: 0), and hydrological features (fauna: 0).\n\nIDENTIFY OBJECT.", keywords: ["map", "a map"], feedback: "OBJECT IDENTIFIED: CARTOGRAPHIC REPRESENTATION." },
-            { text: "ENCRYPTION LAYER 4: MARKET_PARADOX.LOG\n\nMAKER: Has no need.\nBUYER: Has no use.\nUSER: Neither sees nor feels.\n\nIDENTIFY COMMODITY.", keywords: ["coffin", "casket"], feedback: "COMMODITY IDENTIFIED: BURIAL RECEPTACLE." },
-            { text: "ENCRYPTION LAYER 5: IDENTITY_OWNERSHIP.SEC\n\nPROPERTY: Belonging to User.\nUSAGE STATISTICS: External entities utilize this property >99% more frequently than Owner.\n\nIDENTIFY PROPERTY.", keywords: ["name", "my name", "name"], feedback: "IDENTITY CONFIRMED." },
-            { text: "ENCRYPTION LAYER 6: ENTITY_CLASSIFICATION.BIO\n\nTRAITS:\n- Ambulation: Run (No legs)\n- Vocalization: Murmur (No voice)\n- Anatomy: Head (No eyes), Bed (No sleep)\n\nCLASSIFY ENTITY.", keywords: ["river", "a river"], feedback: "ENTITY CLASSIFIED: HYDROLOGICAL FLOW." },
-            { text: "ENCRYPTION LAYER 7: SPATIAL_PHYSICS.ERR\n\nPHENOMENON: Fills volume completely. Mass = 0. Volume Occupied = 0.\n\nIDENTIFY PHENOMENON.", keywords: ["light", "the light"], feedback: "PHENOMENON IDENTIFIED: PHOTONIC RADIATION." },
-            { text: "ENCRYPTION LAYER 8: VITAL_COMPOUND.CHEM\n\nSTATUS: Internal (Vital). External (Cleansing).\nWARNING: Total immersion causes respiratory failure.\n\nIDENTIFY COMPOUND.", keywords: ["water"], feedback: "COMPOUND IDENTIFIED: H2O." },
-            { text: "ENCRYPTION LAYER 9: THERMODYNAMIC_ENTITY.HAZ\n\nNEEDS: Constant fuel input.\nCONTACT EFFECT: Oxidation/Tissue damage.\n\nIDENTIFY ENTITY.", keywords: ["fire"], feedback: "ENTITY IDENTIFIED: COMBUSTION REACTION." },
-            { text: "ENCRYPTION LAYER 10: LOGISTICS_TRACKER.DAT\n\nABILITY: Global circumnavigation.\nCONSTRAINT: Fixed to origin point (corner).\n\nIDENTIFY OBJECT.", keywords: ["stamp", "postage"], feedback: "OBJECT IDENTIFIED: POSTAGE MARKER." },
-            { text: "ENCRYPTION LAYER 11: ATMOSPHERIC_GHOST.MET\n\nFLIGHT: Wingless.\nVISION: Eyeless.\nEFFECT: Lacrimation (Rain). Shadows follow.\n\nIDENTIFY PHENOMENON.", keywords: ["cloud", "a cloud"], feedback: "PHENOMENON IDENTIFIED: CONDENSED WATER VAPOR." }
+          {
+            text: "The Sunday Alibi\n\nA man is found murdered on a Sunday morning. His wife immediately calls the police, who question the household staff:\n\n- The Butler says he was organizing the wine cellar.\n- The Cook says she was preparing breakfast.\n- The Gardener says he was watering the ferns.\n- The Maid says she was collecting the morning mail.\n\nThe police immediately arrest the murderer.\n\nWho did it?",
+            keywords: ["maid", "the maid"],
+            feedback: "Correct. There’s no mail on Sundays"
+          },
+          {
+            text: "The Poisoned Drinks\n\nTwo rivals sit down for a drink. They both order iced tea from the same pitcher. One man drinks his glass very quickly and immediately orders another. The other woman sips her one glass slowly. The woman dies, but the man survives. It is determined that all the drinks were poisoned.\n\nHow did the man survive?",
+            keywords: ["ice", "ice cubes"],
+            feedback: "Correct. The poison was in the ice — it melted into her drink, not his."
+          },
+          {
+            text: "What Am I?\n\nI have cities, but no houses.\nI have mountains, but no trees.\nI have water, but no fish.\n\nWhat am I?",
+            keywords: ["map"],
+            feedback: "Correct. A map shows features without containing them."
+          },
+          {
+            text: "The person who makes it has no need of it.\nThe person who buys it has no use for it.\nThe person who uses it can neither see nor feel it.\n\nWhat is it?",
+            keywords: ["coffin", "casket"],
+            feedback: "Correct. A coffin is made for the dead — unseen, unfelt by its user."
+          },
+          {
+            text: "What belongs to you, but everyone else uses more than you do?",
+            keywords: ["name", "my name"],
+            feedback: "Correct. Others speak your name far more than you do."
+          },
+          {
+            text: "What can run but never walks, has a mouth but never talks, has a head but never weeps, has a bed but never sleeps?",
+            keywords: ["river"],
+            feedback: "Correct. A river fits all four clues perfectly."
+          },
+          {
+            text: "What can fill a room but takes up no space?",
+            keywords: ["light"],
+            feedback: "Correct. Light fills space without occupying it."
+          },
+          {
+            text: "Always in you, sometimes on you; if I surround you, I can kill you. What am I?",
+            keywords: ["water"],
+            feedback: "Correct. Water is essential — but overwhelming, it becomes deadly."
+          },
+          {
+            text: "I’m always hungry, I must always be fed. The finger I touch will soon turn red. What am I?",
+            keywords: ["fire"],
+            feedback: "Correct. Fire consumes and burns — always hungry, always dangerous."
+          },
+          {
+            text: "What can travel around the world while staying in the same spot?",
+            keywords: ["stamp", "postage"],
+            feedback: "Correct. A stamp travels far while remaining fixed to the envelope."
+          },
+          {
+            text: "I fly without wings, I cry without eyes. Wherever I go, darkness follows me. What am I?",
+            keywords: ["cloud", "A cloud"],
+            feedback: "Correct. A cloud drifts, weeps, and casts shadow — poetic and true."
+          }
         ];
 
         let state = {
@@ -701,7 +745,8 @@
             await print(`> ${answer}`, "text-gray-500 italic");
 
             if (matched) {
-                playSound('message');
+                // CHANGED: Play whisper on success
+                playSound('whisper');
                 await print(`>> ${riddle.feedback}`, "text-green-400 glow-text");
                 await print(">> DECRYPTING NEXT FILE...", "text-green-800");
                 
@@ -721,6 +766,7 @@
                 }
 
             } else {
+                // CHANGED: Play wrong on failure
                 playSound('wrong');
                 setStatus("INCORRECT KEY", "error");
                 wrapper.classList.add('shake');
