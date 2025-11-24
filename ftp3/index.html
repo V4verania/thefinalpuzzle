@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Final Puzzle // SECURE TERMINAL</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <style>
+        :root {
+            --terminal-green: #33ff33;
+            --terminal-dim: #1a801a;
+            --terminal-bg: #050505;
+            --alert-red: #ff3333;
+        }
+
+        body {
+            background-color: var(--terminal-bg);
+            color: var(--terminal-green);
+            font-family: 'Share Tech Mono', monospace;
+            overflow: hidden;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* --- 3D Background --- */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.6; /* Dim it slightly so text is readable */
+            transition: opacity 1s ease;
+        }
+
+        /* --- Landing Overlay --- */
+        #landing-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(5, 5, 5, 0.4);
+            transition: transform 0.8s cubic-bezier(0.7, 0, 0.3, 1), opacity 0.8s ease;
+            cursor: ns-resize; /* Hint at scrolling */
+        }
+        
+        .scroll-indicator {
+            position: absolute;
+            bottom: 50px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-10px);}
+            60% {transform: translateY(-5px);}
+        }
+
+        /* --- CRT Effects --- */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 60; /* Above 3D */
+            animation: scroll 10s linear infinite;
+        }
+
+        .screen-flicker {
+            animation: flicker 0.15s infinite;
+            pointer-events: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 255, 0, 0.01);
+            z-index: 59;
+        }
+
+        @keyframes scroll { 0% { background-position: 0 0; } 100% { background-position: 0 100%; } }
+        @keyframes flicker { 0% { opacity: 0.9; } 50% { opacity: 1.0; } 100% { opacity: 0.9; } }
+        
+        /* --- Terminal UI --- */
+        #terminal-wrapper {
+            width: 100%;
+            max-width: 900px;
+            height: 90vh;
+            position: relative;
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            background: rgba(10, 10, 10, 0.85); /* More transparent to see 3D */
+            backdrop-filter: blur(5px);
+            padding: 2px;
+            opacity: 0; /* Hidden initially */
+            transform: scale(0.95);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .glow-border {
+            box-shadow: 0 0 10px var(--terminal-dim), inset 0 0 20px rgba(0, 255, 0, 0.1);
+            border: 1px solid var(--terminal-green);
+        }
+
+        .terminal-content {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--terminal-green) transparent;
+        }
+        
+        /* Hide scrollbar track for cleaner look */
+        .terminal-content::-webkit-scrollbar { width: 6px; }
+        .terminal-content::-webkit-scrollbar-thumb { background-color: var(--terminal-green); }
+        .terminal-content::-webkit-scrollbar-track { background-color: transparent; }
+
+        .input-line {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            border-top: 1px solid var(--terminal-dim);
+            background: rgba(0, 20, 0, 0.5);
+        }
+
+        input[type="text"] {
+            background: transparent;
+            border: none;
+            color: var(--terminal-green);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.2rem;
+            width: 100%;
+            outline: none;
+            margin-left: 10px;
+            text-transform: uppercase;
+        }
+
+        /* --- Animations & Utilities --- */
+        .cursor::after { content: '█'; animation: blink 1s step-end infinite; margin-left: 2px; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        
+        .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        .hidden { display: none !important; }
+        .text-red { color: var(--alert-red); text-shadow: 0 0 5px red; }
+        .border-red { border-color: var(--alert-red) !important; box-shadow: 0 0 10px red !important; }
+        .qr-invert { filter: invert(1) sepia(1) saturate(5) hue-rotate(90deg); border: 2px solid var(--terminal-green); }
+        
+        /* Glitch text effect for title */
+        .glitch {
+            position: relative;
+        }
+        .glitch::before, .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #050505;
+        }
+        .glitch::before {
+            left: 2px;
+            text-shadow: -1px 0 red;
+            clip: rect(24px, 550px, 90px, 0);
+            animation: glitch-anim-1 2.5s infinite linear alternate-reverse;
+        }
+        .glitch::after {
+            left: -2px;
+            text-shadow: -1px 0 blue;
+            clip: rect(85px, 550px, 140px, 0);
+            animation: glitch-anim-2 3s infinite linear alternate-reverse;
+        }
+        @keyframes glitch-anim-1 {
+            0% { clip: rect(20px, 9999px, 10px, 0); }
+            100% { clip: rect(80px, 9999px, 90px, 0); }
+        }
+        @keyframes glitch-anim-2 {
+            0% { clip: rect(90px, 9999px, 100px, 0); }
+            100% { clip: rect(10px, 9999px, 40px, 0); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Audio Assets -->
+    <audio id="ambientAudio" src="ambient.mp3" loop></audio>
+    <audio id="whisperAudio" src="whisper.mp3" preload="auto"></audio>
+    <audio id="wrongAnswerAudio" src="wrong.mp3" preload="auto"></audio>
+    <audio id="messageAudio" src="message.mp3" preload="auto"></audio>
+
+    <!-- 3D Canvas -->
+    <div id="canvas-container"></div>
+
+    <!-- Visual Overlays -->
+    <div class="scanlines"></div>
+    <div class="screen-flicker"></div>
+
+    <!-- Landing / Scroll Trigger -->
+    <div id="landing-overlay">
+        <h1 class="text-4xl md:text-6xl font-bold mb-4 glitch tracking-widest" data-text="THE FINAL PUZZLE">THE FINAL PUZZLE</h1>
+        <p class="text-green-500/80 text-sm md:text-base tracking-widest bg-black/50 p-2 border-l-2 border-green-500">SECURE UPLINK DETECTED</p>
+        
+        <div class="scroll-indicator flex flex-col items-center gap-2 text-green-500/50">
+            <span class="text-xs tracking-[0.3em]">SCROLL TO DECRYPT</span>
+            <i data-lucide="chevrons-down" class="w-6 h-6"></i>
+        </div>
+    </div>
+
+    <!-- Main Terminal Container -->
+    <div id="terminal-wrapper" class="glow-border rounded-sm mx-4">
+        
+        <!-- Header -->
+        <div class="flex justify-between items-center px-4 py-2 border-b border-green-900 bg-green-900/10 text-xs md:text-sm select-none">
+            <div class="flex items-center gap-2">
+                <i data-lucide="terminal" class="w-4 h-4"></i>
+                <span id="header-status">SYSTEM OFFLINE</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <span id="clock">00:00:00</span>
+                <span class="flex items-center gap-1 cursor-pointer hover:text-white transition-colors" id="muteToggle">
+                    <i data-lucide="volume-2" class="w-4 h-4"></i>
+                </span>
+            </div>
+        </div>
+
+        <!-- Scrollable Output Area -->
+        <div id="terminal-output" class="terminal-content flex flex-col gap-4 text-sm md:text-base">
+            <!-- Dynamic Content Injected Here -->
+            <div id="boot-sequence"></div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="input-line">
+            <span class="text-green-500 font-bold mr-2">&gt;</span>
+            <input type="text" id="userInput" placeholder="AWAITING INITIALIZATION..." autocomplete="off" spellcheck="false">
+            <div id="loading-indicator" class="hidden">
+                <span class="animate-pulse">PROCESSING...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logic -->
+    <script>
+        // --- 3D ANIMATION SETUP ---
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        // Add subtle fog to blend object into the black background
+        scene.fog = new THREE.FogExp2(0x000000, 0.03);
+
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+
+        // Create The Artifact (Cyberpunk Icosahedron)
+        const geometry = new THREE.IcosahedronGeometry(2, 1); // Radius 2, detail 1
+        
+        // Wireframe Logic
+        const wireframeGeometry = new THREE.WireframeGeometry(geometry);
+        const material = new THREE.LineBasicMaterial({ 
+            color: 0x33ff33,
+            transparent: true,
+            opacity: 0.3,
+            linewidth: 1 
+        });
+        const artifact = new THREE.LineSegments(wireframeGeometry, material);
+        scene.add(artifact);
+
+        // Inner Core (Solid but transparent)
+        const coreGeo = new THREE.IcosahedronGeometry(1.5, 0);
+        const coreMat = new THREE.MeshBasicMaterial({ 
+            color: 0x004400, 
+            wireframe: true,
+            transparent: true,
+            opacity: 0.1
+        });
+        const core = new THREE.Mesh(coreGeo, coreMat);
+        scene.add(core);
+
+        // Particles
+        const particlesGeo = new THREE.BufferGeometry();
+        const particleCount = 200;
+        const posArray = new Float32Array(particleCount * 3);
+        for(let i = 0; i < particleCount * 3; i++) {
+            posArray[i] = (Math.random() - 0.5) * 15; // Spread
+        }
+        particlesGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        const particlesMat = new THREE.PointsMaterial({
+            size: 0.05,
+            color: 0x33ff33,
+            transparent: true,
+            opacity: 0.5
+        });
+        const particlesMesh = new THREE.Points(particlesGeo, particlesMat);
+        scene.add(particlesMesh);
+
+        camera.position.z = 6;
+
+        // Mouse interaction for 3D parallax
+        let mouseX = 0;
+        let mouseY = 0;
+        document.addEventListener('mousemove', (event) => {
+            mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+            mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+        });
+
+        // Animation Loop
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Rotate Artifact
+            artifact.rotation.x += 0.002;
+            artifact.rotation.y += 0.003;
+            
+            core.rotation.x -= 0.002;
+            core.rotation.y -= 0.002;
+
+            particlesMesh.rotation.y += 0.0005;
+
+            // Parallax
+            camera.position.x += (mouseX * 0.5 - camera.position.x) * 0.05;
+            camera.position.y += (mouseY * 0.5 - camera.position.y) * 0.05;
+            camera.lookAt(scene.position);
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Resize handler
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+
+        // --- SCROLL TO ACTIVATE LOGIC ---
+        let isSystemActive = false;
+        const landingOverlay = document.getElementById('landing-overlay');
+        const terminalWrapper = document.getElementById('terminal-wrapper');
+        const userInput = document.getElementById('userInput');
+
+        function activateSystem() {
+            if(isSystemActive) return;
+            isSystemActive = true;
+
+            // 1. Play Sound
+            state.audioEnabled = true; // Implicit consent via interaction
+            playSound('ambient');
+            
+            // 2. Animate 3D Camera (Zoom In)
+            const tl = setInterval(() => {
+                camera.position.z -= 0.1;
+                if(camera.position.z <= 3.5) clearInterval(tl);
+            }, 16);
+            
+            // 3. UI Transitions
+            landingOverlay.style.opacity = '0';
+            landingOverlay.style.transform = 'translateY(-100vh)'; // Slide up
+            
+            setTimeout(() => {
+                landingOverlay.style.display = 'none';
+                
+                // Show Terminal
+                terminalWrapper.style.opacity = '1';
+                terminalWrapper.style.transform = 'scale(1)';
+                
+                // Start Terminal Logic
+                initTerminal();
+            }, 600);
+        }
+
+        // Listen for Scroll or Touch
+        window.addEventListener('wheel', activateSystem);
+        window.addEventListener('touchmove', activateSystem);
+        landingOverlay.addEventListener('click', activateSystem); // Fallback
+
+        // --- TERMINAL LOGIC (Original Script) ---
+        
+        const WORKER_URL = "https://thefinalpuzzle-worker.thefinalpuzzle.workers.dev";
+        
+        const riddles = [
+            {
+                text: "ENCRYPTION LAYER 1: SUNDAY_ALIBI.LOG\n\nSUBJECT: Murder Investigation\nTIMESTAMP: Sunday Morning\n\nSTATEMENT LOGS:\n> BUTLER: Organizing wine cellar.\n> COOK: Preparing breakfast.\n> GARDENER: Watering ferns.\n> MAID: Collecting morning mail.\n\nANALYSIS REQUIRED: Identify the anomaly. Who is the perpetrator?",
+                keywords: ["maid", "the maid"],
+                feedback: "LOGIC VERIFIED. POSTAL SERVICES INACTIVE ON SUNDAYS."
+            },
+            {
+                text: "ENCRYPTION LAYER 2: TOXICOLOGY_REPORT.DAT\n\nSCENARIO: Two subjects consume iced tea from a shared source.\nSUBJECT A: Consumes 5 units rapidly. Survives.\nSUBJECT B: Consumes 1 unit slowly. Deceased.\nRESULT: Liquid verified poisonous.\n\nQUERY: Explain Subject A's survival vector.",
+                keywords: ["ice", "ice cubes", "the ice"],
+                feedback: "ANALYSIS CONFIRMED. TOXIN SUSPENDED IN SOLID STATE H2O."
+            },
+            {
+                text: "ENCRYPTION LAYER 3: GEOSPATIAL_ANOMALY.TXT\n\nObject possesses urban centers (population: 0), geological formations (vegetation: 0), and hydrological features (fauna: 0).\n\nIDENTIFY OBJECT.",
+                keywords: ["map", "a map"],
+                feedback: "OBJECT IDENTIFIED: CARTOGRAPHIC REPRESENTATION."
+            },
+            {
+                text: "ENCRYPTION LAYER 4: MARKET_PARADOX.LOG\n\nMAKER: Has no need.\nBUYER: Has no use.\nUSER: Neither sees nor feels.\n\nIDENTIFY COMMODITY.",
+                keywords: ["coffin", "casket"],
+                feedback: "COMMODITY IDENTIFIED: BURIAL RECEPTACLE."
+            },
+            {
+                text: "ENCRYPTION LAYER 5: IDENTITY_OWNERSHIP.SEC\n\nPROPERTY: Belonging to User.\nUSAGE STATISTICS: External entities utilize this property >99% more frequently than Owner.\n\nIDENTIFY PROPERTY.",
+                keywords: ["name", "my name", "name"],
+                feedback: "IDENTITY CONFIRMED."
+            },
+            {
+                text: "ENCRYPTION LAYER 6: ENTITY_CLASSIFICATION.BIO\n\nTRAITS:\n- Ambulation: Run (No legs)\n- Vocalization: Murmur (No voice)\n- Anatomy: Head (No eyes), Bed (No sleep)\n\nCLASSIFY ENTITY.",
+                keywords: ["river", "a river"],
+                feedback: "ENTITY CLASSIFIED: HYDROLOGICAL FLOW."
+            },
+            {
+                text: "ENCRYPTION LAYER 7: SPATIAL_PHYSICS.ERR\n\nPHENOMENON: Fills volume completely. Mass = 0. Volume Occupied = 0.\n\nIDENTIFY PHENOMENON.",
+                keywords: ["light", "the light"],
+                feedback: "PHENOMENON IDENTIFIED: PHOTONIC RADIATION."
+            },
+            {
+                text: "ENCRYPTION LAYER 8: VITAL_COMPOUND.CHEM\n\nSTATUS: Internal (Vital). External (Cleansing).\nWARNING: Total immersion causes respiratory failure.\n\nIDENTIFY COMPOUND.",
+                keywords: ["water"],
+                feedback: "COMPOUND IDENTIFIED: H2O."
+            },
+            {
+                text: "ENCRYPTION LAYER 9: THERMODYNAMIC_ENTITY.HAZ\n\nNEEDS: Constant fuel input.\nCONTACT EFFECT: Oxidation/Tissue damage.\n\nIDENTIFY ENTITY.",
+                keywords: ["fire"],
+                feedback: "ENTITY IDENTIFIED: COMBUSTION REACTION."
+            },
+            {
+                text: "ENCRYPTION LAYER 10: LOGISTICS_TRACKER.DAT\n\nABILITY: Global circumnavigation.\nCONSTRAINT: Fixed to origin point (corner).\n\nIDENTIFY OBJECT.",
+                keywords: ["stamp", "postage"],
+                feedback: "OBJECT IDENTIFIED: POSTAGE MARKER."
+            },
+            {
+                text: "ENCRYPTION LAYER 11: ATMOSPHERIC_GHOST.MET\n\nFLIGHT: Wingless.\nVISION: Eyeless.\nEFFECT: Lacrimation (Rain). Shadows follow.\n\nIDENTIFY PHENOMENON.",
+                keywords: ["cloud", "a cloud"],
+                feedback: "PHENOMENON IDENTIFIED: CONDENSED WATER VAPOR."
+            }
+        ];
+
+        let state = {
+            step: 'BOOT', 
+            guestCode: '',
+            currentRiddleIndex: 0,
+            isTyping: false,
+            audioEnabled: false
+        };
+
+        const output = document.getElementById('terminal-output');
+        const inputEl = document.getElementById('userInput');
+        const statusEl = document.getElementById('header-status');
+        const wrapper = document.getElementById('terminal-wrapper');
+        const loader = document.getElementById('loading-indicator');
+        
+        const audio = {
+            ambient: document.getElementById('ambientAudio'),
+            whisper: document.getElementById('whisperAudio'),
+            wrong: document.getElementById('wrongAnswerAudio'),
+            message: document.getElementById('messageAudio')
+        };
+
+        function playSound(type) {
+            if(!state.audioEnabled) return;
+            try {
+                if (type === 'ambient') {
+                    audio.ambient.volume = 0.3;
+                    audio.ambient.play().catch(e => console.log("Audio autoplay blocked"));
+                } else if (audio[type]) {
+                    audio[type].currentTime = 0;
+                    audio[type].play().catch(e => {});
+                }
+            } catch(e) {}
+        }
+
+        function setStatus(text, type = 'normal') {
+            statusEl.innerText = text;
+            if (type === 'error') {
+                statusEl.classList.add('text-red');
+                wrapper.classList.add('border-red');
+            } else if (type === 'success') {
+                statusEl.classList.remove('text-red');
+                statusEl.classList.add('text-green-400');
+                wrapper.classList.remove('border-red');
+            } else {
+                statusEl.className = '';
+                wrapper.classList.remove('border-red');
+            }
+        }
+
+        function scrollToBottom() {
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function print(text, className = '', speed = 20) {
+            return new Promise(resolve => {
+                const line = document.createElement('div');
+                line.className = whitespace-pre-wrap mb-4 ${className};
+                output.appendChild(line);
+                
+                state.isTyping = true;
+                inputEl.disabled = true;
+                
+                let i = 0;
+                function type() {
+                    if (i < text.length) {
+                        line.textContent += text.charAt(i);
+                        i++;
+                        scrollToBottom();
+                        setTimeout(type, speed + (Math.random() * 10)); 
+                    } else {
+                        state.isTyping = false;
+                        inputEl.disabled = false;
+                        inputEl.focus();
+                        resolve();
+                    }
+                }
+                type();
+            });
+        }
+
+        function printHtml(html) {
+            const div = document.createElement('div');
+            div.innerHTML = html;
+            div.className = "mb-6 animate-pulse";
+            output.appendChild(div);
+            scrollToBottom();
+        }
+
+        async function initTerminal() {
+            lucide.createIcons();
+            
+            inputEl.addEventListener('keydown', async (e) => {
+                if (e.key === 'Enter' && !state.isTyping) {
+                    const val = inputEl.value.trim();
+                    if (!val) return;
+                    inputEl.value = '';
+                    await handleInput(val);
+                }
+            });
+
+            setStatus("BOOTING...");
+            await print("INITIALIZING SECURE CONNECTION...", "text-green-600", 10);
+            await new Promise(r => setTimeout(r, 500));
+            await print("LOADING KERNEL... OK", "text-green-600", 5);
+            await print("ESTABLISHING ENCRYPTED TUNNEL TO WORKER NODE...", "text-green-600", 5);
+            await new Promise(r => setTimeout(r, 800));
+            
+            setStatus("AWAITING AUTH");
+            state.step = 'LOGIN';
+            inputEl.placeholder = "ENTER ACCESS CODE...";
+            
+            await print("\n========================================\n   THE FINAL PUZZLE // SECURE GATEWAY   \n========================================", "font-bold glow-text");
+            await print("PLEASE ENTER YOUR INVITATION CODE TO PROCEED:");
+        }
+
+        async function handleInput(val) {
+            if (state.step === 'LOGIN') {
+                await attemptLogin(val);
+            } else if (state.step === 'MAZE') {
+                await checkRiddle(val);
+            } else if (state.step === 'RSVP') {
+                await submitRSVP(val);
+            }
+        }
+
+        async function attemptLogin(code) {
+            state.guestCode = code;
+            inputEl.style.display = 'none';
+            loader.classList.remove('hidden');
+            setStatus("VERIFYING IDENTITY...");
+
+            try {
+                const lockoutRes = await fetch(${WORKER_URL}?code=${code}&type=lockout);
+                const lockoutData = await lockoutRes.json();
+                
+                if (lockoutData.until && new Date(lockoutData.until) > new Date()) {
+                    throw new Error(SYSTEM LOCKED. BRUTE FORCE PROTECTION ACTIVE UNTIL: ${new Date(lockoutData.until).toLocaleTimeString()});
+                }
+
+                const statusRes = await fetch(${WORKER_URL}/validate?code=${code});
+                const status = await statusRes.json();
+
+                if (!status.valid) {
+                    throw new Error("ACCESS DENIED. CODE UNRECOGNIZED.");
+                }
+
+                const progressRes = await fetch(${WORKER_URL}?code=${code}&type=progress);
+                const progressData = await progressRes.json();
+                
+                loader.classList.add('hidden');
+                inputEl.style.display = 'block';
+                playSound('message');
+                setStatus("ACCESS GRANTED", "success");
+                
+                output.innerHTML = ''; 
+                await print(>> IDENTITY VERIFIED., "text-green-400 font-bold");
+                
+                if (status.profile) {
+                     await print(>> WELCOME AGENT: ${status.profile.name || 'UNKNOWN'}\n>> TITLE: ${status.profile.title || 'OPERATIVE'}, "text-green-300");
+                }
+
+                if (status.revealed) {
+                    await initReveal();
+                } else {
+                    state.currentRiddleIndex = progressData.step || 0;
+                    state.step = 'MAZE';
+                    inputEl.placeholder = "ENTER DECRYPTION KEY...";
+                    await showNextRiddle();
+                }
+
+            } catch (error) {
+                loader.classList.add('hidden');
+                inputEl.style.display = 'block';
+                playSound('wrong');
+                wrapper.classList.add('shake');
+                setTimeout(() => wrapper.classList.remove('shake'), 500);
+                
+                setStatus("AUTH FAILED", "error");
+                await print(ERROR: ${error.message}, "text-red font-bold");
+                inputEl.placeholder = "TRY AGAIN...";
+            }
+        }
+
+        async function checkRiddle(answer) {
+            const riddle = riddles[state.currentRiddleIndex];
+            const rawInput = answer.toLowerCase().replace(/[^a-z0-9 ]+/g, " ");
+            const matched = riddle.keywords.some(k => rawInput.includes(k.toLowerCase()));
+
+            await print(> ${answer}, "text-gray-500 italic");
+
+            if (matched) {
+                playSound('message');
+                await print(>> ${riddle.feedback}, "text-green-400 glow-text");
+                await print(">> DECRYPTING NEXT FILE...", "text-green-800");
+                
+                state.currentRiddleIndex++;
+                try {
+                    await fetch(${WORKER_URL}?type=progress, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ code: state.guestCode, step: state.currentRiddleIndex })
+                    });
+                } catch(e) { console.error("Sync failed", e); }
+
+                if (state.currentRiddleIndex < riddles.length) {
+                    setTimeout(showNextRiddle, 1000);
+                } else {
+                    setTimeout(initReveal, 1500);
+                }
+
+            } else {
+                playSound('wrong');
+                setStatus("INCORRECT KEY", "error");
+                wrapper.classList.add('shake');
+                setTimeout(() => wrapper.classList.remove('shake'), 500);
+                
+                await print(">> ERROR: INCORRECT DECRYPTION KEY.", "text-red");
+                
+                const lockoutDate = new Date();
+                lockoutDate.setHours(lockoutDate.getHours() + 2);
+                
+                try {
+                    await fetch(${WORKER_URL}?type=lockout, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ code: state.guestCode, until: lockoutDate.toISOString() })
+                    });
+                } catch(e) { console.error("Lockout sync failed", e); }
+
+                await print(>> SYSTEM LOCKOUT INITIATED. RETURN IN 2 HOURS., "text-red font-bold");
+                inputEl.disabled = true;
+                inputEl.placeholder = "TERMINAL LOCKED";
+            }
+        }
+
+        async function showNextRiddle() {
+            playSound('whisper');
+            setStatus(DECRYPTING FILE ${state.currentRiddleIndex + 1}/${riddles.length});
+            const riddle = riddles[state.currentRiddleIndex];
+            await print("\n" + riddle.text);
+        }
+
+        async function initReveal() {
+            state.step = 'REVEAL';
+            output.innerHTML = ''; 
+            setStatus("ROOT ACCESS GRANTED", "success");
+            playSound('message');
+
+            await print("ALL SECURITY LAYERS BYPASSED.", "text-green-400");
+            await print("ACCESSING CLASSIFIED MAINFRAME...", "animate-pulse");
+            await new Promise(r => setTimeout(r, 1500));
+
+            let rsvpData = {};
+            try {
+                const res = await fetch(${WORKER_URL}?code=${state.guestCode}&type=rsvp);
+                rsvpData = await res.json();
+            } catch(e) {}
+
+            const revealDate = new Date("2026-02-14T00:00:00Z");
+            const now = new Date();
+            const daysLeft = Math.ceil((revealDate - now) / (1000 * 60 * 60 * 24));
+
+            const dossierHTML = `
+                <div class="border border-green-500 p-4 bg-green-900/10 mt-4 mb-4 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 bg-green-500 text-black px-2 text-xs font-bold">TOP SECRET</div>
+                    <h2 class="text-xl font-bold mb-2 underline decoration-green-500">MISSION BRIEF: THE DENE OF WHISPERS</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <p><span class="text-green-400">TARGET LOCATION:</span> Number 40</p>
+                            <p><span class="text-green-400">OPERATION DATE:</span> Saturday, 16th May 2026</p>
+                            <p><span class="text-green-400">T-MINUS:</span> 1930 Hours (7:30 PM)</p>
+                            <p><span class="text-green-400">HOST:</span> Elena (The Archivist)</p>
+                        </div>
+                        <div class="flex flex-col items-center justify-center border border-green-900 p-2">
+                            <img src="innercircle.png" class="w-32 h-32 qr-invert" alt="QR Code">
+                            <span class="text-xs mt-1 text-center text-green-600">SCAN FOR ENCRYPTED COMMS</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            printHtml(dossierHTML);
+
+            if (rsvpData.confirmed) {
+                await print(>> RSVP STATUS: CONFIRMED., "text-green-300 font-bold");
+                
+                if (rsvpData.dossier) {
+                     const charHTML = `
+                        <div class="border-l-4 border-green-500 pl-4 py-2 mt-4 bg-green-900/5">
+                            <h3 class="font-bold text-lg">ASSIGNED IDENTITY: ${rsvpData.dossier}</h3>
+                            <p class="text-green-300 italic">Play the role of: ${rsvpData.name}</p>
+                            <p class="mt-2 text-sm">${rsvpData.description}</p>
+                            <p class="mt-2 text-sm"><strong class="text-green-400">REQUIRED ATTIRE:</strong> ${rsvpData.costume}</p>
+                        </div>
+                    `;
+                    printHtml(charHTML);
+                } else {
+                     await print(>> IDENTITY ASSIGNMENT PENDING. CHECK BACK IN ${daysLeft > 0 ? daysLeft : 0} DAYS., "text-gray-500");
+                }
+                
+                inputEl.placeholder = "CONNECTION TERMINATED.";
+                inputEl.disabled = true;
+
+            } else {
+                state.step = 'RSVP';
+                await print("\n>> INVITATION REQUIRES ACKNOWLEDGMENT.", "font-bold");
+                await print(">> TYPE 'CONFIRM' FOLLOWED BY DIETARY RESTRICTIONS TO ACCEPT MISSION.");
+                await print(">> EXAMPLE: 'CONFIRM VEGETARIAN' or 'CONFIRM NONE'", "text-gray-500 text-xs");
+                inputEl.placeholder = "AWAITING CONFIRMATION...";
+            }
+        }
+
+        async function submitRSVP(val) {
+            if (!val.toUpperCase().startsWith("CONFIRM")) {
+                await print(">> INVALID COMMAND. MUST START WITH 'CONFIRM'.", "text-red");
+                return;
+            }
+
+            const dietary = val.substring(7).trim() || "None";
+            
+            inputEl.disabled = true;
+            await print(">> TRANSMITTING SECURE PACKET...", "animate-pulse");
+
+            try {
+                const res = await fetch(${WORKER_URL}?type=rsvp, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ code: state.guestCode, confirmed: true, dietary })
+                });
+                
+                const result = await res.json();
+                
+                if (result.success) {
+                    playSound('message');
+                    await print(">> RSVP CONFIRMED. MISSION ACCEPTED.", "text-green-400 font-bold");
+                    await print(">> WELCOME TO THE INNER CIRCLE.", "glow-text");
+                    inputEl.placeholder = "SESSION CLOSED";
+                } else {
+                    throw new Error("SERVER REJECTED PACKET");
+                }
+            } catch (e) {
+                inputEl.disabled = false;
+                await print(">> TRANSMISSION ERROR. PLEASE RETRY.", "text-red");
+            }
+        }
+
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('clock').textContent = now.toLocaleTimeString('en-US', {hour12: false});
+        }, 1000);
+
+        document.getElementById('muteToggle').addEventListener('click', () => {
+            if (audio.ambient.paused) {
+                state.audioEnabled = true;
+                playSound('ambient');
+                document.getElementById('muteToggle').innerHTML = '<i data-lucide="volume-2" class="w-4 h-4"></i>';
+            } else {
+                audio.ambient.pause();
+                state.audioEnabled = false;
+                document.getElementById('muteToggle').innerHTML = '<i data-lucide="volume-x" class="w-4 h-4"></i>';
+            }
+            lucide.createIcons();
+        });
+
+    </script>
+</body>
+</html>
