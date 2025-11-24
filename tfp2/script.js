@@ -1,6 +1,7 @@
 // --- CONFIGURATION ---
 const WORKER_URL = "https://thefinalpuzzle-worker.thefinalpuzzle.workers.dev";
 
+
 // --- DATA: RIDDLES (From your original script) ---
 const riddles = [
   {
