@@ -1,0 +1,231 @@
+export default {
+  async fetch(request, env) {
+    const url = new URL(request.url);
+    const code = url.searchParams.get("code");
+    const type = url.searchParams.get("type"); // "lockout", "progress", or "rsvp"
+
+    const validCodes = [
+      "WHISPER-CM-4721", "VEIL-KB-8390", "SIGIL-VC-2204", "FLAME-JV-1057",
+      "ECHO-CE-5913", "SHADE-LP-7642", "RIDDLE-DC-3885", "SHADOW-SH-9176",
+      "ARCHIVE-RM-6430", "CIPHER-HD-2789", "KEY-ME-8301", "MASK-GUEST-0000",
+      "thetest"
+    ];
+
+    const dossierMap = {
+      "WHISPER-CM-4721": {
+        title: "The Innocent Victim",
+        name: "Lena Brookwood",
+        realName: "Anissa",
+        description: "The Daughter In Law - Defensive, wounded, quietly intense. Avoids eye contact, speaks in fragments.",
+        costume: "Soft-toned dress or blouse/skirt combo, shawl. Prop: travel clutch or silk scarf."
+      },
+      "VEIL-KB-8390": {
+        title: "The Lawyer",
+        name: "Isobel Crane",
+        realName: "Karen",
+        description: "Corporate lawyer - persuasive, calculating, loud and known for buying inconvenient truths.",
+        costume: "Tailored navy or charcoal suit, silk blouse, structured handbag. Prop: slim leather-bound notebook or fountain pen."
+      },
+      "SIGIL-VC-2204": {
+        title: "The Shrewd Detective",
+        name: "Evelyn Shaw",
+        realName: "Rachael",
+        description: "Detective - Observant, skeptical, emotionally restrained. Asks sharp questions, rarely reveals her own hand.",
+        costume: "Dark pantsuit or trench over fitted layers. Prop: vintage-style notebook or magnifying glass pendant."
+      },
+      "FLAME-JV-1057": {
+        title: "The Red Herring",
+        name: "Theo Marchand",
+        realName: "Greg",
+        description: "Cryptography Friend - Thoughtful, nostalgic, slightly paranoid. Speaks in metaphors, often references past puzzles.",
+        costume: "Vintage-inspired suit (tweed or velvet), patterned tie. Prop: cipher wheel or antique puzzle box."
+      },
+      "ECHO-CE-5913": {
+        title: "The Rebel",
+        name: "Naomi Vexler",
+        realName: "Bianca",
+        description: "Journalist - Curious, assertive, emotionally driven. Asks direct questions, interrupts when passionate.",
+        costume: "Fitted dress or blouse with tailored jacket. Prop: press badge or leather-bound reporter’s notebook."
+      },
+      "SHADE-LP-7642": {
+        title: "The Secret Keeper",
+        name: "Maria Alvarez",
+        realName: "Jo",
+        description: "The Maid - Nervous, observant, loyal. Speaks softly, often hesitates before revealing anything.",
+        costume: "Black cocktail dress with white cuffs or collar. Prop: feather duster or folded linen napkin."
+      },
+      "RIDDLE-DC-3885": {
+        title: "The Accountant",
+        name: "Colin Drexler",
+        realName: "Brett",
+        description: "Finance Manager - Polished, diplomatic, secretive. Always composed, but chooses words with surgical care.",
+        costume: "Crisp suit, silk tie, polished shoes. Prop: gold pen or minimalist ledger."
+      },
+      "SHADOW-SH-9176": {
+        title: "The Retired Tycoon",
+        name: "Victor Harlan",
+        realName: "Steve",
+        description: "AI Associate - Rational, ambitious, emotionally detached. Frames everything in terms of logic and outcomes.",
+        costume: "Sleek monochrome tailored ensemble, minimalist styling. Prop: tablet case or stylized business card holder. Optional: wireframe glasses."
+      },
+      "ARCHIVE-RM-6430": {
+        title: "The Fallen Healer",
+        name: "Dr. Felix Ward",
+        realName: "Fred",
+        description: "Private doctor - Calm, clinical, evasive. Speaks with authority but avoids emotional topics.",
+        costume: "Three-piece suit in muted tones, crisp shirt. Prop: elegant pen or leather-bound appointment book."
+      },
+      "CIPHER-HD-2789": {
+        title: "The Socialite influencer",
+        name: "Celeste Marlowe",
+        realName: "Tina",
+        description: "Charming, performative, calculating. Plays innocent but enjoys stirring drama and watching reactions.",
+        costume: "Jewel-toned cocktail dress, heels, dramatic earrings. Prop: compact mirror or satin gloves."
+      },
+      "KEY-ME-8301": {
+        title: "The Eraser",
+        name: "Mark Ellison",
+        realName: "Jamie",
+        description: "A quiet Tech Consultant, systems-minded, once erased a digital trail no one could recover.",
+        costume: "Full black-tie: tuxedo or tailored black suit, bow tie. Prop: encrypted USB or sleek cufflink box"
+      },
+      "MASK-GUEST-0000": {
+        title: "Gareth Linwood",
+        name: "The dreaded Ex-Employee",
+        realName: "Sean",
+        description: "Bitter, clever, attention-seeking. Uses sarcasm and deflection to mask resentment.",
+        costume: "Black dress shirt, slim blazer, dark trousers. Prop: pocket watch or folded blueprint."
+      },
+      "thetest": {
+        title: "The Ghost in the system",
+        name: "Unknown Agent",
+        realName: "?",
+        description: "System Administrator Access",
+        costume: "Classified."
+      }
+    };
+
+    const revealDateUTC = new Date("2026-02-14T00:00:00Z");
+    const nowUTC = new Date();
+
+    // 🔧 CORS preflight
+    if (request.method === "OPTIONS") {
+      return new Response(null, {
+        status: 204,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type"
+        }
+      });
+    }
+
+    // ✅ /validate route
+    if (url.pathname === "/validate" && request.method === "GET") {
+      const isValid = validCodes.includes(code);
+      const isRevealed = isValid && nowUTC >= revealDateUTC;
+      let profile = null;
+
+      // Return profile info so the frontend can greet the user
+      if (isValid) {
+          profile = dossierMap[code] || { name: "Unknown", title: "Unknown" };
+      }
+
+      return new Response(JSON.stringify({ valid: isValid, revealed: isRevealed, profile: profile }), {
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Content-Type": "application/json"
+        }
+      });
+    }
+
+    // 🧾 GET: retrieve lockout, progress, or rsvp
+    if (request.method === "GET") {
+      if (!code || !type) {
+        return new Response("Missing code or type", { status: 400 });
+      }
+
+      const store =
+        type === "lockout" ? env.GUEST_LOCKOUTS
+        : type === "progress" ? env.GUEST_PROGRESS
+        : type === "rsvp" ? env.GUEST_RSVP
+        : null;
+
+      if (!store) {
+        return new Response("Invalid type", { status: 400 });
+      }
+
+      const data = await store.get(code);
+      return new Response(data || "{}", {
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*"
+        }
+      });
+    }
+
+    // 📝 POST: save lockout, progress, or rsvp
+    if (request.method === "POST") {
+      try {
+        const body = await request.json();
+        const { code, until, step, confirmed, dietary } = body;
+
+        if (!code || !type) {
+          return new Response("Missing code or type", { status: 400 });
+        }
+
+        const isValid = validCodes.includes(code);
+        const isRevealed = nowUTC >= revealDateUTC;
+
+        if (type === "lockout" && until) {
+          await env.GUEST_LOCKOUTS.put(code, JSON.stringify({ until }));
+        }
+
+        if (type === "progress" && typeof step === "number") {
+          await env.GUEST_PROGRESS.put(code, JSON.stringify({ step }));
+        }
+
+        if (type === "rsvp" && confirmed === true) {
+          const dossier = dossierMap[code] || {
+            name: "Unknown",
+            realName: "Unknown",
+            title: "The Unknown",
+            description: "You walk between worlds.",
+            costume: "Dark cloak, blank mask — undefined, unclaimed, waiting to be named."
+          };
+
+          await env.GUEST_RSVP.put(code, JSON.stringify({
+            confirmed: true,
+            dietary,
+            name: dossier.name,
+            realName: dossier.realName,
+            dossier: dossier.title,
+            description: dossier.description,
+            costume: dossier.costume
+          }));
+        }
+
+        return new Response(JSON.stringify({
+          valid: isValid,
+          revealed: isValid && isRevealed,
+          success: true
+        }), {
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*"
+          }
+        });
+      } catch (err) {
+        return new Response(JSON.stringify({ error: "Invalid request format." }), {
+          status: 400,
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*"
+          }
+        });
+      }
+    }
+
+    return new Response("Method Not Allowed", { status: 405 });
+  }
+};
