@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <script src="script.js"></script>
 
     <!-- Audio Elements -->
     <audio id="audio-ambient" loop>
@@ -32,7 +31,8 @@
         <div class="border-box-outer">
             <div class="border-box-inner">
                 <p class="text-center mb-4 text-green-300">SECURE TERMINAL UPLINK</p>
-                <button onclick="initSystem()" class="btn-primary" style="width: auto; min-width: 200px;">
+                <!-- UPDATED: Removed onclick, added ID -->
+                <button id="init-btn" class="btn-primary" style="width: auto; min-width: 200px;">
                     Initialize System
                 </button>
             </div>
@@ -47,6 +47,7 @@
             
             <div class="mb-4 text-center">
                 <p class="text-green-400 mb-2" style="font-size: 0.875rem;">ENTER ACCESS CODE:</p>
+                <!-- UPDATED: Added ID for JS binding -->
                 <input type="text" id="login-input" class="login-input" placeholder="XXXX-XX-0000" autocomplete="off">
             </div>
 
@@ -56,7 +57,8 @@
                 <div class="loader-bar" id="loader-bar"></div>
             </div>
 
-            <button onclick="attemptLogin()" class="btn-primary mt-4">
+            <!-- UPDATED: Removed onclick, added ID -->
+            <button id="login-btn" class="btn-primary mt-4">
                 AUTHENTICATE
             </button>
             <p class="text-center mt-4 text-green-600" style="font-size: 0.625rem;">AUTHORIZED PERSONNEL ONLY</p>
@@ -84,5 +86,8 @@
             <input type="text" id="command-input" class="input-area" placeholder="Awaiting input..." autocomplete="off" spellcheck="false">
         </div>
     </div>
+
+    <!-- Main Logic -->
+    <script src="script.js"></script>
 </body>
 </html>

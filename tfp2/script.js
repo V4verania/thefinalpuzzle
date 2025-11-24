@@ -1,8 +1,7 @@
 // --- CONFIGURATION ---
 const WORKER_URL = "https://thefinalpuzzle-worker.thefinalpuzzle.workers.dev";
 
-
-// --- DATA: RIDDLES (From your original script) ---
+// --- DATA: RIDDLES ---
 const riddles = [
   {
     text: "The Sunday Alibi\n\nA man is found murdered on a Sunday morning. His wife immediately calls the police, who question the household staff:\n\n- The Butler says he was organizing the wine cellar.\n- The Cook says she was preparing breakfast.\n- The Gardener says he was watering the ferns.\n- The Maid says she was collecting the morning mail.\n\nThe police immediately arrest the murderer.\n\nWho did it?",
@@ -69,14 +68,62 @@ let isTyping = false;
 let gameActive = false;
 let rsvpStage = false;
 
-// --- AUDIO CONTROLLER ---
-const audio = {
-    ambient: document.getElementById('audio-ambient'),
-    wrong: document.getElementById('audio-wrong'),
-    whisper: document.getElementById('audio-whisper'),
-    message: document.getElementById('audio-message')
-};
+// Audio Object (Populated on DOM Load)
+let audio = {};
 
+// --- INITIALIZATION (Fix for initSystem errors) ---
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Setup Audio References safely
+    audio = {
+        ambient: document.getElementById('audio-ambient'),
+        wrong: document.getElementById('audio-wrong'),
+        whisper: document.getElementById('audio-whisper'),
+        message: document.getElementById('audio-message')
+    };
+
+    // 2. Bind Event Listeners
+    const initBtn = document.getElementById('init-btn');
+    if(initBtn) initBtn.addEventListener('click', initSystem);
+
+    const loginBtn = document.getElementById('login-btn');
+    if(loginBtn) loginBtn.addEventListener('click', attemptLogin);
+
+    // Enter Key Listeners
+    document.getElementById('login-input').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') attemptLogin();
+    });
+
+    document.getElementById('command-input').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            const val = this.value;
+            if (val) {
+                this.value = '';
+                checkInput(val);
+            }
+        }
+    });
+
+    // Start Clock
+    setInterval(() => {
+        const now = new Date();
+        const clockEl = document.getElementById('system-clock');
+        if(clockEl) clockEl.textContent = now.toLocaleTimeString('en-US', {hour12: false});
+    }, 1000);
+
+    // Keep focus logic
+    document.addEventListener('click', () => {
+        const loginScreen = document.getElementById('login-screen');
+        const terminal = document.getElementById('terminal-container');
+        
+        if (!loginScreen.classList.contains('hidden') && !loginScreen.style.opacity) {
+            document.getElementById('login-input')?.focus();
+        } else if (!terminal.classList.contains('hidden') && gameActive && !isTyping) {
+            document.getElementById('command-input')?.focus();
+        }
+    });
+});
+
+// --- AUDIO CONTROLLER ---
 function playSound(name) {
     try {
         if (audio[name]) {
@@ -86,7 +133,8 @@ function playSound(name) {
     } catch (e) { console.error("Audio error", e); }
 }
 
-// --- INIT ---
+// --- CORE FUNCTIONS ---
+
 function initSystem() {
     const startScreen = document.getElementById('start-screen');
     const loginScreen = document.getElementById('login-screen');
@@ -98,8 +146,12 @@ function initSystem() {
         startScreen.style.display = 'none';
         loginScreen.classList.remove('hidden');
         document.getElementById('login-input').focus();
-        audio.ambient.volume = 0.3;
-        audio.ambient.play().catch(e => console.log("Ambient play failed", e));
+        
+        // Try playing audio if available
+        if(audio.ambient) {
+            audio.ambient.volume = 0.3;
+            audio.ambient.play().catch(e => console.log("Ambient play failed", e));
+        }
     }, 500);
 }
 
@@ -160,8 +212,9 @@ async function attemptLogin() {
 
         // 2. Validate Code
         const response = await fetch(${WORKER_URL}/validate?code=${encodeURIComponent(code)});
+        if (!response.ok) throw new Error("NETWORK ERROR");
+        
         const data = await response.json();
-
         if (!data.valid) throw new Error("INVALID ACCESS CODE");
 
         // 3. Get Progress
@@ -177,7 +230,7 @@ async function attemptLogin() {
         msg.classList.add('glow-text');
         
         loader.style.display = 'block';
-        void loader.offsetWidth; 
+        void loader.offsetWidth; // Trigger reflow
         bar.style.width = '100%';
         playSound('message');
 
@@ -196,13 +249,13 @@ async function attemptLogin() {
         msg.innerHTML = ERROR: ${error.message || "CONNECTION FAILED"};
         msg.classList.add('glow-text-red');
         
-        const container = document.querySelector('#login-screen > div');
-        container.classList.add('shake');
+        const container = document.querySelector('.login-container'); // Selector fix
+        if(container) container.classList.add('shake');
         playSound('wrong');
         input.disabled = false;
 
         setTimeout(() => {
-            container.classList.remove('shake');
+            if(container) container.classList.remove('shake');
             input.value = "";
             input.focus();
         }, 500);
@@ -258,15 +311,8 @@ async function handleRiddleAnswer(input) {
     const currentRiddle = riddles[currentStep];
     addLogEntry(> ${input}, false, 'text-gray-500');
 
-    // Keyword Matching Logic (Regex generation for flexibility)
-    // Escape special regex chars just in case, though simple keywords are usually safe
-    const escapeRegExp = (string) => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    
-    // Check if ANY keyword matches the input (case insensitive)
+    // Keyword Matching Logic
     const matched = currentRiddle.keywords.some(keyword => {
-        // Create a regex that looks for the keyword
-        // We check if the input contains the keyword, or is the keyword.
-        // The raw script used "includes", so we mirror that leniency but normalise case.
         return input.toLowerCase().includes(keyword.toLowerCase());
     });
 
@@ -276,7 +322,6 @@ async function handleRiddleAnswer(input) {
         addLogEntry(>> ${currentRiddle.feedback}, false, "text-green-300 font-bold mb-2");
         addLogEntry(">> UPDATING SERVER PROGRESS...", false, "text-xs text-green-800");
         
-        // Save to server
         await saveProgress(currentCode, currentStep + 1);
         
         setTimeout(() => {
@@ -296,14 +341,6 @@ async function handleRiddleAnswer(input) {
         
         addLogEntry(">> ERROR: INCORRECT RESPONSE. SYSTEM LOCK WARNING.", false, "text-red-500 font-bold");
 
-        // Send Lockout to server (2 hours)
-        const lockoutDate = new Date();
-        lockoutDate.setHours(lockoutDate.getHours() + 2);
-        // Note: In a real game you might want to await this, 
-        // but for UI responsiveness we fire and forget or handle quietly.
-        // We won't kick them out immediately to keep the flow fluid, just warn them.
-        // await saveLockout(currentCode, lockoutDate.toISOString()); 
-
         setTimeout(() => {
             term.classList.remove('shake');
             inp.placeholder = "Awaiting input...";
@@ -319,7 +356,7 @@ async function triggerSuccess() {
     rsvpStage = true;
     playSound('message');
     
-    // Fetch RSVP status to see if they already did it
+    // Fetch RSVP status
     let alreadyRSVPd = false;
     try {
         const rsvpRes = await fetch(${WORKER_URL}?code=${currentCode}&type=rsvp);
@@ -327,7 +364,7 @@ async function triggerSuccess() {
         if (rsvpData.confirmed) alreadyRSVPd = true;
     } catch (e) {}
 
-    const revealDate = new Date("2025-10-01T00:00:00"); // From your raw script
+    const revealDate = new Date("2025-10-01T00:00:00"); 
     const now = new Date();
     const daysLeft = Math.max(0, Math.ceil((revealDate - now) / (1000 * 60 * 60 * 24)));
     
@@ -360,18 +397,14 @@ async function triggerSuccess() {
         `;
     }
 
-    htmlContent += </div>; // Close card
+    htmlContent += </div>;
 
-    // RSVP Instructions
     if (alreadyRSVPd) {
         htmlContent += `
             <div class="mt-6 text-center">
                 <p class="text-green-300">✅ RSVP CONFIRMED. WE AWAIT YOUR ARRIVAL.</p>
-                <!-- Use a placeholder or your real image if hosted -->
                 <div class="mt-4 border-2 border-white inline-block p-2">
                     <p class="text-xs mb-1">JOIN THE CIRCLE</p>
-                     <!-- Uncomment if you host the image -->
-                    <!-- <img src="innercircle.png" alt="QR Code" style="width: 100px; height: 100px;"> -->
                     <div style="width: 100px; height: 100px; background: white;" class="mx-auto"></div>
                 </div>
             </div>
@@ -391,7 +424,6 @@ async function triggerSuccess() {
 
     addLogEntry("\n--- DECRYPTION SUCCESSFUL ---\n", false);
     
-    // Append HTML safely
     const log = document.getElementById('output-log');
     const entry = document.createElement('div');
     entry.innerHTML = htmlContent;
@@ -477,7 +509,7 @@ function typeWriterEffect(element, text, speed = 15) {
         } else {
             element.classList.remove('cursor');
             isTyping = false;
-            if (!document.getElementById('command-input').placeholder.includes('TERMINATED')) {
+            if (!document.getElementById('command-input').placeholder.includes('TERMINATING')) {
                 document.getElementById('command-input').disabled = false;
                 document.getElementById('command-input').focus();
             }
@@ -485,34 +517,3 @@ function typeWriterEffect(element, text, speed = 15) {
     }
     type();
 }
-
-// --- EVENT LISTENERS ---
-document.getElementById('login-input').addEventListener('keypress', function (e) {
-    if (e.key === 'Enter') attemptLogin();
-});
-
-document.getElementById('command-input').addEventListener('keypress', function (e) {
-    if (e.key === 'Enter') {
-        const val = this.value;
-        if (val) {
-            this.value = '';
-            checkInput(val);
-        }
-    }
-});
-
-setInterval(() => {
-    const now = new Date();
-    document.getElementById('system-clock').textContent = now.toLocaleTimeString('en-US', {hour12: false});
-}, 1000);
-
-document.addEventListener('click', () => {
-    const loginScreen = document.getElementById('login-screen');
-    const terminal = document.getElementById('terminal-container');
-    
-    if (!loginScreen.classList.contains('hidden') && !loginScreen.style.opacity) {
-        document.getElementById('login-input').focus();
-    } else if (!terminal.classList.contains('hidden') && gameActive && !isTyping) {
-        document.getElementById('command-input').focus();
-    }
-});
