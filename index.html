@@ -1,55 +1,928 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>The Final Puzzle // Secure Terminal</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Final Puzzle // SECURE TERMINAL</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Three.js -->
+    <!-- global THREE, lucide -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <style>
+        /* --- THEME VARIABLES --- */
+        :root {
+            --terminal-green: #33ff33;
+            --terminal-dim: #1a801a;
+            --terminal-bg: #050505;
+            --alert-red: #ff3333;
+        }
+
+        body {
+            background-color: var(--terminal-bg);
+            color: var(--terminal-green);
+            font-family: 'Share Tech Mono', monospace;
+            overflow: hidden;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            user-select: none;
+            touch-action: none;
+        }
+
+        /* --- 3D BACKGROUND --- */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            transition: opacity 1s ease;
+        }
+
+        /* --- LANDING SCREEN --- */
+        #landing-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(5, 5, 5, 0.6);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        /* --- GAME UI (Frequency Match) --- */
+        #game-ui {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 95; 
+            display: none; 
+            flex-direction: column;
+            justify-content: space-between; 
+            align-items: center;
+            padding: 40px 0;
+            background: rgba(0,0,0,0.3); 
+            backdrop-filter: blur(4px);
+            pointer-events: none; 
+        }
+
+        .game-header {
+            text-align: center;
+            text-shadow: 0 0 10px black;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 15px;
+            border: 1px solid var(--terminal-green);
+            pointer-events: auto;
+        }
+
+        .tuner-container {
+            pointer-events: auto;
+            width: 300px;
+            height: 60px;
+            border: 2px solid var(--terminal-green);
+            background: rgba(0, 20, 0, 0.8);
+            position: relative;
+            margin-bottom: 20px;
+            overflow: hidden;
+            box-shadow: 0 0 15px var(--terminal-dim);
+        }
+
+        .tuner-zone {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            background: rgba(51, 255, 51, 0.3);
+            border-left: 2px solid var(--terminal-green);
+            border-right: 2px solid var(--terminal-green);
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px; 
+            transition: width 0.2s ease, background-color 0.1s;
+        }
+
+        .tuner-cursor {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: #fff;
+            box-shadow: 0 0 10px #fff;
+            left: 0%; 
+        }
+
+        .breach-btn {
+            pointer-events: auto;
+            padding: 20px 60px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: black;
+            background: var(--terminal-green);
+            border: 2px solid #fff;
+            cursor: pointer;
+            box-shadow: 0 0 30px var(--terminal-green);
+            text-transform: uppercase;
+            font-family: 'Share Tech Mono', monospace;
+            margin-bottom: 50px;
+            animation: pulse-btn 2s infinite;
+        }
+        .breach-btn:active { transform: scale(0.95); background: white; }
+
+        @keyframes pulse-btn {
+            0% { box-shadow: 0 0 20px var(--terminal-green); }
+            50% { box-shadow: 0 0 40px var(--terminal-green); }
+            100% { box-shadow: 0 0 20px var(--terminal-green); }
+        }
+
+        /* --- BOOT SEQUENCE OVERLAY --- */
+        #boot-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 90;
+            background: #000;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+            font-size: 14px;
+            color: var(--terminal-green);
+            display: none;
+            cursor: progress;
+        }
+
+        /* --- PROGRESS BAR --- */
+        .progress-container {
+            width: 300px;
+            height: 4px;
+            background: rgba(0, 50, 0, 0.5);
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--terminal-green);
+            box-shadow: 0 0 10px var(--terminal-green);
+            transition: width 0.1s linear;
+        }
+
+        /* --- EFFECTS --- */
+        .scanlines {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
+            background-size: 100% 4px; pointer-events: none; z-index: 200;
+            animation: scroll 10s linear infinite;
+        }
+        .screen-flicker {
+            animation: flicker 0.15s infinite; pointer-events: none; position: fixed; inset: 0;
+            background: rgba(0, 255, 0, 0.01); z-index: 199;
+        }
+        @keyframes scroll { 0% { background-position: 0 0; } 100% { background-position: 0 100%; } }
+        @keyframes flicker { 0% { opacity: 0.9; } 50% { opacity: 1.0; } 100% { opacity: 0.9; } }
+        
+        /* --- TERMINAL --- */
+        #terminal-wrapper {
+            width: 100%; max-width: 900px; height: 90vh; position: relative; z-index: 50;
+            display: flex; flex-direction: column;
+            background: rgba(10, 10, 10, 0.75); backdrop-filter: blur(3px);
+            padding: 2px; opacity: 0; transform: scale(0.98); display: none; 
+        }
+        .glow-border {
+            box-shadow: 0 0 10px var(--terminal-dim), inset 0 0 20px rgba(0, 255, 0, 0.1);
+            border: 1px solid var(--terminal-green);
+        }
+        .terminal-content { flex-grow: 1; overflow-y: auto; padding: 20px; scrollbar-width: thin; }
+        .terminal-content::-webkit-scrollbar { width: 6px; }
+        .terminal-content::-webkit-scrollbar-thumb { background-color: var(--terminal-green); }
+        .terminal-content::-webkit-scrollbar-track { background-color: transparent; }
+        .input-line {
+            display: flex; align-items: center; padding: 15px 20px;
+            border-top: 1px solid var(--terminal-dim); background: rgba(0, 20, 0, 0.5);
+        }
+        input[type="text"] {
+            background: transparent; border: none; color: var(--terminal-green);
+            font-family: 'Share Tech Mono', monospace; font-size: 1.2rem; width: 100%;
+            outline: none; margin-left: 10px; text-transform: uppercase;
+        }
+
+        /* --- UTILS --- */
+        .hidden { display: none !important; }
+        .text-red { color: var(--alert-red); text-shadow: 0 0 5px red; }
+        .text-green { color: var(--terminal-green); text-shadow: 0 0 5px var(--terminal-green); }
+        .border-red { border-color: var(--alert-red) !important; box-shadow: 0 0 10px red !important; }
+        .bg-green-glow { background: rgba(50, 255, 50, 0.8) !important; }
+        .bg-red-glow { background: rgba(255, 50, 50, 0.8) !important; }
+        .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+        .glitch { position: relative; }
+        .glitch::before, .glitch::after {
+            content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #050505;
+        }
+        .glitch::before {
+            left: 2px; text-shadow: -1px 0 red; clip: rect(24px, 550px, 90px, 0); animation: glitch-anim-1 2.5s infinite linear alternate-reverse;
+        }
+        .glitch::after {
+            left: -2px; text-shadow: -1px 0 blue; clip: rect(85px, 550px, 140px, 0); animation: glitch-anim-2 3s infinite linear alternate-reverse;
+        }
+        @keyframes glitch-anim-1 { 0% { clip: rect(20px, 9999px, 10px, 0); } 100% { clip: rect(80px, 9999px, 90px, 0); } }
+        @keyframes glitch-anim-2 { 0% { clip: rect(90px, 9999px, 100px, 0); } 100% { clip: rect(10px, 9999px, 40px, 0); } }
+        .blink { animation: blink 0.5s infinite; }
+        .cursor::after { content: '█'; animation: blink 1s step-end infinite; margin-left: 2px; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+    </style>
 </head>
 <body>
-  <!-- 🔐 Code Gate -->
-  <section id="veil">
-    <h1>The Final Puzzle</h1>
-    <p class="intro">Enter your invitation code to begin the ritual.</p>
-    <input type="text" id="codeInput" placeholder="Enter your code..." aria-label="Invitation code" />
-    <button id="submitCode">Submit</button>
-    <p id="gateMessage" class="fade" aria-live="polite"></p>
-  </section>
 
-  <!-- 🧩 Riddle Maze -->
-  <section id="maze" class="hidden">
-    <div id="riddleContainer">
-      <p id="riddleText" class="fade"></p>
-      <div id="choices" class="fade"></div>
-      <p id="feedback" class="fade" aria-live="polite"></p>
+    <!-- AUDIO (Ambient loops, others trigger) -->
+    <audio id="ambientAudio" src="ambient.mp3" loop></audio>
+    <audio id="whisperAudio" src="whisper.mp3" preload="auto"></audio>
+    <audio id="wrongAnswerAudio" src="wrong.mp3" preload="auto"></audio>
+
+    <!-- 3D BACKGROUND -->
+    <div id="canvas-container"></div>
+
+    <!-- VISUAL OVERLAYS -->
+    <div class="scanlines"></div>
+    <div class="screen-flicker"></div>
+
+    <!-- 1. LANDING SCREEN -->
+    <div id="landing-overlay">
+        <h1 class="text-4xl md:text-6xl font-bold mb-4 glitch tracking-widest" data-text="THE FINAL PUZZLE">THE FINAL PUZZLE</h1>
+        <p class="text-green-500/80 text-sm md:text-base tracking-widest bg-black/50 p-2 border-l-2 border-green-500 mb-8">SECURE UPLINK DETECTED</p>
+        
+        <div class="flex flex-col items-center gap-2">
+            <span id="scroll-instruction" class="text-xs tracking-[0.3em] text-green-500/50 blink">SCROLL TO CONNECT</span>
+            <div class="progress-container">
+                <div id="scroll-progress-bar" class="progress-fill"></div>
+            </div>
+            <div class="text-xs text-green-800 mt-1"><span id="percent-display">0</span>% CONNECTED</div>
+        </div>
     </div>
 
-    <!-- 🔥 Ritual Animation -->
-    <div id="ritualAnimation" class="ritual-bottom hidden" aria-hidden="true">
-      <div class="flame"></div>
-      <div class="sigil">✶</div>
-      <div class="veilRipple"></div>
+    <!-- 2. MINI-GAME (Frequency) -->
+    <div id="game-ui">
+        <div class="game-header mb-8">
+            <h2 class="text-xl md:text-2xl font-bold text-green-400 mb-2">FREQUENCY SYNC</h2>
+            <p class="text-xs text-gray-400">MATCH THE SIGNAL TO THE CARRIER WAVE</p>
+            <div id="breach-counter" class="mt-2 text-xl font-bold tracking-widest space-x-2">
+                <span class="text-gray-700">●</span> 
+                <span class="text-gray-700">●</span> 
+                <span class="text-gray-700">●</span>
+            </div>
+        </div>
+
+        <div class="tuner-container">
+            <div id="tuner-zone" class="tuner-zone" style="width: 30%;"></div>
+            <div id="tuner-cursor" class="tuner-cursor"></div>
+        </div>
+
+        <p class="game-instruction">PRESS <span class="text-white font-bold">[SPACE]</span> OR <span class="text-white font-bold">TAP</span> WHEN ALIGNED</p>
+
+        <button id="hack-btn" class="breach-btn">SYNC</button>
     </div>
-  </section>
 
-  <!-- 🕯️ Final Reveal -->
-  <section id="reveal" class="hidden">
-  <div id="revealContent"></div>
-</section>
+    <!-- 3. BOOT SCREEN -->
+    <div id="boot-overlay">
+        <div id="boot-text" class="whitespace-pre-wrap font-mono text-xs md:text-sm leading-tight text-green-400"></div>
+    </div>
 
+    <!-- 4. TERMINAL -->
+    <div id="terminal-wrapper" class="glow-border rounded-sm mx-4">
+        <div class="flex justify-between items-center px-4 py-2 border-b border-green-900 bg-green-900/10 text-xs md:text-sm select-none">
+            <div class="flex items-center gap-2">
+                <i data-lucide="terminal" class="w-4 h-4"></i>
+                <span id="header-status">SYSTEM OFFLINE</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <span id="clock">00:00:00</span>
+                <span class="flex items-center gap-1 cursor-pointer hover:text-white transition-colors" id="muteToggle">
+                    <i data-lucide="volume-2" class="w-4 h-4"></i>
+                </span>
+            </div>
+        </div>
 
-  <!-- 🎵 Audio -->
-  <audio id="ambientAudio" src="ambient.mp3" loop autoplay></audio>
-  <audio id="whisperAudio" src="whisper.mp3" preload="auto"></audio>
-  <audio id="wrongAnswerAudio" src="wrong.mp3" preload="auto"></audio>
-  <button id="muteToggle" class="fade" aria-label="Toggle sound">🔊</button>
+        <div id="terminal-output" class="terminal-content flex flex-col gap-4 text-sm md:text-base"></div>
 
-  <!-- 🌘 Visual Effects -->
-  <div id="dimOverlay" class="hidden"></div>
-  <div id="rippleEffect" class="hidden"></div>
+        <div class="input-line">
+            <span class="text-green-500 font-bold mr-2">&gt;</span>
+            <input type="text" id="userInput" placeholder="AWAITING SYSTEM BOOT..." autocomplete="off" spellcheck="false">
+            <div id="loading-indicator" class="hidden">
+                <span class="animate-pulse">PROCESSING...</span>
+            </div>
+        </div>
+    </div>
 
-  <!-- ✅ Script -->
-  <script src="script.js"></script>
+    <script>
+        /* global THREE, lucide */
+
+        // --- CONFIGURATION ---
+        const WORKER_URL = "https://thefinalpuzzle-worker.thefinalpuzzle.workers.dev";
+        const REVEAL_DATE = new Date("2026-02-14T00:00:00Z");
+        const TOTAL_STEPS = 3;
+
+        // --- STATE ---
+        let appState = 'SCROLLING'; 
+        let scrollProgress = 0;
+        let gameProgress = 0;
+        let barPos = 0; 
+        let barSpeed = 1.5; 
+        let barDirection = 1;
+        let gameRunning = false;
+        let artifactPulse = 1.0;
+
+        let state = {
+            guestCode: '',
+            currentRiddleIndex: 0,
+            isTyping: false
+        };
+
+        // --- OBFUSCATED DATA ---
+        // Helper to decode Base64
+        const b64 = (str) => decodeURIComponent(escape(window.atob(str)));
+
+        // Encoded Riddles (Base64) to prevent casual source reading
+        // Original text preserved exactly as requested
+        const encryptedRiddles = [
+            {
+                t: "VGhlIFN1bmRheSBBbGliaQoKQSBtYW4gaXMgZm91bmQgbXVyZGVyZWQgb24gYSBTdW5kYXkgbW9ybmluZy4gSGlzIHdpZmUgaW1tZWRpYXRlbHkgY2FsbHMgdGhlIHBvbGljZSwgd2hvIHF1ZXN0aW9uIHRoZSBob3VzZWhvbGQgc3RhZmY6CgotIFRoZSBCdXRsZXIgc2F5cyBoZSB3YXMgb3JnYW5pemluZyB0aGUgd2luZSBjZWxsYXIuCi0gVGhlIENvb2sgc2F5cyBzaGUgd2FzIHByZXBhcmluZyBicmVha2Zhc3QuCi0gVGhlIEdhcmRlbmVyIHNheXMgaGUgd2FzIHdhdGVyaW5nIHRoZSBmZXJucy4KLSBUaGUgTWFpZCBzYXlzIHNoZSB3YXMgY29sbGVjdGluZyB0aGUgbW9ybmluZyBtYWlsLgoKVGhlIHBvbGljZSBpbW1lZGlhdGVseSBhcnJlc3QgdGhlIG11cmRlcmVyLgoKV2hvIGRpZCBpdD8=",
+                k: ["bWFpZA==", "dGhlIG1haWQ="],
+                f: "Q29ycmVjdC4gVGhlcmXigJlzIG5vIG1haWwgb24gU3VuZGF5cw=="
+            },
+            {
+                t: "VGhlIFBvaXNvbmVkIERyaW5rcwoKVHdvIHJpdmFscyBzaXQgZG93biBmb3IgYSBkcmluay4gVGhleSBib3RoIG9yZGVyIGljZWQgdGVhIGZyb20gdGhlIHNhbWUgcGl0Y2hlci4gT25lIG1hbiBkcmlua3MgaGlzIGdsYXNzIHZlcnkgcXVpY2tseSBhbmQgaW1tZWRpYXRlbHkgb3JkZXJzIGFub3RoZXIuIFRoZSBvdGhlciB3b21hbiBzaXBzIGhlciBvbmUgZ2xhc3Mgc2xvd2x5LiBUaGUgd29tYW4gZGllcywgYnV0IHRoZSBtYW4gc3Vydml2ZXMuIEl0IGlzIGRldGVybWluZWQgdGhhdCBhbGwgdGhlIGRyaW5rcyB3ZXJlIHBvaXNvbmVkLgoKSG93IGRpZCB0aGUgbWFuIHN1cnZpdmU/",
+                k: ["aWNl", "aWNlIGN1YmVz"], 
+                f: "Q29ycmVjdC4gVGhlIHBvaXNvbiB3YXMgaW4gdGhlIGljZSDigJQgaXQgbWVsdGVkIGludG8gaGVyIGRyaW5rLCBub3QgaGlzLg=="
+            },
+            {
+                t: "V2hhdCBBbSBJPwoKSSBoYXZlIGNpdGllcywgYnV0IG5vIGhvdXNlcy4KSSBoYXZlIG1vdW50YWlucywgYnV0IG5vIHRyZWVzLgpJIGhhdmUgd2F0ZXIsIGJ1dCBubyBmaXNoLgoKV2hhdCBhbSBJPw==",
+                k: ["bWFw"], 
+                f: "Q29ycmVjdC4gQSBtYXAgc2hvd3MgZmVhdHVyZXMgd2l0aG91dCBjb250YWluaW5nIHRoZW0u"
+            },
+            {
+                t: "VGhlIHBlcnNvbiB3aG8gbWFrZXMgaXQgaGFzIG5vIG5lZWQgb2YgaXQuClRoZSBwZXJzb24gd2hvIGJ1eXMgaXQgaGFzIG5vIHVzZSBmb3IgaXQuClRoZSBwZXJzb24gd2hvIHVzZXMgaXQgY2FuIG5laXRoZXIgc2VlIG5vciBmZWVsIGl0LgoKV2hhdCBpcyBpdD8=",
+                k: ["Y29mZmlu", "Y2Fza2V0"], 
+                f: "Q29ycmVjdC4gQSBjb2ZmaW4gaXMgbWFkZSBmb3IgdGhlIGRlYWQg4oCUIHVuc2VlbiwgdW5mZWx0IGJ5IGl0cyB1c2VyLg=="
+            },
+            {
+                t: "V2hhdCBiZWxvbmdzIHRvIHlvdSwgYnV0IGV2ZXJ5b25lIGVsc2UgdXNlcyBtb3JlIHRoYW4geW91IGRvPw==",
+                k: ["bmFtZQ==", "bXkgbmFtZQ=="], 
+                f: "Q29ycmVjdC4gT3RoZXJzIHNwZWFrIHlvdXIgbmFtZSBmYXIgbW9yZSB0aGFuIHlvdSBkby4="
+            },
+            {
+                t: "V2hhdCBjYW4gcnVuIGJ1dCBuZXZlciB3YWxrcywgaGFzIGEgbW91dGggYnV0IG5ldmVyIHRhbGtzLCBoYXMgYSBoZWFkIGJ1dCBuZXZlciB3ZWVwcywgaGFzIGEgYmVkIGJ1dCBuZXZlciBzbGVlcHM/",
+                k: ["cml2ZXI="], 
+                f: "Q29ycmVjdC4gQSByaXZlciBmaXRzIGFsbCBmb3VyIGNsdWVzIHBlcmZlY3RseS4="
+            },
+            {
+                t: "V2hhdCBjYW4gZmlsbCBhIHJvb20gYnV0IHRha2VzIHVwIG5vIHNwYWNlPw==",
+                k: ["bGlnaHQ="], 
+                f: "Q29ycmVjdC4gTGlnaHQgZmlsbHMgc3BhY2Ugd2l0aG91dCBvY2N1cHlpbmcgaXQu"
+            },
+            {
+                t: "QWx3YXlzIGluIHlvdSwgc29tZXRpbWVzIG9uIHlvdTsgaWYgSSBzdXJyb3VuZCB5b3UsIEkgY2FuIGtpbGwgeW91LiBXaGF0IGFtIEk/",
+                k: ["d2F0ZXI="], 
+                f: "Q29ycmVjdC4gV2F0ZXIgaXMgZXNzZW50aWFsIOKAlCBidXQgb3ZlcndoZWxtaW5nLCBpdCBiZWNvbWVzIGRlYWRseS4="
+            },
+            {
+                t: "SeKAmW0gYWx3YXlzIGh1bmdyeSwgSSBtdXN0IGFsd2F5cyBiZSBmZWQuIFRoZSBmaW5nZXIgSSB0b3VjaCB3aWxsIHNvb24gdHVybiByZWQuIFdoYXQgYW0gST8=",
+                k: ["ZmlyZQ=="], 
+                f: "Q29ycmVjdC4gRmlyZSBjb25zdW1lcyBhbmQgYnVybnMg4oCUIGFsd2F5cyBodW5ncnksIGFsd2F5cyBkYW5nZXJvdXMu"
+            },
+            {
+                t: "V2hhdCBjYW4gdHJhdmVsIGFyb3VuZCB0aGUgd29ybGQgd2hpbGUgc3RheWluZyBpbiB0aGUgc2FtZSBzcG90Pw==",
+                k: ["c3RhbXA=", "cG9zdGFnZQ=="], 
+                f: "Q29ycmVjdC4gQSBzdGFtcCB0cmF2ZWxzIGZhciB3aGlsZSByZW1haW5pbmcgZml4ZWQgdG8gdGhlIGVudmVsb3BlLg=="
+            },
+            {
+                t: "SSBmbHkgd2l0aG91dCB3aW5ncywgSSBjcnkgd2l0aG91dCBleWVzLiBXaGVyZXZlciBJIGdvLCBkYXJrbmVzcyBmb2xsb3dzIG1lLiBXaGF0IGFtIEk/",
+                k: ["Y2xvdWQ=", "QSBjbG91ZA=="], 
+                f: "Q29ycmVjdC4gQSBjbG91ZCBkcmlmdHMsIHdlZXBzLCBhbmQgY2FzdHMgc2hhZG93IOKAlCBwb2V0aWMgYW5kIHRydWUu"
+            }
+        ];
+
+        // --- 3D SCENE SETUP ---
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x000000, 0.03);
+
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+
+        const coreGroup = new THREE.Group();
+        scene.add(coreGroup);
+
+        const geometry = new THREE.IcosahedronGeometry(1.5, 1);
+        const wireframeGeometry = new THREE.WireframeGeometry(geometry);
+        const material = new THREE.LineBasicMaterial({ color: 0x33ff33, transparent: true, opacity: 0.4 });
+        const artifact = new THREE.LineSegments(wireframeGeometry, material);
+        coreGroup.add(artifact);
+
+        const innerCoreGeo = new THREE.IcosahedronGeometry(1.0, 0);
+        const innerCoreMat = new THREE.MeshBasicMaterial({ color: 0x004400, wireframe: true, transparent: true, opacity: 0.1 });
+        const innerCore = new THREE.Mesh(innerCoreGeo, innerCoreMat);
+        coreGroup.add(innerCore);
+
+        const particlesGeo = new THREE.BufferGeometry();
+        const particleCount = 200;
+        const posArray = new Float32Array(particleCount * 3);
+        for(let i = 0; i < particleCount * 3; i++) {
+            posArray[i] = (Math.random() - 0.5) * 15;
+        }
+        particlesGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        const particlesMat = new THREE.PointsMaterial({ size: 0.05, color: 0x33ff33, transparent: true, opacity: 0.5 });
+        const particlesMesh = new THREE.Points(particlesGeo, particlesMat);
+        scene.add(particlesMesh);
+
+        camera.position.z = 6;
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            artifact.rotation.x += 0.003;
+            artifact.rotation.y += 0.005;
+            innerCore.rotation.x -= 0.003;
+
+            // Pulse Effect
+            if (artifactPulse > 1.0) {
+                artifactPulse -= 0.05;
+                artifact.scale.set(artifactPulse, artifactPulse, artifactPulse);
+                material.opacity = 0.8;
+            } else {
+                artifact.scale.set(1, 1, 1);
+                material.opacity = 0.4;
+            }
+
+            if (appState === 'SCROLLING') {
+                camera.position.z = 6 - (scrollProgress * 2.5); 
+            } 
+            else if (appState === 'GAMING') {
+                camera.position.z = 3.5;
+                artifact.rotation.y += 0.02 * (gameProgress + 1);
+                if(gameRunning) updateGameLoop();
+            }
+
+            particlesMesh.rotation.y += 0.001;
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // --- SCROLL LOGIC ---
+        const scrollBar = document.getElementById('scroll-progress-bar');
+        const percentDisplay = document.getElementById('percent-display');
+        const landingOverlay = document.getElementById('landing-overlay');
+        const gameUI = document.getElementById('game-ui');
+
+        function handleScroll(delta) {
+            if (appState !== 'SCROLLING') return;
+            if(!audioCtx) initAudioContext(); 
+
+            scrollProgress += delta * 0.0003; 
+            scrollProgress = Math.max(0, Math.min(1, scrollProgress));
+
+            scrollBar.style.width = `${scrollProgress * 100}%`;
+            percentDisplay.textContent = Math.floor(scrollProgress * 100);
+
+            if (scrollProgress >= 1) transitionToGame();
+        }
+
+        window.addEventListener('wheel', (e) => handleScroll(e.deltaY));
+        window.addEventListener('touchmove', (e) => handleScroll(20));
+
+        function transitionToGame() {
+            appState = 'GAMING';
+            landingOverlay.style.opacity = '0';
+            landingOverlay.style.pointerEvents = 'none';
+            gameUI.style.display = 'flex';
+            gameRunning = true;
+            playSound('ambient');
+            setupRound();
+        }
+
+        // --- MINI-GAME LOGIC (Frequency Match) ---
+        const hackBtn = document.getElementById('hack-btn');
+        const tunerCursor = document.getElementById('tuner-cursor');
+        const tunerZone = document.getElementById('tuner-zone');
+        const breachCounter = document.getElementById('breach-counter');
+
+        function setupRound() {
+            barPos = Math.random() * 100;
+            let zoneWidth = 30 - (gameProgress * 5);
+            if (zoneWidth < 15) zoneWidth = 15;
+            tunerZone.style.width = `${zoneWidth}%`;
+            tunerZone.classList.remove('bg-green-glow', 'bg-red-glow');
+        }
+
+        function updateGameLoop() {
+            barPos += barSpeed * barDirection;
+            if (barPos > 100 || barPos < 0) barDirection *= -1;
+            const visualPos = Math.max(0, Math.min(100, barPos));
+            tunerCursor.style.left = visualPos + "%";
+        }
+
+        function attemptSync() {
+            if (!gameRunning) return;
+            const currentZoneWidth = parseFloat(tunerZone.style.width);
+            const safeStart = 50 - (currentZoneWidth / 2);
+            const safeEnd = 50 + (currentZoneWidth / 2);
+
+            if (barPos >= safeStart && barPos <= safeEnd) handleGameSuccess();
+            else handleGameFail();
+        }
+
+        hackBtn.addEventListener('click', (e) => { e.stopPropagation(); attemptSync(); });
+        document.addEventListener('keydown', (e) => { 
+            if (appState === 'GAMING' && e.code === 'Space') { e.preventDefault(); attemptSync(); }
+        });
+        gameUI.addEventListener('touchstart', (e) => { 
+            if (e.target !== hackBtn) { e.preventDefault(); attemptSync(); }
+        });
+        gameUI.addEventListener('mousedown', (e) => { 
+            if (e.target !== hackBtn) attemptSync(); 
+        });
+
+        function handleGameSuccess() {
+            playTypingBlip();
+            gameProgress++;
+            artifactPulse = 1.5; 
+            const dots = breachCounter.querySelectorAll('span');
+            if(dots[gameProgress-1]) {
+                dots[gameProgress-1].className = "text-green-500 glow-text";
+                dots[gameProgress-1].innerText = "●";
+            }
+            tunerZone.classList.add('bg-green-glow');
+            if (gameProgress >= TOTAL_STEPS) {
+                gameRunning = false;
+                setTimeout(() => { gameUI.style.display = 'none'; startBootSequence(); }, 500);
+            } else {
+                barSpeed = Math.abs(barSpeed) * 1.2 * Math.sign(barDirection);
+                setTimeout(() => { tunerZone.classList.remove('bg-green-glow'); setupRound(); }, 200);
+            }
+        }
+
+        function handleGameFail() {
+            playSound('wrong');
+            document.body.classList.add('shake');
+            tunerZone.classList.add('bg-red-glow');
+            setTimeout(() => { document.body.classList.remove('shake'); tunerZone.classList.remove('bg-red-glow'); }, 400);
+        }
+
+        // --- BOOT SEQUENCE ---
+        async function startBootSequence(isReturningUser = false) {
+            appState = 'BOOTING';
+            document.getElementById('boot-overlay').style.display = 'flex';
+            const bootText = document.getElementById('boot-text');
+            
+            const lines = isReturningUser ? [
+                "RE-ESTABLISHING SECURE LINK...", "BIOMETRICS VERIFIED.", "WELCOME BACK, OPERATIVE.", "INITIALIZING TERMINAL..."
+            ] : [
+                "SYSTEM BREACH CONFIRMED.", "BYPASSING FIREWALL... SUCCESS", "DECRYPTING KERNEL...", "ACCESSING MAINFRAME...", "LOADING INTERFACE...", "WELCOME USER."
+            ];
+
+            for (const line of lines) {
+                bootText.textContent += line + "\n";
+                playTypingBlip();
+                await new Promise(r => setTimeout(r, isReturningUser ? 200 : 400));
+            }
+
+            await new Promise(r => setTimeout(r, 500));
+            document.getElementById('boot-overlay').style.display = 'none';
+            
+            appState = 'TERMINAL';
+            const term = document.getElementById('terminal-wrapper');
+            term.style.display = 'flex';
+            setTimeout(() => { term.style.opacity = '1'; term.style.transform = 'scale(1)'; initTerminal(); }, 50);
+        }
+
+        // --- AUDIO SYSTEM ---
+        let audioCtx = null;
+        function initAudioContext() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+            }
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        function playTypingBlip() {
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine'; 
+            osc.frequency.value = 400 + (Math.random() * 100); 
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.03);
+            osc.stop(audioCtx.currentTime + 0.03);
+        }
+
+        function playRiddleAlert() {
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+            osc.frequency.linearRampToValueAtTime(440, audioCtx.currentTime + 0.1);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+            osc.stop(audioCtx.currentTime + 0.3);
+        }
+
+        function playSound(id) {
+            const el = document.getElementById(id + 'Audio');
+            if(el) {
+                if(id === 'ambient' && !el.paused) return;
+                if(id !== 'ambient') el.currentTime = 0;
+                el.play().catch(e=>{});
+            }
+        }
+
+        // --- TERMINAL LOGIC ---
+        const output = document.getElementById('terminal-output');
+        const inputEl = document.getElementById('userInput');
+        const statusEl = document.getElementById('header-status');
+        const wrapper = document.getElementById('terminal-wrapper');
+        const loader = document.getElementById('loading-indicator');
+
+        function setStatus(text, type = 'normal') {
+            statusEl.innerText = text;
+            if (type === 'error') { statusEl.classList.add('text-red'); wrapper.classList.add('border-red'); }
+            else if (type === 'success') { statusEl.classList.remove('text-red'); statusEl.classList.add('text-green'); wrapper.classList.remove('border-red'); }
+            else { statusEl.className = ''; wrapper.classList.remove('border-red'); }
+        }
+
+        function scrollToBottom() { output.scrollTop = output.scrollHeight; }
+
+        function print(text, className = '', speed = 20) {
+            return new Promise(resolve => {
+                const line = document.createElement('div');
+                line.className = `whitespace-pre-wrap mb-4 ${className}`;
+                output.appendChild(line);
+                state.isTyping = true;
+                inputEl.disabled = true;
+                let i = 0;
+                function type() {
+                    if (i < text.length) {
+                        line.textContent += text.charAt(i);
+                        i++;
+                        playTypingBlip();
+                        scrollToBottom();
+                        setTimeout(type, speed + (Math.random() * 10));
+                    } else {
+                        state.isTyping = false;
+                        inputEl.disabled = false;
+                        inputEl.focus();
+                        resolve();
+                    }
+                }
+                type();
+            });
+        }
+
+        function printHtml(html) {
+            const div = document.createElement('div');
+            div.innerHTML = html;
+            div.className = "mb-6 animate-pulse";
+            output.appendChild(div);
+            playRiddleAlert();
+            scrollToBottom();
+        }
+
+        async function initTerminal() {
+            lucide.createIcons();
+            inputEl.addEventListener('keydown', async (e) => {
+                if (e.key === 'Enter' && !state.isTyping) {
+                    const val = inputEl.value.trim();
+                    if (!val) return;
+                    inputEl.value = '';
+                    await handleInput(val);
+                }
+            });
+            setStatus("AWAITING AUTH");
+            state.step = 'LOGIN';
+            inputEl.placeholder = "ENTER ACCESS CODE...";
+            await print("\n========================================\n   THE FINAL PUZZLE // SECURE GATEWAY   \n========================================", "font-bold text-green-400");
+            await print("PLEASE ENTER YOUR INVITATION CODE TO PROCEED:");
+        }
+
+        async function handleInput(val) {
+            if (state.step === 'LOGIN') await attemptLogin(val);
+            else if (state.step === 'MAZE') await checkRiddle(val);
+            else if (state.step === 'RSVP') await submitRSVP(val);
+        }
+
+        async function attemptLogin(code) {
+            code = code.trim().toUpperCase();
+            state.guestCode = code;
+            inputEl.style.display = 'none';
+            loader.classList.remove('hidden');
+            setStatus("VERIFYING IDENTITY...");
+            try {
+                const lockoutRes = await fetch(`${WORKER_URL}?code=${code}&type=lockout`);
+                const lockoutData = await lockoutRes.json();
+                if (lockoutData.until && new Date(lockoutData.until) > new Date()) throw new Error(`LOCKED UNTIL: ${new Date(lockoutData.until).toLocaleTimeString()}`);
+                
+                const statusRes = await fetch(`${WORKER_URL}/validate?code=${code}`);
+                const status = await statusRes.json();
+                if (!status.valid) throw new Error("ACCESS DENIED.");
+                
+                const progressRes = await fetch(`${WORKER_URL}?code=${code}&type=progress`);
+                const progressData = await progressRes.json();
+                
+                let isReturning = false;
+                if (progressData.step >= encryptedRiddles.length || status.revealed) {
+                    isReturning = true;
+                }
+
+                const agentName = status.profile?.name ? status.profile.name.toUpperCase() : "OPERATIVE";
+
+                if (isReturning) {
+                    loader.classList.add('hidden');
+                    inputEl.style.display = 'block';
+                    output.innerHTML = '';
+                    playSound('whisper');
+                    setStatus("ACCESS GRANTED", "success");
+                    await print(`>> IDENTITY CONFIRMED. WELCOME BACK ${agentName}.`, "text-green font-bold");
+                    await initReveal();
+                    return; 
+                }
+
+                loader.classList.add('hidden');
+                inputEl.style.display = 'block';
+                playSound('whisper');
+                setStatus("ACCESS GRANTED", "success");
+                output.innerHTML = '';
+                await print(`>> IDENTITY VERIFIED.`, "text-green font-bold");
+                if (status.profile) await print(`>> WELCOME AGENT: ${agentName}`, "text-green");
+                
+                state.currentRiddleIndex = progressData.step || 0;
+                state.step = 'MAZE';
+                inputEl.placeholder = "ENTER DECRYPTION KEY...";
+                await showNextRiddle();
+                
+            } catch (error) {
+                loader.classList.add('hidden');
+                inputEl.style.display = 'block';
+                playSound('wrong');
+                setStatus("AUTH FAILED", "error");
+                await print(`ERROR: ${error.message}`, "text-red font-bold");
+            }
+        }
+
+        async function checkRiddle(answer) {
+            const riddleObj = encryptedRiddles[state.currentRiddleIndex];
+            // Decoded keys
+            const correctKeys = riddleObj.k.map(k => b64(k).toLowerCase());
+            const feedback = b64(riddleObj.f);
+
+            const rawInput = answer.toLowerCase().replace(/[^a-z0-9 ]+/g, " ");
+            // Check if rawInput contains any of the correct key phrases
+            const matched = correctKeys.some(k => rawInput.includes(k));
+
+            await print(`> ${answer}`, "text-gray-500 italic");
+
+            if (matched) {
+                playSound('whisper');
+                await print(`>> ${feedback}`, "text-green glow-text");
+                state.currentRiddleIndex++;
+                
+                try { await fetch(`${WORKER_URL}?type=progress`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code: state.guestCode, step: state.currentRiddleIndex }) }); } catch(e) {}
+                if (state.currentRiddleIndex < encryptedRiddles.length) setTimeout(showNextRiddle, 1000);
+                else setTimeout(initReveal, 1500);
+            } else {
+                playSound('wrong');
+                setStatus("INCORRECT KEY", "error");
+                await print(">> ERROR: INCORRECT KEY.", "text-red");
+                const lockoutDate = new Date();
+                lockoutDate.setHours(lockoutDate.getHours() + 2);
+                try { await fetch(`${WORKER_URL}?type=lockout`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code: state.guestCode, until: lockoutDate.toISOString() }) }); } catch(e) {}
+                await print(`>> LOCKOUT INITIATED.`, "text-red font-bold");
+                inputEl.disabled = true;
+            }
+        }
+
+        async function showNextRiddle() {
+            playSound('whisper');
+            playRiddleAlert();
+            setStatus(`DECRYPTING FILE ${state.currentRiddleIndex + 1}/${encryptedRiddles.length}`);
+            const riddleText = b64(encryptedRiddles[state.currentRiddleIndex].t);
+            await print("\n" + riddleText);
+        }
+
+        async function initReveal() {
+            state.step = 'REVEAL';
+            output.innerHTML = '';
+            setStatus("ROOT ACCESS GRANTED", "success");
+            playSound('whisper');
+            await print("ALL SECURITY LAYERS BYPASSED.", "text-green");
+            let rsvpData = {};
+            try { const res = await fetch(`${WORKER_URL}?code=${state.guestCode}&type=rsvp`); rsvpData = await res.json(); } catch(e) {}
+            
+            const dossierHTML = `<div class="border border-green-500 p-4 bg-green-900/10 mt-4 mb-4"><h2 class="text-xl font-bold mb-2 underline decoration-green-500">MISSION BRIEF</h2><p>TARGET: Number 40</p><p>DATE: Saturday, 16th May 2026, 1930 Hours</p><p>HOST: Elena (The Archivist)</p><div class="mt-4 border border-green-900 p-2 inline-block"><img src="innercircle.png" class="w-32 h-32 qr-invert" alt="QR Code"></div></div>`;
+            printHtml(dossierHTML);
+            
+            const now = new Date();
+            const isRevealed = now >= REVEAL_DATE;
+            
+            if (rsvpData.confirmed) {
+                await print(`>> RSVP STATUS: CONFIRMED.`, "text-green font-bold");
+                if (isRevealed && rsvpData.dossier) {
+                    const charHTML = `<div class="border-l-4 border-green-500 pl-4 py-2 mt-4 bg-green-900/5"><h3 class="font-bold">IDENTITY: ${rsvpData.dossier}</h3><p>Role: ${rsvpData.name}</p><p class="mt-2 text-sm">${rsvpData.description}</p><p class="mt-2 text-sm"><strong>Attire:</strong> ${rsvpData.costume}</p></div>`;
+                    printHtml(charHTML);
+                } else {
+                    const daysLeft = Math.ceil((REVEAL_DATE - now) / (1000 * 60 * 60 * 24));
+                    const lockHTML = `<div class="border border-red-500/50 bg-red-900/20 p-4 mt-4"><p class="text-red-400 font-bold blink">⚠ DOSSIER ENCRYPTED</p><p class="text-sm">TIME LOCK ACTIVE. DECRYPTION IN: ${daysLeft} DAYS</p></div>`;
+                    printHtml(lockHTML);
+                }
+                inputEl.placeholder = "CONNECTION TERMINATED.";
+                inputEl.disabled = true;
+            } else {
+                state.step = 'RSVP';
+                await print("\n>> TYPE 'CONFIRM' [DIETARY] TO ACCEPT.", "font-bold");
+                inputEl.placeholder = "AWAITING CONFIRMATION...";
+            }
+        }
+
+        async function submitRSVP(val) {
+            if (!val.toUpperCase().startsWith("CONFIRM")) { await print(">> INVALID COMMAND.", "text-red"); return; }
+            const dietary = val.substring(7).trim() || "None";
+            inputEl.disabled = true;
+            await print(">> TRANSMITTING...", "animate-pulse");
+            try {
+                const res = await fetch(`${WORKER_URL}?type=rsvp`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code: state.guestCode, confirmed: true, dietary }) });
+                const result = await res.json();
+                if (result.success) { playSound('whisper'); await print(">> RSVP CONFIRMED.", "text-green font-bold"); await initReveal(); } else throw new Error("FAILED");
+            } catch (e) { inputEl.disabled = false; await print(">> ERROR. RETRY.", "text-red"); }
+        }
+
+        document.getElementById('muteToggle').addEventListener('click', () => {
+            const ambient = document.getElementById('ambientAudio');
+            if (ambient.paused) {
+                if(audioCtx) audioCtx.resume();
+                ambient.play();
+                document.getElementById('muteToggle').innerHTML = '<i data-lucide="volume-2" class="w-4 h-4"></i>';
+            } else {
+                if(audioCtx) audioCtx.suspend();
+                ambient.pause();
+                document.getElementById('muteToggle').innerHTML = '<i data-lucide="volume-x" class="w-4 h-4"></i>';
+            }
+            lucide.createIcons();
+        });
+        
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').textContent = now.toLocaleTimeString('en-US', {hour12: false});
+        }
+        setInterval(updateClock, 1000);
+        updateClock(); 
+        
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
 </body>
 </html>
+`
