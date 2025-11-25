@@ -272,6 +272,7 @@
     <audio id="wrongAnswerAudio" src="wrong.mp3" preload="auto"></audio>
     <audio id="returnuser" src="returnuser.mp3" preload="auto"></audio>
     <audio id="auth" src="auth.mp3" preload="auto"></audio>
+    <audio id="nextriddle" src="nextriddle.mp3" preload="auto"></audio>
 
     <!-- 3D BACKGROUND -->
     <div id="canvas-container"></div>
@@ -844,7 +845,7 @@
         }
 
         async function showNextRiddle() {
-            playSound('whisper');
+            playSound('nextriddle');
             playRiddleAlert();
             setStatus(`DECRYPTING FILE ${state.currentRiddleIndex + 1}/${encryptedRiddles.length}`);
             const riddleText = b64(encryptedRiddles[state.currentRiddleIndex].t);
