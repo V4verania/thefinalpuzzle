@@ -745,7 +745,7 @@
             setStatus("AWAITING AUTH");
             state.step = 'LOGIN';
             inputEl.placeholder = "ENTER ACCESS CODE...";
-            await print("\n========================================\n   THE FINAL PUZZLE // SECURE GATEWAY   \n========================================", "font-bold text-green-400");
+            await print("\n========================================\n   THE FINAL PUZZLE // SECURE GATEWAY // ELENA BROOKWOOD  \n========================================", "font-bold text-green-400");
             await print("PLEASE ENTER YOUR INVITATION CODE TO PROCEED:");
         }
 
@@ -801,7 +801,7 @@
                 
                 state.currentRiddleIndex = progressData.step || 0;
                 state.step = 'MAZE';
-                inputEl.placeholder = "ENTER DECRYPTION KEY...";
+                inputEl.placeholder = "ENTER THE ANSWER...";
                 await showNextRiddle();
                 
             } catch (error) {
@@ -836,11 +836,11 @@
             } else {
                 playSound('wrong');
                 setStatus("INCORRECT KEY", "error");
-                await print(">> ERROR: INCORRECT KEY.", "text-red");
+                await print(">> ERROR: INCORRECT GUESS.", "text-red");
                 const lockoutDate = new Date();
                 lockoutDate.setHours(lockoutDate.getHours() + 2);
                 try { await fetch(`${WORKER_URL}?type=lockout`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code: state.guestCode, until: lockoutDate.toISOString() }) }); } catch(e) {}
-                await print(`>> LOCKOUT INITIATED.`, "text-red font-bold");
+                await print(`>> LOCKOUT INITIATED. PLEASE RELOAD AND TRY AGAIN WHEN TIMER HAS RUN OUT`, "text-red font-bold");
                 inputEl.disabled = true;
             }
         }
@@ -858,7 +858,7 @@
             output.innerHTML = '';
             setStatus("ROOT ACCESS GRANTED", "success");
             playSound('auth');
-            await print("ALL SECURITY LAYERS BYPASSED.", "text-green");
+            await print("ALL SECURITY LAYERS BYPASSED. WELCOME TO THE INNER CIRCLE.", "text-green");
             let rsvpData = {};
             try { const res = await fetch(`${WORKER_URL}?code=${state.guestCode}&type=rsvp`); rsvpData = await res.json(); } catch(e) {}
             
