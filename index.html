@@ -270,6 +270,8 @@
     <audio id="ambientAudio" src="ambient.mp3" loop></audio>
     <audio id="whisperAudio" src="whisper.mp3" preload="auto"></audio>
     <audio id="wrongAnswerAudio" src="wrong.mp3" preload="auto"></audio>
+    <audio id="returnuser" src="returnuser.mp3" preload="auto"></audio>
+    <audio id="auth" src="auth.mp3" preload="auto"></audio>
 
     <!-- 3D BACKGROUND -->
     <div id="canvas-container"></div>
@@ -781,7 +783,7 @@
                     loader.classList.add('hidden');
                     inputEl.style.display = 'block';
                     output.innerHTML = '';
-                    playSound('whisper');
+                    playSound('returnuser');
                     setStatus("ACCESS GRANTED", "success");
                     await print(`>> IDENTITY CONFIRMED. WELCOME BACK ${agentName}.`, "text-green font-bold");
                     await initReveal();
@@ -790,7 +792,7 @@
 
                 loader.classList.add('hidden');
                 inputEl.style.display = 'block';
-                playSound('whisper');
+                playSound('auth');
                 setStatus("ACCESS GRANTED", "success");
                 output.innerHTML = '';
                 await print(`>> IDENTITY VERIFIED.`, "text-green font-bold");
