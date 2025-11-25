@@ -375,8 +375,7 @@
         // Helper to decode Base64
         const b64 = (str) => decodeURIComponent(escape(window.atob(str)));
 
-        // Encoded Riddles (Base64) to prevent casual source reading
-        // Original text preserved exactly as requested
+//Riddles
         const encryptedRiddles = [
             {
                 t: "VGhlIFN1bmRheSBBbGliaQoKQSBtYW4gaXMgZm91bmQgbXVyZGVyZWQgb24gYSBTdW5kYXkgbW9ybmluZy4gSGlzIHdpZmUgaW1tZWRpYXRlbHkgY2FsbHMgdGhlIHBvbGljZSwgd2hvIHF1ZXN0aW9uIHRoZSBob3VzZWhvbGQgc3RhZmY6CgotIFRoZSBCdXRsZXIgc2F5cyBoZSB3YXMgb3JnYW5pemluZyB0aGUgd2luZSBjZWxsYXIuCi0gVGhlIENvb2sgc2F5cyBzaGUgd2FzIHByZXBhcmluZyBicmVha2Zhc3QuCi0gVGhlIEdhcmRlbmVyIHNheXMgaGUgd2FzIHdhdGVyaW5nIHRoZSBmZXJucy4KLSBUaGUgTWFpZCBzYXlzIHNoZSB3YXMgY29sbGVjdGluZyB0aGUgbW9ybmluZyBtYWlsLgoKVGhlIHBvbGljZSBpbW1lZGlhdGVseSBhcnJlc3QgdGhlIG11cmRlcmVyLgoKV2hvIGRpZCBpdD8=",
@@ -612,9 +611,9 @@
             const bootText = document.getElementById('boot-text');
             
             const lines = isReturningUser ? [
-                "RE-ESTABLISHING SECURE LINK...", "BIOMETRICS VERIFIED.", "WELCOME BACK, OPERATIVE.", "INITIALIZING TERMINAL..."
+                "RE-ESTABLISHING SECURE LINK...", "BIOMETRICS VERIFIED.", "WELCOME BACK, OPERATIVE.", "ARCHIVIST ENABLED", "INITIALIZING TERMINAL..."
             ] : [
-                "SYSTEM BREACH CONFIRMED.", "BYPASSING FIREWALL... SUCCESS", "DECRYPTING KERNEL...", "ACCESSING MAINFRAME...", "LOADING INTERFACE...", "WELCOME USER."
+                "SYSTEM BREACH CONFIRMED.", "BYPASSING FIREWALL... SUCCESS", "DECRYPTING KERNEL...", "ACCESSING MAINFRAME...", "LOADING INTERFACE...", "WELCOME USER TO THE FINAL GAME."
             ];
 
             for (const line of lines) {
@@ -881,7 +880,7 @@
                 inputEl.disabled = true;
             } else {
                 state.step = 'RSVP';
-                await print("\n>> TYPE 'CONFIRM' [DIETARY] TO ACCEPT.", "font-bold");
+                await print("\n>> TO RSVP TYPE 'CONFIRM' WITH ANY DIETARY REQUIREMENTS [DIETARY] TO ACCEPT.", "font-bold");
                 inputEl.placeholder = "AWAITING CONFIRMATION...";
             }
         }
