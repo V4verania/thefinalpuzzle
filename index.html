@@ -273,6 +273,7 @@
     <audio id="returnuser" src="returnuser.mp3" preload="auto"></audio>
     <audio id="auth" src="auth.mp3" preload="auto"></audio>
     <audio id="nextriddle" src="nextriddle.mp3" preload="auto"></audio>
+   <audio id="rsvpconfirm" src="rsvpconfirm.mp3" preload="auto"></audio>
 
     <!-- 3D BACKGROUND -->
     <div id="canvas-container"></div>
@@ -894,7 +895,7 @@
             try {
                 const res = await fetch(`${WORKER_URL}?type=rsvp`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code: state.guestCode, confirmed: true, dietary }) });
                 const result = await res.json();
-                if (result.success) { playSound('whisper'); await print(">> RSVP CONFIRMED.", "text-green font-bold"); await initReveal(); } else throw new Error("FAILED");
+                if (result.success) { playSound('rsvpconfirm'); await print(">> RSVP CONFIRMED.", "text-green font-bold"); await initReveal(); } else throw new Error("FAILED");
             } catch (e) { inputEl.disabled = false; await print(">> ERROR. RETRY.", "text-red"); }
         }
 
