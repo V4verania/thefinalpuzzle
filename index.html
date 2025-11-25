@@ -855,7 +855,7 @@
             state.step = 'REVEAL';
             output.innerHTML = '';
             setStatus("ROOT ACCESS GRANTED", "success");
-            playSound('whisper');
+            playSound('auth');
             await print("ALL SECURITY LAYERS BYPASSED.", "text-green");
             let rsvpData = {};
             try { const res = await fetch(`${WORKER_URL}?code=${state.guestCode}&type=rsvp`); rsvpData = await res.json(); } catch(e) {}
