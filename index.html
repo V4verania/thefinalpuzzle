@@ -745,7 +745,7 @@
             setStatus("AWAITING AUTH");
             state.step = 'LOGIN';
             inputEl.placeholder = "ENTER ACCESS CODE...";
-            await print("\n========================================\n   THE FINAL PUZZLE // SECURE GATEWAY // ELENA BROOKWOOD  \n========================================", "font-bold text-green-400");
+            await print("\n====================================================\n   THE FINAL PUZZLE // SECURE GATEWAY // ELENA BROOKWOOD  \n===============================================", "font-bold text-green-400");
             await print("PLEASE ENTER YOUR INVITATION CODE TO PROCEED:");
         }
 
@@ -840,7 +840,7 @@
                 const lockoutDate = new Date();
                 lockoutDate.setHours(lockoutDate.getHours() + 2);
                 try { await fetch(`${WORKER_URL}?type=lockout`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code: state.guestCode, until: lockoutDate.toISOString() }) }); } catch(e) {}
-                await print(`>> LOCKOUT INITIATED. PLEASE RELOAD AND TRY AGAIN WHEN TIMER HAS RUN OUT`, "text-red font-bold");
+                await print(`>> LOCKOUT INITIATED. PLEASE RELOAD AND TRY AGAIN LATER`, "text-red font-bold");
                 inputEl.disabled = true;
             }
         }
@@ -862,7 +862,7 @@
             let rsvpData = {};
             try { const res = await fetch(`${WORKER_URL}?code=${state.guestCode}&type=rsvp`); rsvpData = await res.json(); } catch(e) {}
             
-            const dossierHTML = `<div class="border border-green-500 p-4 bg-green-900/10 mt-4 mb-4"><h2 class="text-xl font-bold mb-2 underline decoration-green-500">CONGRATULATIONS ON COMPLETING THE</h2><p>Please join me at THE DENE OF WHISPERS Number 40</p><p>DATE: Saturday, 16th May 2026, 1930 Hours</p><p>YOUR HOST: Elena Brookwood</p><p>While you wait for the dossier to reveal itself, please scan the QR code</p><div class="mt-4 border border-green-900 p-2 inline-block"><img src="innercircle.png" class="w-32 h-32 qr-invert" alt="QR Code"></div></div>`;
+            const dossierHTML = `<div class="border border-green-500 p-4 bg-green-900/10 mt-4 mb-4"><h2 class="text-xl font-bold mb-2 underline decoration-green-500">CONGRATULATIONS ON COMPLETING THE PUZZLE</h2><p>Please join me at THE DENE OF WHISPERS Number 40</p><p>DATE: Saturday, 16th May 2026, 1930 Hours</p><p>YOUR HOST: Elena Brookwood</p><p>While you wait for the dossier to reveal itself, please scan the QR code</p><div class="mt-4 border border-green-900 p-2 inline-block"><img src="innercircle.png" class="w-32 h-32 qr-invert" alt="QR Code"></div></div>`;
             printHtml(dossierHTML);
             
             const now = new Date();
