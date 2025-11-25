@@ -745,7 +745,7 @@
             setStatus("AWAITING AUTH");
             state.step = 'LOGIN';
             inputEl.placeholder = "ENTER ACCESS CODE...";
-            await print("\n====================================================\n   THE FINAL PUZZLE // SECURE GATEWAY // ELENA BROOKWOOD  \n===============================================", "font-bold text-green-400");
+            await print("\n====================================================\n   THE FINAL PUZZLE // SECURE GATEWAY // ELENA BROOKWOOD  \n====================================================", "font-bold text-green-400");
             await print("PLEASE ENTER YOUR INVITATION CODE TO PROCEED:");
         }
 
@@ -786,7 +786,7 @@
                     output.innerHTML = '';
                     playSound('returnuser');
                     setStatus("ACCESS GRANTED", "success");
-                    await print(`>> IDENTITY CONFIRMED. WELCOME BACK ${agentName}.`, "text-green font-bold");
+                    await print(`>> IDENTITY CONFIRMED. WELCOME BACK ${agentName}. WE LOOK FORWARD TO SEEING YOU SOON`, "text-green font-bold");
                     await initReveal();
                     return; 
                 }
