@@ -871,7 +871,7 @@
             if (rsvpData.confirmed) {
                 await print(`>> RSVP STATUS: CONFIRMED.`, "text-green font-bold");
                 if (isRevealed && rsvpData.dossier) {
-                    const charHTML = `<div class="border-l-4 border-green-500 pl-4 py-2 mt-4 bg-green-900/5"><h3 class="font-bold">IDENTITY: ${rsvpData.dossier}</h3><p>Role: ${rsvpData.name}</p><p class="mt-2 text-sm">${rsvpData.description}</p><p class="mt-2 text-sm"><strong>Attire:</strong> ${rsvpData.costume}</p></div>`;
+                    const charHTML = `<div class="border-l-4 border-green-500 pl-4 py-2 mt-4 bg-green-900/5"><h3 class="font-bold">YOUR NAME: ${rsvpData.dossier}</h3><p>About you: ${rsvpData.name}</p><p class="mt-2 text-sm">${rsvpData.description}</p><p class="mt-2 text-sm"><strong>Costume Suggestions:</strong> ${rsvpData.costume}</p></div>`;
                     printHtml(charHTML);
                 } else {
                     const daysLeft = Math.ceil((REVEAL_DATE - now) / (1000 * 60 * 60 * 24));
