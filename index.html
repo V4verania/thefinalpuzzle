@@ -697,7 +697,7 @@
 
         function scrollToBottom() { output.scrollTop = output.scrollHeight; }
 
-        function print(text, className = '', speed = 20) {
+        function print(text, className = '', speed = 50) {
             return new Promise(resolve => {
                 const line = document.createElement('div');
                 line.className = `whitespace-pre-wrap mb-4 ${className}`;
@@ -786,7 +786,7 @@
                     output.innerHTML = '';
                     playSound('returnuser');
                     setStatus("ACCESS GRANTED", "success");
-                    await print(`>> IDENTITY CONFIRMED. WELCOME BACK ${agentName}. WE LOOK FORWARD TO SEEING YOU SOON`, "text-green font-bold");
+                    await print(`>> IDENTITY CONFIRMED. WELCOME BACK ${agentName}....`, "text-green font-bold");
                     await initReveal();
                     return; 
                 }
