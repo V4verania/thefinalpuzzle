@@ -600,7 +600,7 @@
         }
 
         function handleGameFail() {
-            playSound('wrong');
+            playSound('wrongAnswerAudio');
             document.body.classList.add('shake');
             tunerZone.classList.add('bg-red-glow');
             setTimeout(() => { document.body.classList.remove('shake'); tunerZone.classList.remove('bg-red-glow'); }, 400);
@@ -807,7 +807,7 @@
             } catch (error) {
                 loader.classList.add('hidden');
                 inputEl.style.display = 'block';
-                playSound('wrong');
+                playSound('wrongAnswerAudio');
                 setStatus("AUTH FAILED", "error");
                 await print(`ERROR: ${error.message}`, "text-red font-bold");
             }
@@ -834,7 +834,7 @@
                 if (state.currentRiddleIndex < encryptedRiddles.length) setTimeout(showNextRiddle, 1000);
                 else setTimeout(initReveal, 1500);
             } else {
-                playSound('wrong');
+                playSound('wrongAnswerAudio');
                 setStatus("INCORRECT KEY", "error");
                 await print(">> ERROR: INCORRECT GUESS.", "text-red");
                 const lockoutDate = new Date();
