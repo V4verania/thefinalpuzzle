@@ -1,0 +1,356 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Final Puzzle // THE ARCHIVE</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- GSAP for High-Performance Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+        :root {
+            --paper-bg: #1a1510;
+            --gold-accent: #c5a059;
+            --gold-dim: #8a6d3b;
+            --text-color: #e0d5c1;
+        }
+
+        body {
+            background-color: var(--paper-bg);
+            color: var(--text-color);
+            font-family: 'Cormorant Garamond', serif;
+            overflow-x: hidden;
+            margin: 0;
+        }
+
+        /* --- ATMOSPHERIC BACKGROUND --- */
+        .bg-texture {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c5a059' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            z-index: -2;
+        }
+
+        .vignette {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, transparent 40%, #000 120%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* --- FLOATING EMBERS --- */
+        .ember {
+            position: fixed;
+            width: 4px; height: 4px;
+            background: var(--gold-accent);
+            border-radius: 50%;
+            opacity: 0;
+            animation: floatUp 10s infinite linear;
+            z-index: 0;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.4; }
+            100% { transform: translateY(-10vh) translateX(20px); opacity: 0; }
+        }
+
+        /* --- SCROLL SECTIONS --- */
+        section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* --- TYPOGRAPHY --- */
+        h1 {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(3rem, 8vw, 6rem);
+            text-align: center;
+            line-height: 1.1;
+            background: linear-gradient(to bottom, #fff, #c5a059);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            opacity: 0; /* Initial state for animation */
+            transform: translateY(30px);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            letter-spacing: 0.3em;
+            color: var(--gold-dim);
+            margin-top: 1rem;
+            text-transform: uppercase;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        /* --- VIDEO CONTAINER --- */
+        .video-frame {
+            width: 100%;
+            max-width: 1000px;
+            position: relative;
+            margin-top: 2rem;
+            opacity: 0;
+            transform: scale(0.95);
+            border: 1px solid var(--gold-dim);
+            padding: 10px;
+            background: rgba(26, 21, 16, 0.8);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .video-wrapper {
+            position: relative;
+            aspect-ratio: 16 / 9;
+            overflow: hidden;
+            border: 1px solid rgba(197, 160, 89, 0.3);
+        }
+
+        video {
+            width: 100%; height: 100%; object-fit: cover;
+            filter: sepia(0.2) contrast(1.1);
+        }
+
+        /* --- CONTROLS --- */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold-dim);
+            animation: bounce 2s infinite;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-10px);}
+            60% {transform: translateY(-5px);}
+        }
+
+        .action-btn {
+            margin-top: 3rem;
+            padding: 15px 40px;
+            font-family: 'Cinzel', serif;
+            font-size: 1.2rem;
+            color: #1a1510;
+            background: var(--gold-accent);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+        }
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: 0.5s;
+        }
+        .action-btn:hover::before { left: 100%; }
+        .action-btn:hover { background: #e6cc9d; transform: scale(1.05); box-shadow: 0 0 30px rgba(197, 160, 89, 0.4); }
+
+        /* --- AUDIO TOGGLE --- */
+        .audio-control {
+            position: fixed;
+            top: 30px; right: 30px;
+            color: var(--gold-dim);
+            z-index: 100;
+            cursor: pointer;
+            border: 1px solid var(--gold-dim);
+            padding: 10px;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+        .audio-control:hover { color: var(--gold-accent); border-color: var(--gold-accent); }
+
+    </style>
+</head>
+<body>
+
+    <audio id="ambientAudio" src="ambient.mp3" loop></audio>
+
+    <div class="bg-texture"></div>
+    <div class="vignette"></div>
+    
+    <!-- Dynamic Embers -->
+    <div id="ember-container"></div>
+
+    <div id="muteToggle" class="audio-control">
+        <i data-lucide="volume-2" class="w-6 h-6"></i>
+    </div>
+
+    <!-- SECTION 1: HERO INTRO -->
+    <section id="hero">
+        <h1 id="hero-title">The Archivist's Log</h1>
+        <p class="subtitle">ENTRY 404: CLASSIFIED BRIEFING</p>
+        
+        <div class="scroll-indicator" onclick="scrollToVideo()">
+            <span class="text-xs tracking-widest">SCROLL TO DECRYPT</span>
+            <i data-lucide="chevron-down" class="w-6 h-6"></i>
+        </div>
+    </section>
+
+    <!-- SECTION 2: VIDEO REVEAL -->
+    <section id="briefing">
+        <div class="video-frame">
+            <div class="video-wrapper">
+                <!-- Replace src with your file -->
+                <video id="briefingVideo" src="tinaandfredvid.mp4" playsinline></video>
+                
+                <div id="playOverlay" class="absolute inset-0 flex flex-col items-center justify-center bg-black/60 cursor-pointer hover:bg-black/40 transition-all duration-500 group">
+                    <div class="w-20 h-20 border border-gold-500/50 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <i data-lucide="play" class="w-8 h-8 text-[#c5a059] fill-[#c5a059] ml-1"></i>
+                    </div>
+                    <p class="mt-4 text-[#8a6d3b] tracking-[0.3em] text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500">PLAY RECORDING</p>
+                </div>
+            </div>
+            
+            <div class="flex justify-between items-center mt-4 px-2">
+                <div class="flex gap-2">
+                    <div class="w-2 h-2 bg-[#8a6d3b] rounded-full animate-pulse"></div>
+                    <span class="text-xs text-[#8a6d3b] tracking-widest">SECURE CONNECTION</span>
+                </div>
+                <span class="text-xs text-[#8a6d3b] font-mono">ID: 849-22-ALPHA</span>
+            </div>
+        </div>
+
+        <button onclick="location.href='index.html'" class="action-btn">
+            ENTER THE MAZE
+        </button>
+    </section>
+
+    <script>
+        /* global lucide, gsap, ScrollTrigger */
+        lucide.createIcons();
+        gsap.registerPlugin(ScrollTrigger);
+
+        // --- ANIMATION SETUP ---
+        
+        // 1. Hero Reveal
+        const tl = gsap.timeline();
+        tl.to("#hero-title", { opacity: 1, y: 0, duration: 1.5, ease: "power3.out" })
+          .to(".subtitle", { opacity: 1, y: 0, duration: 1, delay: -1 })
+          .to(".scroll-indicator", { opacity: 1, duration: 1, delay: -0.5 });
+
+        // 2. Scroll Transitions
+        gsap.to("#hero", {
+            scrollTrigger: {
+                trigger: "#hero",
+                start: "top top",
+                end: "bottom top",
+                scrub: true
+            },
+            opacity: 0,
+            y: -100
+        });
+
+        gsap.to(".video-frame", {
+            scrollTrigger: {
+                trigger: "#briefing",
+                start: "top center",
+                end: "center center",
+                scrub: 1
+            },
+            opacity: 1,
+            scale: 1,
+            y: -50
+        });
+
+        gsap.to(".action-btn", {
+            scrollTrigger: {
+                trigger: "#briefing",
+                start: "center center",
+            },
+            opacity: 1,
+            y: 0,
+            duration: 1,
+            delay: 0.5
+        });
+
+        // --- EMBER PARTICLES ---
+        const emberContainer = document.getElementById('ember-container');
+        for(let i=0; i<30; i++) {
+            const ember = document.createElement('div');
+            ember.classList.add('ember');
+            ember.style.left = Math.random() * 100 + 'vw';
+            ember.style.animationDuration = (Math.random() * 5 + 5) + 's';
+            ember.style.animationDelay = Math.random() * 5 + 's';
+            emberContainer.appendChild(ember);
+        }
+
+        // --- VIDEO & AUDIO LOGIC ---
+        const video = document.getElementById('briefingVideo');
+        const playBtn = document.getElementById('playOverlay');
+        const ambient = document.getElementById('ambientAudio');
+        const muteBtn = document.getElementById('muteToggle');
+        let audioStarted = false;
+
+        ambient.volume = 0.2;
+
+        function toggleAudio() {
+            if (!audioStarted) {
+                ambient.play().catch(()=>{});
+                audioStarted = true;
+            }
+            
+            if (ambient.paused) {
+                ambient.play();
+                video.muted = false;
+                muteBtn.innerHTML = '<i data-lucide="volume-2" class="w-6 h-6"></i>';
+            } else {
+                ambient.pause();
+                video.muted = true;
+                muteBtn.innerHTML = '<i data-lucide="volume-x" class="w-6 h-6"></i>';
+            }
+            lucide.createIcons();
+        }
+
+        muteBtn.addEventListener('click', toggleAudio);
+
+        playBtn.addEventListener('click', () => {
+            video.play();
+            gsap.to(playBtn, { opacity: 0, duration: 0.5, onComplete: () => playBtn.style.display = 'none' });
+            if(!audioStarted) {
+                ambient.play().catch(()=>{});
+                audioStarted = true;
+            }
+        });
+
+        video.addEventListener('ended', () => {
+            playBtn.style.display = 'flex';
+            gsap.to(playBtn, { opacity: 1, duration: 0.5 });
+        });
+
+        function scrollToVideo() {
+            document.getElementById('briefing').scrollIntoView({ behavior: 'smooth' });
+        }
+
+    </script>
+</body>
+</html>
