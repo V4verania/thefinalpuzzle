@@ -826,7 +826,7 @@
             await print(`> ${answer}`, "text-gray-500 italic");
 
             if (matched) {
-                playSound('whisper');
+                playSound('whisperAudio');
                 await print(`>> ${feedback}`, "text-green glow-text");
                 state.currentRiddleIndex++;
                 
