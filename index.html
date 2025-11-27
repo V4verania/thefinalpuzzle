@@ -270,10 +270,10 @@
     <audio id="ambientAudio" src="ambient.mp3" loop></audio>
     <audio id="whisperAudio" src="whisper.mp3" preload="auto"></audio>
     <audio id="wrongAnswerAudio" src="wrong.mp3" preload="auto"></audio>
-    <audio id="returnuser" src="returnuser.mp3" preload="auto"></audio>
-    <audio id="auth" src="auth.mp3" preload="auto"></audio>
-    <audio id="nextriddle" src="nextriddle.mp3" preload="auto"></audio>
-   <audio id="rsvpconfirm" src="rsvpconfirm.mp3" preload="auto"></audio>
+    <audio id="returnAudio" src="returnuser.mp3" preload="auto"></audio>
+    <audio id="authAudio" src="auth.mp3" preload="auto"></audio>
+    <audio id="nextAudio" src="nextriddle.mp3" preload="auto"></audio>
+     <audio id="rsvpAudio" src="rsvpconfirm.mp3" preload="auto"></audio>
 
     <!-- 3D BACKGROUND -->
     <div id="canvas-container"></div>
@@ -613,7 +613,7 @@
             const bootText = document.getElementById('boot-text');
             
             const lines = isReturningUser ? [
-                "RE-ESTABLISHING SECURE LINK...", "BIOMETRICS VERIFIED.", "WELCOME BACK, OPERATIVE.", "ARCHIVIST ENABLED", "INITIALIZING TERMINAL..."
+                "RE-ESTABLISHING SECURE LINK...", "BIOMETRICS VERIFIED.", "WELCOME BACK, OPERATIVE.", "ARCHIVIST ENABLED.", "INITIALIZING TERMINAL..."
             ] : [
                 "SYSTEM BREACH CONFIRMED.", "BYPASSING FIREWALL... SUCCESS", "DECRYPTING KERNEL...", "ACCESSING MAINFRAME...", "LOADING INTERFACE...", "WELCOME USER TO THE FINAL GAME."
             ];
@@ -784,7 +784,7 @@
                     loader.classList.add('hidden');
                     inputEl.style.display = 'block';
                     output.innerHTML = '';
-                    playSound('returnuser');
+                    playSound('returnAudio');
                     setStatus("ACCESS GRANTED", "success");
                     await print(`>> IDENTITY CONFIRMED. WELCOME BACK ${agentName}....`, "text-green font-bold");
                     await initReveal();
@@ -793,7 +793,7 @@
 
                 loader.classList.add('hidden');
                 inputEl.style.display = 'block';
-                playSound('auth');
+                playSound('authAudio');
                 setStatus("ACCESS GRANTED", "success");
                 output.innerHTML = '';
                 await print(`>> IDENTITY VERIFIED.`, "text-green font-bold");
@@ -846,7 +846,7 @@
         }
 
         async function showNextRiddle() {
-            playSound('nextriddle');
+            playSound('nextAudio');
             playRiddleAlert();
             setStatus(`DECRYPTING FILE ${state.currentRiddleIndex + 1}/${encryptedRiddles.length}`);
             const riddleText = b64(encryptedRiddles[state.currentRiddleIndex].t);
@@ -857,7 +857,7 @@
             state.step = 'REVEAL';
             output.innerHTML = '';
             setStatus("ROOT ACCESS GRANTED", "success");
-            playSound('auth');
+            playSound('authAudio');
             await print("ALL SECURITY LAYERS BYPASSED. WELCOME TO THE INNER CIRCLE.", "text-green");
             let rsvpData = {};
             try { const res = await fetch(`${WORKER_URL}?code=${state.guestCode}&type=rsvp`); rsvpData = await res.json(); } catch(e) {}
@@ -895,7 +895,7 @@
             try {
                 const res = await fetch(`${WORKER_URL}?type=rsvp`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code: state.guestCode, confirmed: true, dietary }) });
                 const result = await res.json();
-                if (result.success) { playSound('rsvpconfirm'); await print(">> RSVP CONFIRMED.", "text-green font-bold"); await initReveal(); } else throw new Error("FAILED");
+                if (result.success) { playSound('rsvpAudio'); await print(">> RSVP CONFIRMED.", "text-green font-bold"); await initReveal(); } else throw new Error("FAILED");
             } catch (e) { inputEl.disabled = false; await print(">> ERROR. RETRY.", "text-red"); }
         }
 
