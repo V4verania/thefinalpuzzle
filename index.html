@@ -265,12 +265,13 @@
     </style>
 </head>
 <body>
-<div id="re-clarification" class="bg-yellow-200 text-black px-4 py-3 text-sm font-medium">
+<div id="re-clarification" class="bg-yellow-200 text-black px-4 py-3 text-sm font-medium flex justify-between items-center">
     <p>
         I’ve noticed a sudden increase in visitors looking for information about the new Resident Evil game.
         Just to clarify: <strong>I am not connected to Capcom, Resident Evil, or any part of that franchise.</strong>
         The Final Puzzle is an independent project, and any similarity in naming is coincidental.
     </p>
+    <button onclick="document.getElementById('re-clarification').remove()" class="ml-4 font-bold">✕</button>
 </div>
     <!-- AUDIO (Ambient loops, others trigger) -->
     <audio id="ambientAudio" src="ambient.mp3" loop></audio>
