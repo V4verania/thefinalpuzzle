@@ -929,14 +929,38 @@
         });
     </script>
 
-    <div id="re-clarification" class="bg-yellow-200 text-black px-4 py-3 text-sm font-medium flex justify-between items-center">
-    <p>
-        I’ve noticed a sudden increase in visitors looking for information about the new Resident Evil game.
-        Just to clarify: <strong>I am not connected to Capcom, Resident Evil, or any part of that franchise.</strong>
-        The Final Puzzle is an independent project, and any similarity in naming is coincidental.
-    </p>
-    <button onclick="document.getElementById('re-clarification').remove()" class="ml-4 font-bold">✕</button>
+<div id="re-modal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+    <div class="bg-white text-black p-6 rounded shadow-lg max-w-md">
+        <h2 class="font-bold text-lg mb-2">Clarification</h2>
+        <p class="mb-4">
+            I’ve noticed a surge of visitors looking for information about the new Resident Evil game.
+            Just to clarify: <strong>I am not connected to Capcom, Resident Evil, or the Resident Evil franchise.</strong>
+            The Final Puzzle is an independent project.
+        </p>
+        <button id="re-close" class="bg-black text-white px-4 py-2 rounded">
+            Continue
+        </button>
+    </div>
 </div>
+
+<script>
+(function() {
+    const modal = document.getElementById("re-modal");
+    const closeBtn = document.getElementById("re-close");
+
+    // Close when clicking the button
+    closeBtn.addEventListener("click", () => {
+        modal.remove();
+    });
+
+    // Close when clicking the dark background
+    modal.addEventListener("click", (e) => {
+        if (e.target === modal) {
+            modal.remove();
+        }
+    });
+})();
+</script>
 </body>
 </html>
 `
