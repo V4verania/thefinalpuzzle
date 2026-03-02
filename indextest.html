@@ -730,7 +730,7 @@
             scrollToBottom();
         }
 
-        // NEW: safer dossier renderer + PDF link
+        // NEW: safer dossier renderer + PDF link + murderer note
         function appendDossier(outputEl, rsvpData, guestCode) {
             const wrapper = document.createElement("div");
             wrapper.className = "border-l-4 border-green-500 pl-4 py-2 mt-4 bg-green-900/5";
@@ -749,6 +749,18 @@
             const costumeEl = document.createElement("p");
             costumeEl.className = "mt-2 text-sm";
             costumeEl.textContent = `Costume Suggestions: ${rsvpData.costume}`;
+
+            // Optional murderer note if backend provides isMurderer
+            if (typeof rsvpData.isMurderer === "boolean") {
+                const noteText = rsvpData.isMurderer
+                    ? "This character is the murderer."
+                    : "This character is not the murderer.";
+
+                const noteEl = document.createElement("p");
+                noteEl.className = "mt-2 text-xs text-green-300";
+                noteEl.textContent = noteText;
+                wrapper.appendChild(noteEl);
+            }
 
             const pdfLink = document.createElement("a");
             pdfLink.href = `${WORKER_URL}/pdf?code=${guestCode}`;
