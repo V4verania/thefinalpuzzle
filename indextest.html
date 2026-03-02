@@ -744,12 +744,12 @@
             titleEl.textContent = `YOUR NAME: ${rsvpData.dossier}`;
 
             // Location is provided by the Worker only after a valid code + reveal
-            if (rsvpData.location) {
-                const locEl = document.createElement("p");
-                locEl.className = "mt-1 text-sm text-green-200";
-                locEl.textContent = `LOCATION: ${rsvpData.location}`;
-                wrapper.appendChild(locEl);
-            }
+  //          if (rsvpData.location) {
+   //             const locEl = document.createElement("p");
+   //             locEl.className = "mt-1 text-sm text-green-200";
+   //             locEl.textContent = `LOCATION: ${rsvpData.location}`;
+   //             wrapper.appendChild(locEl);
+   //         }
 
             const aboutEl = document.createElement("p");
             aboutEl.textContent = `About you: ${rsvpData.name}`;
