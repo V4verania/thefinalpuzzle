@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -272,7 +271,7 @@
     <audio id="returnAudio" src="returnuser.mp3" preload="auto"></audio>
     <audio id="authAudio" src="auth.mp3" preload="auto"></audio>
     <audio id="nextAudio" src="nextriddle.mp3" preload="auto"></audio>
-     <audio id="rsvpAudio" src="rsvpconfirm.mp3" preload="auto"></audio>
+    <audio id="rsvpAudio" src="rsvpconfirm.mp3" preload="auto"></audio>
 
     <!-- 3D BACKGROUND -->
     <div id="canvas-container"></div>
@@ -376,7 +375,7 @@
         // Helper to decode Base64
         const b64 = (str) => decodeURIComponent(escape(window.atob(str)));
 
-//Riddles
+        //Riddles
         const encryptedRiddles = [
             {
                 t: "VGhlIFN1bmRheSBBbGliaQoKQSBtYW4gaXMgZm91bmQgbXVyZGVyZWQgb24gYSBTdW5kYXkgbW9ybmluZy4gSGlzIHdpZmUgaW1tZWRpYXRlbHkgY2FsbHMgdGhlIHBvbGljZSwgd2hvIHF1ZXN0aW9uIHRoZSBob3VzZWhvbGQgc3RhZmY6CgotIFRoZSBCdXRsZXIgc2F5cyBoZSB3YXMgb3JnYW5pemluZyB0aGUgd2luZSBjZWxsYXIuCi0gVGhlIENvb2sgc2F5cyBzaGUgd2FzIHByZXBhcmluZyBicmVha2Zhc3QuCi0gVGhlIEdhcmRlbmVyIHNheXMgaGUgd2FzIHdhdGVyaW5nIHRoZSBmZXJucy4KLSBUaGUgTWFpZCBzYXlzIHNoZSB3YXMgY29sbGVjdGluZyB0aGUgbW9ybmluZyBtYWlsLgoKVGhlIHBvbGljZSBpbW1lZGlhdGVseSBhcnJlc3QgdGhlIG11cmRlcmVyLgoKV2hvIGRpZCBpdD8=",
@@ -568,7 +567,11 @@
             else handleGameFail();
         }
 
-        hackBtn.addEventListener('click', (e) => { e.stopPropagation(); attemptSync(); });
+        hackBtn.addEventListener('click', (e) => { 
+            e.stopPropagation(); 
+            initAudioContext(); 
+            attemptSync(); 
+        });
         document.addEventListener('keydown', (e) => { 
             if (appState === 'GAMING' && e.code === 'Space') { e.preventDefault(); attemptSync(); }
         });
@@ -731,8 +734,100 @@
             scrollToBottom();
         }
 
+        // NEW: safer dossier renderer + PDF link + murderer note
+        function appendDossier(outputEl, rsvpData, guestCode) {
+            const wrapper = document.createElement("div");
+            wrapper.className = "border-l-4 border-green-500 pl-4 py-2 mt-4 bg-green-900/5";
+
+            const titleEl = document.createElement("h3");
+            titleEl.className = "font-bold";
+            titleEl.textContent = `YOUR NAME: ${rsvpData.dossier}`;
+
+            // Location is provided by the Worker only after a valid code + reveal
+            if (rsvpData.location) {
+                const locEl = document.createElement("p");
+                locEl.className = "mt-1 text-sm text-green-200";
+                locEl.textContent = `LOCATION: ${rsvpData.location}`;
+                wrapper.appendChild(locEl);
+            }
+
+            const aboutEl = document.createElement("p");
+            aboutEl.textContent = `About you: ${rsvpData.name}`;
+
+            const descEl = document.createElement("p");
+            descEl.className = "mt-2 text-sm";
+            descEl.textContent = rsvpData.description;
+
+            const costumeEl = document.createElement("p");
+            costumeEl.className = "mt-2 text-sm";
+            costumeEl.textContent = `Costume Suggestions: ${rsvpData.costume}`;
+
+            // Optional secret note if backend provides isMurderer
+            if (typeof rsvpData.isMurderer === "boolean") {
+                if (rsvpData.isMurderer === true) {
+                    // Murderer: two-step reveal to reduce shoulder-surfing risk
+                    const noteWrapper = document.createElement("div");
+                    noteWrapper.className = "mt-2 text-xs";
+
+                    const promptEl = document.createElement("p");
+                    promptEl.className = "text-yellow-300";
+                    promptEl.textContent =
+                        "You are about to be told a secret about your character. Make sure no one can see your screen.";
+
+                    const revealBtn = document.createElement("button");
+                    revealBtn.className =
+                        "mt-2 px-3 py-1 rounded border border-red-400 text-red-400 text-[10px] uppercase tracking-widest hover:bg-red-400 hover:text-black transition-colors";
+                    revealBtn.textContent = "Reveal secret";
+
+                    revealBtn.addEventListener("click", () => {
+                        promptEl.className = "text-xs font-bold text-red-400";
+                        promptEl.textContent =
+                            "You are the murderer. Do not reveal this to anyone. Keep your dossier secret for now.";
+                        revealBtn.remove();
+
+                        // Auto-hide the secret after a short time (e.g. 10 seconds)
+                        setTimeout(() => {
+                            noteWrapper.remove();
+                        }, 10000);
+                    });
+
+                    noteWrapper.appendChild(promptEl);
+                    noteWrapper.appendChild(revealBtn);
+                    wrapper.appendChild(noteWrapper);
+                } else {
+                    // Non-murderer: give a random cryptic rhyme as a private "secret"
+                    const rhymes = [
+                        "When whispers fade and candles dim,\nYour truth lies not with blood or sin.\nGuard what you know but play your part,\nFor every secret hides a heart.",
+                        "The mask you wear is thin as glass,\nLet questions come and answers pass.\nSpeak half in truth and half in jest,\nAnd let suspicion do the rest.",
+                        "In shadowed rooms where stories twist,\nRemember what the clues have missed.\nA careful word, a sideways glance,\nCan turn the tide of circumstance.",
+                        "Not every stain is born of crime,\nNot every glance betrays the time.\nBut hold your tongue and watch the floor—\nA single slip can start a war."
+                    ];
+                    const rhyme =
+                        rhymes[Math.floor(Math.random() * rhymes.length)];
+
+                    const noteEl = document.createElement("p");
+                    noteEl.className = "mt-2 text-xs text-green-300 italic whitespace-pre-line";
+                    noteEl.textContent = rhyme;
+                    wrapper.appendChild(noteEl);
+                }
+            }
+
+            const pdfLink = document.createElement("a");
+            pdfLink.href = `${WORKER_URL}/pdf?code=${guestCode}`;
+            pdfLink.target = "_blank";
+            pdfLink.rel = "noopener";
+            pdfLink.className = "inline-block mt-4 text-green-400 underline";
+            pdfLink.textContent = "Download your full dossier (PDF)";
+
+            wrapper.append(titleEl, aboutEl, descEl, costumeEl, pdfLink);
+            outputEl.appendChild(wrapper);
+            scrollToBottom();
+        }
+
         async function initTerminal() {
             lucide.createIcons();
+            // Ensure audio context is started once the user reaches the terminal
+            initAudioContext();
             inputEl.addEventListener('keydown', async (e) => {
                 if (e.key === 'Enter' && !state.isTyping) {
                     const val = inputEl.value.trim();
@@ -767,7 +862,9 @@
                 
                 const statusRes = await fetch(`${WORKER_URL}/validate?code=${code}`);
                 const status = await statusRes.json();
-                if (!status.valid) throw new Error("ACCESS DENIED.");
+                if (!status.valid) {
+                    throw new Error("INCORRECT CODE: UNAUTHORISED");
+                }
                 
                 const progressRes = await fetch(`${WORKER_URL}?code=${code}&type=progress`);
                 const progressData = await progressRes.json();
@@ -808,7 +905,7 @@
                 inputEl.style.display = 'block';
                 playSound('wrongAnswerAudio');
                 setStatus("AUTH FAILED", "error");
-                await print(`ERROR: ${error.message}`, "text-red font-bold");
+                await print("ERROR: ACCESS DENIED. UNAUTHORISED OR CONNECTION FAILED.", "text-red font-bold");
             }
         }
 
@@ -860,21 +957,26 @@
             await print("ALL SECURITY LAYERS BYPASSED. WELCOME TO THE INNER CIRCLE.", "text-green");
             let rsvpData = {};
             try { const res = await fetch(`${WORKER_URL}?code=${state.guestCode}&type=rsvp`); rsvpData = await res.json(); } catch(e) {}
+
+            const locationText = rsvpData.location
+                ? `at ${rsvpData.location}.`
+                : "at a concealed location revealed only in your personal dossier.";
             
-            const dossierHTML = `<div class="border border-green-500 p-4 bg-green-900/10 mt-4 mb-4"><h2 class="text-xl font-bold mb-2 underline decoration-green-500">CONGRATULATIONS ON COMPLETING THE PUZZLE</h2><p>The Archivist, on behalf of Elena Brookwood invites you to join us at THE DENE OF WHISPERS Number 40.</p><p>DATE: Saturday, 16th May 2026, 1930 Hours</p><p>YOUR HOST: Elena Brookwood</p><p><p>WHO WILL I BE?</p><p>While you wait for the dossier below to reveal who you will be, please scan the QR code. \n Join in the chatter, don't forget to RSVP with any dietary requirements.</p><div class="mt-4 border border-green-900 p-2 inline-block">
+            const dossierHTML = `<div class="border border-green-500 p-4 bg-green-900/10 mt-4 mb-4"><h2 class="text-xl font-bold mb-2 underline decoration-green-500">CONGRATULATIONS ON COMPLETING THE PUZZLE</h2><p>The Archivist, on behalf of Elena Brookwood, invites you to join us ${locationText}</p><p>DATE: Saturday, 16th May 2026, 1930 Hours</p><p>YOUR HOST: Elena Brookwood</p><p><p>WHO WILL I BE?</p><p>While you wait for the dossier below to reveal who you will be, please scan the QR code. 
+ Join in the chatter, don't forget to RSVP with any dietary requirements.</p><div class="mt-4 border border-green-900 p-2 inline-block">
     <img id="qrImage" class="w-32 h-32 qr-invert" alt="QR Code">
 </div>`;
             printHtml(dossierHTML);
             document.getElementById("qrImage").src =
-  `https://thefinalpuzzle-worker.thefinalpuzzle.workers.dev/qr?code=${state.guestCode}`;
+  `${WORKER_URL}/qr?code=${state.guestCode}`;
             const now = new Date();
             const isRevealed = now >= REVEAL_DATE;
             
             if (rsvpData.confirmed) {
                 await print(`>> RSVP STATUS: CONFIRMED.`, "text-green font-bold");
                 if (isRevealed && rsvpData.dossier) {
-                    const charHTML = `<div class="border-l-4 border-green-500 pl-4 py-2 mt-4 bg-green-900/5"><h3 class="font-bold">YOUR NAME: ${rsvpData.dossier}</h3><p>About you: ${rsvpData.name}</p><p class="mt-2 text-sm">${rsvpData.description}</p><p class="mt-2 text-sm"><strong>Costume Suggestions:</strong> ${rsvpData.costume}</p></div>`;
-                    printHtml(charHTML);
+                    // Use DOM nodes instead of innerHTML for the character dossier
+                    appendDossier(output, rsvpData, state.guestCode);
                 } else {
                     const daysLeft = Math.ceil((REVEAL_DATE - now) / (1000 * 60 * 60 * 24));
                     const lockHTML = `<div class="border border-red-500/50 bg-red-900/20 p-4 mt-4"><p class="text-red-400 font-bold blink">⚠ DOSSIER ENCRYPTED</p><p class="text-sm">TIME LOCK ACTIVE. DECRYPTION IN: ${daysLeft} DAYS</p></div>`;
@@ -929,38 +1031,5 @@
         });
     </script>
 
-<div id="re-modal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-    <div class="bg-white text-black p-6 rounded shadow-lg max-w-md">
-        <h2 class="font-bold text-lg mb-2">Clarification</h2>
-        <p class="mb-4">
-            I’ve noticed a surge of visitors looking for information about the new Resident Evil game.
-            Just to clarify: <strong>I am not connected to Capcom, Resident Evil, or the Resident Evil franchise.</strong>
-            The Final Puzzle is an independent project.
-        </p>
-        <button id="re-close" class="bg-black text-white px-4 py-2 rounded">
-            Continue
-        </button>
-    </div>
-</div>
-
-<script>
-(function() {
-    const modal = document.getElementById("re-modal");
-    const closeBtn = document.getElementById("re-close");
-
-    // Close when clicking the button
-    closeBtn.addEventListener("click", () => {
-        modal.remove();
-    });
-
-    // Close when clicking the dark background
-    modal.addEventListener("click", (e) => {
-        if (e.target === modal) {
-            modal.remove();
-        }
-    });
-})();
-</script>
 </body>
 </html>
-`
