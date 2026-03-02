@@ -750,18 +750,32 @@
             costumeEl.className = "mt-2 text-sm";
             costumeEl.textContent = `Costume Suggestions: ${rsvpData.costume}`;
 
-            // Optional murderer note if backend provides isMurderer
-            if (typeof rsvpData.isMurderer === "boolean") {
-                const noteText = rsvpData.isMurderer
-                    ? "You are the murderer, do not reveal this to anyone. Keep your dossier secret for now"
-                    : "Keep your dossier secret, it holds background information that must not be revealed yet";
+            // Optional murderer note if backend provides isMurderer – only for murderer
+            if (rsvpData.isMurderer === true) {
+                // Two-step reveal to reduce shoulder-surfing risk
+                const noteWrapper = document.createElement("div");
+                noteWrapper.className = "mt-2 text-xs";
 
-                const noteEl = document.createElement("p");
-                noteEl.className = rsvpData.isMurderer
-                    ? "mt-2 text-xs font-bold text-red-400"
-                    : "mt-2 text-xs text-green-300";
-                noteEl.textContent = noteText;
-                wrapper.appendChild(noteEl);
+                const promptEl = document.createElement("p");
+                promptEl.className = "text-yellow-300";
+                promptEl.textContent =
+                    "You are about to be told a secret about your character. Make sure no one can see your screen.";
+
+                const revealBtn = document.createElement("button");
+                revealBtn.className =
+                    "mt-2 px-3 py-1 rounded border border-red-400 text-red-400 text-[10px] uppercase tracking-widest hover:bg-red-400 hover:text-black transition-colors";
+                revealBtn.textContent = "Reveal secret";
+
+                revealBtn.addEventListener("click", () => {
+                    promptEl.className = "text-xs font-bold text-red-400";
+                    promptEl.textContent =
+                        "You are the murderer. Do not reveal this to anyone. Keep your dossier secret for now.";
+                    revealBtn.remove();
+                });
+
+                noteWrapper.appendChild(promptEl);
+                noteWrapper.appendChild(revealBtn);
+                wrapper.appendChild(noteWrapper);
             }
 
             const pdfLink = document.createElement("a");
