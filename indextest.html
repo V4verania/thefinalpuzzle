@@ -567,7 +567,11 @@
             else handleGameFail();
         }
 
-        hackBtn.addEventListener('click', (e) => { e.stopPropagation(); attemptSync(); });
+        hackBtn.addEventListener('click', (e) => { 
+            e.stopPropagation(); 
+            initAudioContext(); 
+            attemptSync(); 
+        });
         document.addEventListener('keydown', (e) => { 
             if (appState === 'GAMING' && e.code === 'Space') { e.preventDefault(); attemptSync(); }
         });
@@ -814,6 +818,8 @@
 
         async function initTerminal() {
             lucide.createIcons();
+            // Ensure audio context is started once the user reaches the terminal
+            initAudioContext();
             inputEl.addEventListener('keydown', async (e) => {
                 if (e.key === 'Enter' && !state.isTyping) {
                     const val = inputEl.value.trim();
