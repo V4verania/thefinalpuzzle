@@ -753,8 +753,8 @@
             // Optional murderer note if backend provides isMurderer
             if (typeof rsvpData.isMurderer === "boolean") {
                 const noteText = rsvpData.isMurderer
-                    ? "You are the murderer, do not reveal this to anyone."
-                    : "This character is not the murderer. Do not reveal this to anyone.";
+                    ? "You are the murderer, do not reveal this to anyone. Keep your dossier secret for now"
+                    : "Keep your dossier secret, it holds background information that must not be revealed yet";
 
                 const noteEl = document.createElement("p");
                 noteEl.className = rsvpData.isMurderer
