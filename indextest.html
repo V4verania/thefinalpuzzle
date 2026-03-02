@@ -862,7 +862,9 @@
                 
                 const statusRes = await fetch(`${WORKER_URL}/validate?code=${code}`);
                 const status = await statusRes.json();
-                if (!status.valid) throw new Error("ACCESS DENIED.");
+                if (!status.valid) {
+                    throw new Error("INCORRECT CODE: UNAUTHORISED");
+                }
                 
                 const progressRes = await fetch(`${WORKER_URL}?code=${code}&type=progress`);
                 const progressData = await progressRes.json();
@@ -903,7 +905,7 @@
                 inputEl.style.display = 'block';
                 playSound('wrongAnswerAudio');
                 setStatus("AUTH FAILED", "error");
-                await print(`ERROR: ${error.message}`, "text-red font-bold");
+                await print("ERROR: ACCESS DENIED. UNAUTHORISED OR CONNECTION FAILED.", "text-red font-bold");
             }
         }
 
