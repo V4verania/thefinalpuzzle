@@ -757,7 +757,9 @@
                     : "This character is not the murderer. Do not reveal this to anyone.";
 
                 const noteEl = document.createElement("p");
-                noteEl.className = "mt-2 text-xs text-green-300";
+                noteEl.className = rsvpData.isMurderer
+                    ? "mt-2 text-xs font-bold text-red-400"
+                    : "mt-2 text-xs text-green-300";
                 noteEl.textContent = noteText;
                 wrapper.appendChild(noteEl);
             }
