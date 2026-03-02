@@ -743,6 +743,14 @@
             titleEl.className = "font-bold";
             titleEl.textContent = `YOUR NAME: ${rsvpData.dossier}`;
 
+            // Location is provided by the Worker only after a valid code + reveal
+            if (rsvpData.location) {
+                const locEl = document.createElement("p");
+                locEl.className = "mt-1 text-sm text-green-200";
+                locEl.textContent = `LOCATION: ${rsvpData.location}`;
+                wrapper.appendChild(locEl);
+            }
+
             const aboutEl = document.createElement("p");
             aboutEl.textContent = `About you: ${rsvpData.name}`;
 
@@ -947,8 +955,12 @@
             await print("ALL SECURITY LAYERS BYPASSED. WELCOME TO THE INNER CIRCLE.", "text-green");
             let rsvpData = {};
             try { const res = await fetch(`${WORKER_URL}?code=${state.guestCode}&type=rsvp`); rsvpData = await res.json(); } catch(e) {}
+
+            const locationText = rsvpData.location
+                ? `at ${rsvpData.location}.`
+                : "at a concealed location revealed only in your personal dossier.";
             
-            const dossierHTML = `<div class="border border-green-500 p-4 bg-green-900/10 mt-4 mb-4"><h2 class="text-xl font-bold mb-2 underline decoration-green-500">CONGRATULATIONS ON COMPLETING THE PUZZLE</h2><p>The Archivist, on behalf of Elena Brookwood invites you to join us at THE DENE OF WHISPERS Number 40.</p><p>DATE: Saturday, 16th May 2026, 1930 Hours</p><p>YOUR HOST: Elena Brookwood</p><p><p>WHO WILL I BE?</p><p>While you wait for the dossier below to reveal who you will be, please scan the QR code. 
+            const dossierHTML = `<div class="border border-green-500 p-4 bg-green-900/10 mt-4 mb-4"><h2 class="text-xl font-bold mb-2 underline decoration-green-500">CONGRATULATIONS ON COMPLETING THE PUZZLE</h2><p>The Archivist, on behalf of Elena Brookwood, invites you to join us ${locationText}</p><p>DATE: Saturday, 16th May 2026, 1930 Hours</p><p>YOUR HOST: Elena Brookwood</p><p><p>WHO WILL I BE?</p><p>While you wait for the dossier below to reveal who you will be, please scan the QR code. 
  Join in the chatter, don't forget to RSVP with any dietary requirements.</p><div class="mt-4 border border-green-900 p-2 inline-block">
     <img id="qrImage" class="w-32 h-32 qr-invert" alt="QR Code">
 </div>`;
