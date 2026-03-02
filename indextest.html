@@ -750,32 +750,54 @@
             costumeEl.className = "mt-2 text-sm";
             costumeEl.textContent = `Costume Suggestions: ${rsvpData.costume}`;
 
-            // Optional murderer note if backend provides isMurderer – only for murderer
-            if (rsvpData.isMurderer === true) {
-                // Two-step reveal to reduce shoulder-surfing risk
-                const noteWrapper = document.createElement("div");
-                noteWrapper.className = "mt-2 text-xs";
+            // Optional secret note if backend provides isMurderer
+            if (typeof rsvpData.isMurderer === "boolean") {
+                if (rsvpData.isMurderer === true) {
+                    // Murderer: two-step reveal to reduce shoulder-surfing risk
+                    const noteWrapper = document.createElement("div");
+                    noteWrapper.className = "mt-2 text-xs";
 
-                const promptEl = document.createElement("p");
-                promptEl.className = "text-yellow-300";
-                promptEl.textContent =
-                    "You are about to be told a secret about your character. Make sure no one can see your screen.";
-
-                const revealBtn = document.createElement("button");
-                revealBtn.className =
-                    "mt-2 px-3 py-1 rounded border border-red-400 text-red-400 text-[10px] uppercase tracking-widest hover:bg-red-400 hover:text-black transition-colors";
-                revealBtn.textContent = "Reveal secret";
-
-                revealBtn.addEventListener("click", () => {
-                    promptEl.className = "text-xs font-bold text-red-400";
+                    const promptEl = document.createElement("p");
+                    promptEl.className = "text-yellow-300";
                     promptEl.textContent =
-                        "You are the murderer. Do not reveal this to anyone. Keep your dossier secret for now.";
-                    revealBtn.remove();
-                });
+                        "You are about to be told a secret about your character. Make sure no one can see your screen.";
 
-                noteWrapper.appendChild(promptEl);
-                noteWrapper.appendChild(revealBtn);
-                wrapper.appendChild(noteWrapper);
+                    const revealBtn = document.createElement("button");
+                    revealBtn.className =
+                        "mt-2 px-3 py-1 rounded border border-red-400 text-red-400 text-[10px] uppercase tracking-widest hover:bg-red-400 hover:text-black transition-colors";
+                    revealBtn.textContent = "Reveal secret";
+
+                    revealBtn.addEventListener("click", () => {
+                        promptEl.className = "text-xs font-bold text-red-400";
+                        promptEl.textContent =
+                            "You are the murderer. Do not reveal this to anyone. Keep your dossier secret for now.";
+                        revealBtn.remove();
+
+                        // Auto-hide the secret after a short time (e.g. 10 seconds)
+                        setTimeout(() => {
+                            noteWrapper.remove();
+                        }, 10000);
+                    });
+
+                    noteWrapper.appendChild(promptEl);
+                    noteWrapper.appendChild(revealBtn);
+                    wrapper.appendChild(noteWrapper);
+                } else {
+                    // Non-murderer: give a random cryptic rhyme as a private "secret"
+                    const rhymes = [
+                        "When whispers fade and candles dim,\nYour truth lies not with blood or sin.\nGuard what you know but play your part,\nFor every secret hides a heart.",
+                        "The mask you wear is thin as glass,\nLet questions come and answers pass.\nSpeak half in truth and half in jest,\nAnd let suspicion do the rest.",
+                        "In shadowed rooms where stories twist,\nRemember what the clues have missed.\nA careful word, a sideways glance,\nCan turn the tide of circumstance.",
+                        "Not every stain is born of crime,\nNot every glance betrays the time.\nBut hold your tongue and watch the floor—\nA single slip can start a war."
+                    ];
+                    const rhyme =
+                        rhymes[Math.floor(Math.random() * rhymes.length)];
+
+                    const noteEl = document.createElement("p");
+                    noteEl.className = "mt-2 text-xs text-green-300 italic whitespace-pre-line";
+                    noteEl.textContent = rhyme;
+                    wrapper.appendChild(noteEl);
+                }
             }
 
             const pdfLink = document.createElement("a");
