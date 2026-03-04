@@ -810,6 +810,22 @@
                     noteEl.className = "mt-2 text-xs text-green-300 italic whitespace-pre-line";
                     noteEl.textContent = rhyme;
                     wrapper.appendChild(noteEl);
+
+                    // Explicit play button so audio is guaranteed to be user-initiated
+                    const audioBtn = document.createElement("button");
+                    audioBtn.className =
+                        "mt-2 px-3 py-1 rounded border border-green-400 text-green-300 text-[10px] uppercase tracking-widest hover:bg-green-400 hover:text-black transition-colors";
+                    audioBtn.textContent = "Play briefing audio";
+
+                    audioBtn.addEventListener("click", () => {
+                        const dossierAudio = document.getElementById("dossierAudio");
+                        if (dossierAudio) {
+                            dossierAudio.currentTime = 0;
+                            dossierAudio.play().catch(() => {});
+                        }
+                    });
+
+                    wrapper.appendChild(audioBtn);
                 }
             }
 
