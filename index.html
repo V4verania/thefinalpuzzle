@@ -272,6 +272,7 @@
     <audio id="authAudio" src="auth.mp3" preload="auto"></audio>
     <audio id="nextAudio" src="nextriddle.mp3" preload="auto"></audio>
     <audio id="rsvpAudio" src="rsvpconfirm.mp3" preload="auto"></audio>
+    <audio id="dossierAudio" src="dossier-reveal.mp3" preload="auto"></audio>
 
     <!-- 3D BACKGROUND -->
     <div id="canvas-container"></div>
@@ -351,8 +352,8 @@
         /* global THREE, lucide */
 
         // --- CONFIGURATION ---
-        const WORKER_URL = "https://thefinalpuzzle-worker.thefinalpuzzle.workers.dev";
-        const REVEAL_DATE = new Date("2026-04-01T00:00:00Z");
+        const WORKER_URL = "https://thefinalpuzzle-worker-test.thefinalpuzzle.workers.dev";
+        const REVEAL_DATE = new Date("2026-03-01T00:00:00Z");
         const TOTAL_STEPS = 3;
 
         // --- STATE ---
@@ -734,7 +735,7 @@
             scrollToBottom();
         }
 
-        // NEW: safer dossier renderer + PDF link + murderer note
+        // dossier renderer + PDF link + murderer note
         function appendDossier(outputEl, rsvpData, guestCode) {
             const wrapper = document.createElement("div");
             wrapper.className = "border-l-4 border-green-500 pl-4 py-2 mt-4 bg-green-900/5";
@@ -743,13 +744,6 @@
             titleEl.className = "font-bold";
             titleEl.textContent = `YOUR NAME: ${rsvpData.dossier}`;
 
-            // Location is provided by the Worker only after a valid code + reveal
-            if (rsvpData.location) {
-                const locEl = document.createElement("p");
-                locEl.className = "mt-1 text-sm text-green-200";
-                locEl.textContent = `LOCATION: ${rsvpData.location}`;
-                wrapper.appendChild(locEl);
-            }
 
             const aboutEl = document.createElement("p");
             aboutEl.textContent = `About you: ${rsvpData.name}`;
@@ -762,10 +756,10 @@
             costumeEl.className = "mt-2 text-sm";
             costumeEl.textContent = `Costume Suggestions: ${rsvpData.costume}`;
 
-            // Optional secret
+            // Optional secret note if backend provides isMurderer
             if (typeof rsvpData.isMurderer === "boolean") {
                 if (rsvpData.isMurderer === true) {
-                    
+                    // Murderer: two-step reveal to reduce shoulder-surfing risk
                     const noteWrapper = document.createElement("div");
                     noteWrapper.className = "mt-2 text-xs";
 
@@ -785,6 +779,13 @@
                             "You are the murderer. Do not reveal this to anyone. Keep your dossier secret for now.";
                         revealBtn.remove();
 
+                        // Play dossier audio when the secret is revealed (user-initiated)
+                        const dossierAudio = document.getElementById("dossierAudio");
+                        if (dossierAudio) {
+                            dossierAudio.currentTime = 0;
+                            dossierAudio.play().catch(() => {});
+                        }
+
                         // Auto-hide the secret after a short time (e.g. 10 seconds)
                         setTimeout(() => {
                             noteWrapper.remove();
@@ -795,7 +796,7 @@
                     noteWrapper.appendChild(revealBtn);
                     wrapper.appendChild(noteWrapper);
                 } else {
-
+                    // Non-murderer: give a random cryptic rhyme as a private "secret"
                     const rhymes = [
                         "When whispers fade and candles dim,\nYour truth lies not with blood or sin.\nGuard what you know but play your part,\nFor every secret hides a heart.",
                         "The mask you wear is thin as glass,\nLet questions come and answers pass.\nSpeak half in truth and half in jest,\nAnd let suspicion do the rest.",
@@ -809,6 +810,26 @@
                     noteEl.className = "mt-2 text-xs text-green-300 italic whitespace-pre-line";
                     noteEl.textContent = rhyme;
                     wrapper.appendChild(noteEl);
+
+                    // Explicit play button so audio is guaranteed to be user-initiated
+                    const audioBtn = document.createElement("button");
+                    audioBtn.className =
+                        "px-3 py-1 rounded border border-green-400 text-green-300 text-[10px] uppercase tracking-widest hover:bg-green-400 hover:text-black transition-colors";
+                    audioBtn.textContent = "Play briefing audio";
+
+                    audioBtn.addEventListener("click", () => {
+                        const dossierAudio = document.getElementById("dossierAudio");
+                        if (dossierAudio) {
+                            dossierAudio.currentTime = 0;
+                            dossierAudio.play().catch(() => {});
+                        }
+                    });
+
+                    const audioBtnWrapper = document.createElement("div");
+                    audioBtnWrapper.className = "mt-4 mb-2 flex justify-end";
+                    audioBtnWrapper.appendChild(audioBtn);
+
+                    wrapper.appendChild(audioBtnWrapper);
                 }
             }
 
@@ -960,7 +981,7 @@
 
             const locationText = rsvpData.location
                 ? `at ${rsvpData.location}.`
-                : "at a concealed location revealed only for confirmed guests.";
+                : "at a concealed location revealed only in your personal dossier.";
             
             const dossierHTML = `<div class="border border-green-500 p-4 bg-green-900/10 mt-4 mb-4"><h2 class="text-xl font-bold mb-2 underline decoration-green-500">CONGRATULATIONS ON COMPLETING THE PUZZLE</h2><p>The Archivist, on behalf of Elena Brookwood, invites you to join us ${locationText}</p><p>DATE: Saturday, 16th May 2026, 1930 Hours</p><p>YOUR HOST: Elena Brookwood</p><p><p>WHO WILL I BE?</p><p>While you wait for the dossier below to reveal who you will be, please scan the QR code. 
  Join in the chatter, don't forget to RSVP with any dietary requirements.</p><div class="mt-4 border border-green-900 p-2 inline-block">
@@ -975,7 +996,7 @@
             if (rsvpData.confirmed) {
                 await print(`>> RSVP STATUS: CONFIRMED.`, "text-green font-bold");
                 if (isRevealed && rsvpData.dossier) {
-                    
+                    // Use DOM nodes instead of innerHTML for the character dossier
                     appendDossier(output, rsvpData, state.guestCode);
                 } else {
                     const daysLeft = Math.ceil((REVEAL_DATE - now) / (1000 * 60 * 60 * 24));
@@ -1030,6 +1051,15 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
     </script>
+
+    <!-- Social link footer -->
+    <div class="fixed bottom-3 right-3 z-40 flex items-center gap-2 text-xs text-green-700">
+        <a href="https://x.com/thefinalpuzzle" target="_blank" rel="noopener"
+           class="flex items-center gap-1 px-2 py-1 border border-green-700/60 rounded-full bg-black/40 hover:bg-black/70 transition-colors">
+            <i data-lucide="twitter" class="w-3 h-3"></i>
+            <span>@thefinalpuzzle</span>
+        </a>
+    </div>
 
 </body>
 </html>
