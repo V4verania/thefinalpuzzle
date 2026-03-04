@@ -814,7 +814,7 @@
                     // Explicit play button so audio is guaranteed to be user-initiated
                     const audioBtn = document.createElement("button");
                     audioBtn.className =
-                        "mt-2 px-3 py-1 rounded border border-green-400 text-green-300 text-[10px] uppercase tracking-widest hover:bg-green-400 hover:text-black transition-colors";
+                        "px-3 py-1 rounded border border-green-400 text-green-300 text-[10px] uppercase tracking-widest hover:bg-green-400 hover:text-black transition-colors";
                     audioBtn.textContent = "Play briefing audio";
 
                     audioBtn.addEventListener("click", () => {
@@ -825,7 +825,11 @@
                         }
                     });
 
-                    wrapper.appendChild(audioBtn);
+                    const audioBtnWrapper = document.createElement("div");
+                    audioBtnWrapper.className = "mt-4 mb-2 flex justify-end";
+                    audioBtnWrapper.appendChild(audioBtn);
+
+                    wrapper.appendChild(audioBtnWrapper);
                 }
             }
 
