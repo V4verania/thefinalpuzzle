@@ -762,10 +762,10 @@
             costumeEl.className = "mt-2 text-sm";
             costumeEl.textContent = `Costume Suggestions: ${rsvpData.costume}`;
 
-            // Optional secret note if backend provides isMurderer
+            // Optional secret
             if (typeof rsvpData.isMurderer === "boolean") {
                 if (rsvpData.isMurderer === true) {
-                    // Murderer: two-step reveal to reduce shoulder-surfing risk
+                    
                     const noteWrapper = document.createElement("div");
                     noteWrapper.className = "mt-2 text-xs";
 
@@ -795,7 +795,7 @@
                     noteWrapper.appendChild(revealBtn);
                     wrapper.appendChild(noteWrapper);
                 } else {
-                    // Non-murderer: give a random cryptic rhyme as a private "secret"
+
                     const rhymes = [
                         "When whispers fade and candles dim,\nYour truth lies not with blood or sin.\nGuard what you know but play your part,\nFor every secret hides a heart.",
                         "The mask you wear is thin as glass,\nLet questions come and answers pass.\nSpeak half in truth and half in jest,\nAnd let suspicion do the rest.",
@@ -975,7 +975,7 @@
             if (rsvpData.confirmed) {
                 await print(`>> RSVP STATUS: CONFIRMED.`, "text-green font-bold");
                 if (isRevealed && rsvpData.dossier) {
-                    // Use DOM nodes instead of innerHTML for the character dossier
+                    
                     appendDossier(output, rsvpData, state.guestCode);
                 } else {
                     const daysLeft = Math.ceil((REVEAL_DATE - now) / (1000 * 60 * 60 * 24));

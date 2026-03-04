@@ -272,6 +272,7 @@
     <audio id="authAudio" src="auth.mp3" preload="auto"></audio>
     <audio id="nextAudio" src="nextriddle.mp3" preload="auto"></audio>
     <audio id="rsvpAudio" src="rsvpconfirm.mp3" preload="auto"></audio>
+    <audio id="dossierAudio" src="dossier-reveal.mp3" preload="auto"></audio>
 
     <!-- 3D BACKGROUND -->
     <div id="canvas-container"></div>
@@ -734,7 +735,7 @@
             scrollToBottom();
         }
 
-        // NEW: safer dossier renderer + PDF link + murderer note
+        // dossier renderer + PDF link + murderer note
         function appendDossier(outputEl, rsvpData, guestCode) {
             const wrapper = document.createElement("div");
             wrapper.className = "border-l-4 border-green-500 pl-4 py-2 mt-4 bg-green-900/5";
@@ -743,13 +744,6 @@
             titleEl.className = "font-bold";
             titleEl.textContent = `YOUR NAME: ${rsvpData.dossier}`;
 
-            // Location is provided by the Worker only after a valid code + reveal
-  //          if (rsvpData.location) {
-   //             const locEl = document.createElement("p");
-   //             locEl.className = "mt-1 text-sm text-green-200";
-   //             locEl.textContent = `LOCATION: ${rsvpData.location}`;
-   //             wrapper.appendChild(locEl);
-   //         }
 
             const aboutEl = document.createElement("p");
             aboutEl.textContent = `About you: ${rsvpData.name}`;
@@ -784,6 +778,13 @@
                         promptEl.textContent =
                             "You are the murderer. Do not reveal this to anyone. Keep your dossier secret for now.";
                         revealBtn.remove();
+
+                        // Play dossier audio when the secret is revealed (user-initiated)
+                        const dossierAudio = document.getElementById("dossierAudio");
+                        if (dossierAudio) {
+                            dossierAudio.currentTime = 0;
+                            dossierAudio.play().catch(() => {});
+                        }
 
                         // Auto-hide the secret after a short time (e.g. 10 seconds)
                         setTimeout(() => {
